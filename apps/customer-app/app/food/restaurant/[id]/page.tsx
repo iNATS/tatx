@@ -5,8 +5,8 @@ import { Star, Clock, MapPin, Phone, Info, ChevronLeft, ShoppingCart } from 'luc
 import { Button } from '@tatx/ui/button';
 import { Badge } from '@tatx/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@tatx/ui/tabs';
-import { MenuCategory } from '../../components/food/MenuCategory';
-import { CartSummary } from '../../components/food/CartSummary';
+import { MenuCategory } from '../../../components/food/MenuCategory';
+import { CartSummary } from '../../../components/food/CartSummary';
 import Link from 'next/link';
 
 // Mock data
