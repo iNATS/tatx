@@ -1,0 +1,47 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Appetizing food spread background",
+      "imageUrl": "https://picsum.photos/seed/food1/1200/600",
+      "imageHint": "food spread"
+    },
+    {
+      "id": "burger-joint",
+      "description": "Juicy gourmet burger",
+      "imageUrl": "https://picsum.photos/seed/burger/600/400",
+      "imageHint": "gourmet burger"
+    },
+    {
+      "id": "pizza-palace",
+      "description": "Authentic wood-fired pizza",
+      "imageUrl": "https://picsum.photos/seed/pizza/600/400",
+      "imageHint": "fired pizza"
+    },
+    {
+      "id": "sushi-zen",
+      "description": "Fresh premium sushi platter",
+      "imageUrl": "https://picsum.photos/seed/sushi/600/400",
+      "imageHint": "sushi platter"
+    },
+    {
+      "id": "arabic-delight",
+      "description": "Traditional mixed grill and hummus",
+      "imageUrl": "https://picsum.photos/seed/arabic/600/400",
+      "imageHint": "arabic food"
+    },
+    {
+      "id": "healthy-greens",
+      "description": "Fresh vibrant salad bowl",
+      "imageUrl": "https://picsum.photos/seed/salad/600/400",
+      "imageHint": "salad bowl"
+    },
+    {
+      "id": "pasta-perfection",
+      "description": "Creamy italian pasta dish",
+      "imageUrl": "https://picsum.photos/seed/pasta/600/400",
+      "imageHint": "italian pasta"
+    }
+  ]
+}
