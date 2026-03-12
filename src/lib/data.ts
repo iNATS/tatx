@@ -1,141 +1,121 @@
-
-export interface Restaurant {
+export interface Provider {
   id: string;
   name: string;
-  cuisine: string;
+  description: string;
   rating: number;
-  deliveryTime: string;
-  minOrder: number;
+  deliveryTime?: string;
+  minOrder?: number;
   image: string;
   category: string;
+  isPopular?: boolean;
 }
 
 export interface MenuItem {
   id: string;
-  restaurantId: string;
+  providerId: string;
   name: string;
   description: string;
   price: number;
   image: string;
   category: string;
+  isFeatured?: boolean;
 }
 
-export const RESTAURANTS: Restaurant[] = [
+export const CATEGORIES = [
+  { id: 'food', name: 'طعام', icon: 'Utensils' },
+  { id: 'taxi', name: 'تاكسي', icon: 'Car' },
+  { id: 'services', name: 'خدمات', icon: 'Wrench' },
+  { id: 'halls', name: 'قاعات', icon: 'PartyPopper' },
+  { id: 'chalets', name: 'شاليهات', icon: 'Home' },
+  { id: 'market', name: 'ماركت', icon: 'Store' },
+  { id: 'pharmacy', name: 'صيدلية', icon: 'Pill' },
+];
+
+export const PROVIDERS: Provider[] = [
   {
     id: '1',
-    name: 'Burger Craft',
-    cuisine: 'Burgers, American',
+    name: 'برجر كرافت',
+    description: 'أفضل أنواع البرجر المشوي على اللهب',
     rating: 4.8,
-    deliveryTime: '25-35 min',
+    deliveryTime: '25-35 دقيقة',
     minOrder: 20,
     image: 'https://picsum.photos/seed/burger/600/400',
-    category: 'Burgers'
+    category: 'food',
+    isPopular: true
   },
   {
     id: '2',
-    name: 'Pizza Romana',
-    cuisine: 'Pizza, Italian',
-    rating: 4.6,
-    deliveryTime: '30-45 min',
-    minOrder: 30,
-    image: 'https://picsum.photos/seed/pizza/600/400',
-    category: 'Pizza'
+    name: 'كابتن تاتكس',
+    description: 'توصيل سريع وآمن في جميع أنحاء المدينة',
+    rating: 4.9,
+    image: 'https://picsum.photos/seed/taxi/600/400',
+    category: 'taxi',
+    isPopular: true
   },
   {
     id: '3',
-    name: 'Sushi Zen',
-    cuisine: 'Sushi, Japanese',
-    rating: 4.9,
-    deliveryTime: '35-50 min',
-    minOrder: 50,
-    image: 'https://picsum.photos/seed/sushi/600/400',
-    category: 'Sushi'
+    name: 'قاعة الزمردة',
+    description: 'أفخم القاعات لمناسباتكم السعيدة',
+    rating: 4.7,
+    image: 'https://picsum.photos/seed/hall/600/400',
+    category: 'halls'
   },
   {
     id: '4',
-    name: 'Arabic Nights',
-    cuisine: 'Middle Eastern, Grill',
-    rating: 4.7,
-    deliveryTime: '20-30 min',
-    minOrder: 25,
-    image: 'https://picsum.photos/seed/arabic/600/400',
-    category: 'Arabic'
+    name: 'شاليه لافندر',
+    description: 'استرخاء وهدوء مع مسبح خاص',
+    rating: 4.6,
+    image: 'https://picsum.photos/seed/chalet/600/400',
+    category: 'chalets'
   },
   {
     id: '5',
-    name: 'Green Bowl',
-    cuisine: 'Healthy, Salad',
+    name: 'ماركت تاتكس',
+    description: 'كل احتياجاتك المنزلية في مكان واحد',
     rating: 4.5,
-    deliveryTime: '15-25 min',
-    minOrder: 15,
-    image: 'https://picsum.photos/seed/salad/600/400',
-    category: 'Healthy'
+    image: 'https://picsum.photos/seed/market/600/400',
+    category: 'market'
   },
   {
     id: '6',
-    name: 'Pasta Lab',
-    cuisine: 'Italian, Pasta',
-    rating: 4.6,
-    deliveryTime: '30-40 min',
-    minOrder: 25,
-    image: 'https://picsum.photos/seed/pasta/600/400',
-    category: 'Italian'
+    name: 'صيدلية الشفاء',
+    description: 'رعاية صحية وتوصيل سريع للأدوية',
+    rating: 4.9,
+    image: 'https://picsum.photos/seed/pharmacy/600/400',
+    category: 'pharmacy',
+    isPopular: true
   }
 ];
 
-export const MENU_ITEMS: MenuItem[] = [
+export const FEATURED_ITEMS: MenuItem[] = [
   {
-    id: 'm1',
-    restaurantId: '1',
-    name: 'The Classic Beast',
-    description: 'Double beef patty, cheddar, secret sauce, caramelized onions.',
-    price: 12.99,
-    image: 'https://picsum.photos/seed/m1/400/300',
-    category: 'Burgers'
+    id: 'f1',
+    providerId: '1',
+    name: 'وجبة البرجر الكلاسيكي',
+    description: 'قطعة لحم فاخرة مع الجبن والخضروات الطازجة',
+    price: 35,
+    image: 'https://picsum.photos/seed/f1/400/300',
+    category: 'food',
+    isFeatured: true
   },
   {
-    id: 'm2',
-    restaurantId: '1',
-    name: 'Spicy Chicken Fire',
-    description: 'Crispy chicken breast, jalapeños, habanero mayo, slaw.',
-    price: 10.99,
-    image: 'https://picsum.photos/seed/m2/400/300',
-    category: 'Burgers'
+    id: 'f2',
+    providerId: '5',
+    name: 'صندوق الفواكه الطازجة',
+    description: 'تشكيلة مختارة من فواكه الموسم',
+    price: 45,
+    image: 'https://picsum.photos/seed/f2/400/300',
+    category: 'market',
+    isFeatured: true
   },
   {
-    id: 'm3',
-    restaurantId: '1',
-    name: 'Truffle Fries',
-    description: 'Golden fries tossed in truffle oil and parmesan.',
-    price: 5.99,
-    image: 'https://picsum.photos/seed/m3/400/300',
-    category: 'Sides'
-  },
-  {
-    id: 'm4',
-    restaurantId: '2',
-    name: 'Margherita Dream',
-    description: 'San Marzano tomatoes, fresh mozzarella, basil, olive oil.',
-    price: 14.50,
-    image: 'https://picsum.photos/seed/m4/400/300',
-    category: 'Pizza'
-  },
-  {
-    id: 'm5',
-    restaurantId: '2',
-    name: 'Spicy Salami',
-    description: 'Italian pepperoni, chili honey, mozzarella.',
-    price: 16.50,
-    image: 'https://picsum.photos/seed/m5/400/300',
-    category: 'Pizza'
-  },
-  {
-    id: 'm6',
-    restaurantId: '4',
-    name: 'Mixed Grill Platter',
-    description: 'Lamb chops, chicken tawook, beef kebab, grilled vegetables.',
-    price: 24.00,
-    image: 'https://picsum.photos/seed/m6/400/300',
-    category: 'Main Courses'
+    id: 'f3',
+    providerId: '2',
+    name: 'رحلة داخل المدينة',
+    description: 'توصيل مريح إلى أي نقطة في الرياض',
+    price: 25,
+    image: 'https://picsum.photos/seed/f3/400/300',
+    category: 'taxi',
+    isFeatured: true
   }
 ];
