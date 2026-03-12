@@ -290,3 +290,4 @@ coverage/
 # Temporary files
 tmp/
 temp/
+.md

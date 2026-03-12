@@ -1,0 +1,130 @@
+// Tatx Platform - Minimal Prisma Schema for Deployment
+// This is a simplified version without complex relations
+// Use this for quick deployment testing
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Simplified User model
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  phone         String   @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          String   @default("CUSTOMER")
+  emailVerified Boolean  @default(false)
+  phoneVerified Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([email])
+  @@index([phone])
+}
+
+// Simplified Customer
+model Customer {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Simplified Driver
+model Driver {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  status    String   @default("OFFLINE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Simplified Restaurant
+model Restaurant {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Simplified MenuItem
+model MenuItem {
+  id          String   @id @default(cuid())
+  name        String
+  price       Decimal
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Simplified Order
+model Order {
+  id          String   @id @default(cuid())
+  status      String   @default("PENDING")
+  total       Decimal
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Simplified Ride
+model Ride {
+  id        String   @id @default(cuid())
+  status    String   @default("REQUESTED")
+  totalFare Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Simplified Payment
+model Payment {
+  id     String   @id @default(cuid())
+  amount Decimal
+  status String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Simplified Wallet
+model Wallet {
+  id      String   @id @default(cuid())
+  balance Decimal  @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Simplified Notification
+model Notification {
+  id      String   @id @default(cuid())
+  message String
+  status  String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Simplified Review
+model Review {
+  id      String   @id @default(cuid())
+  rating  Int
+  comment String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Simplified Admin
+model Admin {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  permissions String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
