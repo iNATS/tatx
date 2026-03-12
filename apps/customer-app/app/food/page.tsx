@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Filter, Star, Clock, MapPin, ChevronRight } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Button } from '@tatx/ui/button';
 import { Input } from '@tatx/ui/input';
-import { Card, CardContent } from '@tatx/ui/card';
-import { Badge } from '@tatx/ui/badge';
 import { RestaurantCard } from '../../components/food/RestaurantCard';
 import { RestaurantFilters } from '../../components/food/RestaurantFilters';
 import { CuisineSelector } from '../../components/food/CuisineSelector';

@@ -2,7 +2,7 @@
  * Payment and financial types
  */
 
-import { Currency, Money } from './common';
+import { Currency, Money, ServiceType } from './common';
 
 // ===========================================
 // Payment Types
@@ -268,22 +268,7 @@ export interface PaymentWebhookEvent {
 // ===========================================
 // Pricing Types
 // ===========================================
-
-export interface PricingConfig {
-  ride: RidePricing;
-  delivery: DeliveryPricing;
-  service: ServicePricing;
-}
-
-export interface RidePricing {
-  baseFare: number;
-  perKmRate: number;
-  perMinuteRate: number;
-  minimumFare: number;
-  cancellationFee: number;
-  bookingFee: number;
-  surgeMultiplier: number;
-}
+// Note: PricingConfig is exported from ride.ts
 
 export interface DeliveryPricing {
   baseFee: number;
@@ -339,7 +324,7 @@ export interface PromoCode {
 
 export type PromoType = 'PERCENTAGE' | 'FIXED';
 
-export type ServiceType = 'RIDE' | 'FOOD_DELIVERY' | 'PACKAGE_DELIVERY';
+// Note: ServiceType is exported from common.ts
 
 export interface ApplyPromoRequest {
   code: string;

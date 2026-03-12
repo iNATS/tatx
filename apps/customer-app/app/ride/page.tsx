@@ -25,7 +25,6 @@ import {
 import {
   ArrowLeft,
   MapPin,
-  Clock,
   User,
   Phone,
   Calendar,
@@ -95,7 +94,7 @@ const MOCK_RECENT_LOCATIONS: LocationSuggestion[] = [
   {
     id: 'r1',
     address: 'Dubai Mall, Downtown Dubai',
-    name: 'Dubai Mall',
+    
     latitude: 25.1972,
     longitude: 55.2794,
     type: 'place',
@@ -103,7 +102,7 @@ const MOCK_RECENT_LOCATIONS: LocationSuggestion[] = [
   {
     id: 'r2',
     address: 'Dubai International Airport, Terminal 3',
-    name: 'DXB Airport T3',
+    
     latitude: 25.2532,
     longitude: 55.3657,
     type: 'place',
@@ -181,13 +180,11 @@ const MOCK_RIDE_HISTORY: RideHistoryItem[] = [
       address: '123 Marina Street, Dubai Marina',
       latitude: 25.0805,
       longitude: 55.1396,
-      name: 'Home',
     },
     dropoff: {
       address: 'Dubai Mall, Downtown Dubai',
       latitude: 25.1972,
       longitude: 55.2794,
-      name: 'Dubai Mall',
     },
     fare: 24.5,
     date: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
@@ -202,13 +199,13 @@ const MOCK_RIDE_HISTORY: RideHistoryItem[] = [
       address: '456 Business Bay Boulevard',
       latitude: 25.1872,
       longitude: 55.2674,
-      name: 'Work',
+      
     },
     dropoff: {
       address: '789 JBR Walk, Jumeirah Beach Residence',
       latitude: 25.0785,
       longitude: 55.1329,
-      name: 'Gym',
+      
     },
     fare: 18.75,
     date: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
@@ -223,13 +220,13 @@ const MOCK_RIDE_HISTORY: RideHistoryItem[] = [
       address: 'Dubai International Airport',
       latitude: 25.2532,
       longitude: 55.3657,
-      name: 'DXB Airport',
+      
     },
     dropoff: {
       address: '123 Marina Street, Dubai Marina',
       latitude: 25.0805,
       longitude: 55.1396,
-      name: 'Home',
+      
     },
     fare: 45.0,
     date: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
@@ -420,7 +417,6 @@ export default function RideBookingPage() {
         address: address.address,
         latitude: address.latitude,
         longitude: address.longitude,
-        name: address.label,
       };
 
       setForm((prev) => ({
@@ -519,7 +515,7 @@ export default function RideBookingPage() {
                         setForm((prev) => ({ ...prev, pickup: location }))
                       }
                       recentLocations={MOCK_RECENT_LOCATIONS}
-                      savedLocations={MOCK_SAVED_ADDRESSES}
+                      savedLocations={MOCK_SAVED_ADDRESSES as any}
                       icon={<MapPin className="h-5 w-5 text-brand-600" />}
                     />
 
@@ -546,7 +542,7 @@ export default function RideBookingPage() {
                         setForm((prev) => ({ ...prev, dropoff: location }))
                       }
                       recentLocations={MOCK_RECENT_LOCATIONS}
-                      savedLocations={MOCK_SAVED_ADDRESSES}
+                      savedLocations={MOCK_SAVED_ADDRESSES as any}
                       icon={<MapPin className="h-5 w-5 text-green-600" />}
                     />
 

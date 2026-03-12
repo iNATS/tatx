@@ -41,13 +41,7 @@ export interface Ride {
   updatedAt: Date;
 }
 
-export interface Location {
-  address: string;
-  latitude: number;
-  longitude: number;
-  name?: string;
-  instructions?: string;
-}
+// Note: Location is exported from common.ts
 
 export interface Route {
   distance: number; // in km

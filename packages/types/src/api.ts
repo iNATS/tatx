@@ -208,18 +208,7 @@ export interface VehicleResponse {
 // ===========================================
 // Ride API Types
 // ===========================================
-
-export interface CreateRideRequest {
-  pickupAddress: string;
-  pickupLatitude: number;
-  pickupLongitude: number;
-  dropoffAddress: string;
-  dropoffLatitude: number;
-  dropoffLongitude: number;
-  vehicleType?: string;
-  scheduledAt?: Date;
-  paymentMethod?: string;
-}
+// Note: CreateRideRequest is now exported from ride.ts
 
 export interface EstimateRideRequest {
   pickupLatitude: number;
@@ -232,11 +221,11 @@ export interface EstimateRideRequest {
 export interface EstimateRideResponse {
   distance: number;
   duration: number;
-  fare: FareEstimate;
+  fare: ApiFareEstimate;
   surgeMultiplier: number;
 }
 
-export interface FareEstimate {
+export interface ApiFareEstimate {
   baseFare: number;
   distanceFare: number;
   timeFare: number;
@@ -280,7 +269,7 @@ export interface RideResponse {
   pickup: LocationResponse;
   dropoff: LocationResponse;
   vehicleType: string;
-  fare: FareEstimate;
+  fare: ApiFareEstimate;
   finalFare?: number;
   scheduledAt?: Date;
   startedAt?: Date;
@@ -429,19 +418,10 @@ export interface SearchRestaurantsRequest extends PaginationParams {
   longitude?: number;
   radius?: number;
 }
-
 // ===========================================
 // Order API Types
 // ===========================================
-
-export interface CreateOrderRequest {
-  restaurantId: string;
-  items: OrderItemRequest[];
-  orderType?: 'DELIVERY' | 'PICKUP';
-  deliveryAddress?: Address;
-  customerNotes?: string;
-  paymentMethod: string;
-}
+// Note: CreateOrderRequest is exported from food.ts
 
 export interface OrderItemRequest {
   menuItemId: string;

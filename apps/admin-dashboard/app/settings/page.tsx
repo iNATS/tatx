@@ -48,6 +48,8 @@ import {
   Trash2,
   Edit,
   CheckCircle,
+  ShoppingBag,
+  Download,
 } from 'lucide-react';
 
 interface PricingTier {

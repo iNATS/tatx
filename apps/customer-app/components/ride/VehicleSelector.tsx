@@ -6,16 +6,19 @@ import { Button } from '@tatx/ui/components/button';
 import { Badge } from '@tatx/ui/components/badge';
 import {
   Car,
-  CarSide,
   Star,
   Users,
-  Motorcycle,
   Zap,
   Clock,
   User,
   Briefcase,
   Flame,
+  Bike,
 } from 'lucide-react';
+
+// Fallback icons for missing lucide-react exports
+const CarSide = Car;
+const Motorcycle = Bike;
 import { cn } from '@tatx/ui/utils/cn';
 import type { VehicleOption, VehicleSelectorProps } from '@/types/ride-booking';
 

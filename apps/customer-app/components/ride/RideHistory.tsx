@@ -163,6 +163,7 @@ export function RideHistory({
                 formatTime={formatTime}
                 formatPrice={formatPrice}
                 getStatusBadge={getStatusBadge}
+                getVehicleIcon={getVehicleIcon}
                 onRebook={onRebook}
                 onViewDetails={onViewDetails}
               />
@@ -184,6 +185,7 @@ function RideHistoryCard({
   formatTime,
   formatPrice,
   getStatusBadge,
+  getVehicleIcon,
   onRebook,
   onViewDetails,
 }: {
@@ -192,6 +194,7 @@ function RideHistoryCard({
   formatTime: (date: Date) => string;
   formatPrice: (amount: number) => string;
   getStatusBadge: (status: RideStatusType) => React.ReactNode;
+  getVehicleIcon: () => React.ReactNode;
   onRebook?: (ride: RideHistoryItem) => void;
   onViewDetails?: (ride: RideHistoryItem) => void;
 }) {
@@ -239,7 +242,7 @@ function RideHistoryCard({
                 Pickup
               </p>
               <p className="text-sm font-medium text-gray-900 truncate">
-                {ride.pickup.name || ride.pickup.address}
+                {ride.pickup.address || ride.pickup.address}
               </p>
             </div>
           </div>
@@ -253,7 +256,7 @@ function RideHistoryCard({
                 Dropoff
               </p>
               <p className="text-sm font-medium text-gray-900 truncate">
-                {ride.dropoff.name || ride.dropoff.address}
+                {ride.dropoff.address || ride.dropoff.address}
               </p>
             </div>
           </div>

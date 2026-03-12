@@ -249,27 +249,7 @@ export interface DeliveryEstimate {
 // ===========================================
 // Merchant Types
 // ===========================================
-
-export interface Merchant {
-  id: string;
-  userId: string;
-  businessName: string;
-  businessType: string;
-  taxId?: string;
-  phone: string;
-  email: string;
-  logo?: string;
-  banner?: string;
-  description?: string;
-  isActive: boolean;
-  verifiedAt?: Date;
-  rating: number;
-  totalOrders: number;
-  commissionRate: number;
-  restaurants: Restaurant[];
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Note: Merchant is exported from common.ts
 
 export interface MerchantDashboard {
   totalRestaurants: number;

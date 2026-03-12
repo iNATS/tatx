@@ -42,7 +42,7 @@ export function RestaurantFilters({ filters, onFiltersChange }: RestaurantFilter
           min={0}
           max={5}
           step={0.5}
-          onValueChange={(value) => onFiltersChange({ ...filters, minRating: value[0] })}
+          onValueChange={(value) => onFiltersChange({ ...filters, minRating: value[0] || 0 })}
           className="w-full"
         />
         <div className="flex justify-between text-xs text-gray-500">
@@ -63,7 +63,7 @@ export function RestaurantFilters({ filters, onFiltersChange }: RestaurantFilter
           min={15}
           max={90}
           step={5}
-          onValueChange={(value) => onFiltersChange({ ...filters, maxDeliveryTime: value[0] })}
+          onValueChange={(value) => onFiltersChange({ ...filters, maxDeliveryTime: value[0] || 0 })}
           className="w-full"
         />
         <div className="flex justify-between text-xs text-gray-500">
@@ -84,7 +84,7 @@ export function RestaurantFilters({ filters, onFiltersChange }: RestaurantFilter
           min={0}
           max={20}
           step={1}
-          onValueChange={(value) => onFiltersChange({ ...filters, maxDeliveryFee: value[0] })}
+          onValueChange={(value) => onFiltersChange({ ...filters, maxDeliveryFee: value[0] || 0 })}
           className="w-full"
         />
         <div className="flex justify-between text-xs text-gray-500">

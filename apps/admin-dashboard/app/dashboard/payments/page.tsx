@@ -64,13 +64,13 @@ const paymentMethodData = [
 ];
 
 const revenueData = [
-  { date: 'Mon', revenue: 45200, commission: 6780, refunds: 450 },
-  { date: 'Tue', revenue: 52300, commission: 7845, refunds: 320 },
-  { date: 'Wed', revenue: 61500, commission: 9225, refunds: 580 },
-  { date: 'Thu', revenue: 48900, commission: 7335, refunds: 290 },
-  { date: 'Fri', revenue: 78500, commission: 11775, refunds: 720 },
-  { date: 'Sat', revenue: 89200, commission: 13380, refunds: 650 },
-  { date: 'Sun', revenue: 72100, commission: 10815, refunds: 480 },
+  { date: 'Mon', revenue: 45200, commission: 6780, driverEarnings: 45200 - 6780 },
+  { date: 'Tue', revenue: 52300, commission: 7845, driverEarnings: 52300 - 7845 },
+  { date: 'Wed', revenue: 61500, commission: 9225, driverEarnings: 61500 - 9225 },
+  { date: 'Thu', revenue: 48900, commission: 7335, driverEarnings: 48900 - 7335 },
+  { date: 'Fri', revenue: 78500, commission: 11775, driverEarnings: 78500 - 11775 },
+  { date: 'Sat', revenue: 89200, commission: 13380, driverEarnings: 89200 - 13380 },
+  { date: 'Sun', revenue: 72100, commission: 10815, driverEarnings: 72100 - 10815 },
 ];
 
 const allPayments = [

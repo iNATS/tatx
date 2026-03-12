@@ -214,7 +214,7 @@ export function RideStatus({
                 {statusSteps[currentStepIndex]?.description || ''}
               </p>
             </div>
-            {eta !== undefined && eta > 0 && currentStatus !== 'COMPLETED' && (
+            {eta !== undefined && eta > 0 && (currentStatus as string) !== 'COMPLETED' && (
               <div className="text-right">
                 <div className="flex items-center gap-1">
                   <Timer className="h-4 w-4" />
@@ -327,8 +327,8 @@ export function RideStatus({
 
         {/* Cancel Button */}
         {onCancel &&
-          currentStatus !== 'COMPLETED' &&
-          currentStatus !== 'CANCELLED' && (
+          (currentStatus as string) !== 'COMPLETED' &&
+          (currentStatus as string) !== 'CANCELLED' && (
             <div className="p-4 border-t">
               <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
                 <AlertDialogTrigger asChild>

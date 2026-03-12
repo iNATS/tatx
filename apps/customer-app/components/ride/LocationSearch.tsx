@@ -122,10 +122,9 @@ export function LocationSearch({
         address: suggestion.address,
         latitude: suggestion.latitude,
         longitude: suggestion.longitude,
-        name: suggestion.name || suggestion.address,
       };
       onChange(location);
-      setQuery(suggestion.name || suggestion.address);
+      setQuery(suggestion.address || suggestion.address);
       setIsOpen(false);
     },
     [onChange]
@@ -183,7 +182,7 @@ export function LocationSearch({
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-gray-900 truncate">
-          {suggestion.name || suggestion.address}
+          {suggestion.address || suggestion.address}
         </p>
         <p className="text-sm text-gray-500 truncate">{suggestion.address}</p>
         {suggestion.savedLabel && (

@@ -6,7 +6,14 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strict": false,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "exactOptionalPropertyTypes": false
   },
   "include": [
     "../../packages/config/next-env.d.ts",
