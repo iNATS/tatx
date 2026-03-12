@@ -36,6 +36,9 @@ COPY apps/customer-app/package.json ./apps/customer-app/
 
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
+# Create necessary directories if they don't exist
+RUN mkdir -p ./packages/types/dist ./packages/utils/dist ./packages/ui/dist ./apps/customer-app/public
+
 COPY --from=builder /app/packages/types/dist ./packages/types/dist
 COPY --from=builder /app/packages/utils/dist ./packages/utils/dist
 COPY --from=builder /app/packages/ui/dist ./packages/ui/dist

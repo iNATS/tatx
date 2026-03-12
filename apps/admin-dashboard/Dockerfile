@@ -21,6 +21,10 @@ COPY packages/utils/package.json ./packages/utils/
 COPY packages/config/package.json ./packages/config/
 COPY apps/admin-dashboard/package.json ./apps/admin-dashboard/
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+
+# Create necessary directories if they don't exist
+RUN mkdir -p ./packages/types/dist ./packages/utils/dist ./packages/ui/dist
+
 COPY --from=builder /app/packages/types/dist ./packages/types/dist
 COPY --from=builder /app/packages/utils/dist ./packages/utils/dist
 COPY --from=builder /app/packages/ui/dist ./packages/ui/dist
