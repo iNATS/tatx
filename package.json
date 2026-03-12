@@ -48,5 +48,10 @@
     "*.{json,md}": [
       "prettier --write"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      
+    }
   }
 }

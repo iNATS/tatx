@@ -7,7 +7,7 @@ COPY packages/types/package.json ./packages/types/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/config/package.json ./packages/config/
 COPY services/admin-service/package.json ./services/admin-service/
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY . .
 RUN pnpm --filter @tatx/database build && pnpm --filter @tatx/types build && pnpm --filter @tatx/utils build && pnpm --filter @tatx/config build && pnpm --filter @tatx/admin-service build
 
@@ -20,7 +20,7 @@ COPY packages/types/package.json ./packages/types/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/config/package.json ./packages/config/
 COPY services/admin-service/package.json ./services/admin-service/
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 COPY --from=builder /app/packages/database/dist ./packages/database/dist
 COPY --from=builder /app/packages/types/dist ./packages/types/dist
 COPY --from=builder /app/packages/utils/dist ./packages/utils/dist
