@@ -1,0 +1,86 @@
+version: '3.8'
+
+# Simple deployment for testing - NOT FOR PRODUCTION
+# Use docker-compose.prod.yml for production
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tatx-postgres
+    environment:
+      POSTGRES_USER: tatx
+      POSTGRES_PASSWORD: tatx_password_123
+      POSTGRES_DB: tatx_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - tatx-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tatx"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tatx-redis
+    command: redis-server --requirepass tatx_redis_password
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - tatx-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "tatx_redis_password", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  customer-app:
+    build:
+      context: .
+      dockerfile: apps/customer-app/Dockerfile
+    container_name: tatx-customer-app
+    environment:
+      - NODE_ENV=production
+      - PORT=3100
+      - DATABASE_URL=postgresql://tatx:tatx_password_123@postgres:5432/tatx_db
+      - REDIS_URL=redis://:tatx_redis_password@redis:6379
+    ports:
+      - "3100:3100"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-net
+    restart: unless-stopped
+
+  admin-dashboard:
+    build:
+      context: .
+      dockerfile: apps/admin-dashboard/Dockerfile
+    container_name: tatx-admin-dashboard
+    environment:
+      - NODE_ENV=production
+      - PORT=3103
+    ports:
+      - "3103:3103"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - tatx-net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  tatx-net:
+    driver: bridge

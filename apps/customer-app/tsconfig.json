@@ -3,7 +3,16 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
-  }
+  },
+  "include": [
+    "../../packages/config/next-env.d.ts",
+    "../../packages/config/**/*.ts",
+    "../../packages/config/**/*.tsx",
+    "../../packages/config/.next/types/**/*.ts",
+    ".next/types/**/*.ts"
+  ]
 }
