@@ -1,0 +1,60 @@
+import { registerEnumType } from '@nestjs/swagger';
+
+export enum RideStatus {
+  REQUESTED = 'REQUESTED',
+  SEARCHING_DRIVER = 'SEARCHING_DRIVER',
+  DRIVER_ASSIGNED = 'DRIVER_ASSIGNED',
+  DRIVER_ARRIVED = 'DRIVER_ARRIVED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  NO_DRIVERS_FOUND = 'NO_DRIVERS_FOUND',
+}
+
+export enum VehicleType {
+  ECONOMY = 'ECONOMY',
+  COMFORT = 'COMFORT',
+  PREMIUM = 'PREMIUM',
+  LUXURY = 'LUXURY',
+  VAN = 'VAN',
+  MOTORCYCLE = 'MOTORCYCLE',
+}
+
+export enum RideCategory {
+  REGULAR = 'REGULAR',
+  EXPRESS = 'EXPRESS',
+  SCHEDULED = 'SCHEDULED',
+  SHARED = 'SHARED',
+  BUSINESS = 'BUSINESS',
+  FAMILY = 'FAMILY',
+}
+
+export enum PaymentMethod {
+  CREDIT_CARD = 'CREDIT_CARD',
+  DEBIT_CARD = 'DEBIT_CARD',
+  CASH = 'CASH',
+  WALLET = 'WALLET',
+  APPLE_PAY = 'APPLE_PAY',
+  GOOGLE_PAY = 'GOOGLE_PAY',
+  MADA = 'MADA',
+  STC_PAY = 'STC_PAY',
+}
+
+export enum CancellationReason {
+  DRIVER_DELAYED = 'DRIVER_DELAYED',
+  DRIVER_CANCELLED = 'DRIVER_CANCELLED',
+  RIDER_CANCELLED = 'RIDER_CANCELLED',
+  NO_DRIVERS_AVAILABLE = 'NO_DRIVERS_AVAILABLE',
+  INCORRECT_PICKUP = 'INCORRECT_PICKUP',
+  CHANGED_PLANS = 'CHANGED_PLANS',
+  FOUND_OTHER_RIDE = 'FOUND_OTHER_RIDE',
+  WEATHER_CONDITIONS = 'WEATHER_CONDITIONS',
+  OTHER = 'OTHER',
+}
+
+// Register enums for Swagger
+registerEnumType(RideStatus);
+registerEnumType(VehicleType);
+registerEnumType(RideCategory);
+registerEnumType(PaymentMethod);
+registerEnumType(CancellationReason);

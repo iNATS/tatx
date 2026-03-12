@@ -1,0 +1,356 @@
+version: '3.8'
+
+services:
+  # ===========================================
+  # Database Services
+  # ===========================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: tatx-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tatx
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tatx-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: tatx-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tatx-network
+
+  # ===========================================
+  # Message Queue
+  # ===========================================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: tatx-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: tatx
+      RABBITMQ_DEFAULT_PASS: tatx123
+    ports:
+      - "5672:5672"  # AMQP
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - tatx-network
+
+  # ===========================================
+  # Monitoring & Observability
+  # ===========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: tatx-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - tatx-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: tatx-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+    ports:
+      - "3200:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - tatx-network
+
+  # ===========================================
+  # API Gateway (Optional - for production)
+  # ===========================================
+  nginx:
+    image: nginx:alpine
+    container_name: tatx-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - auth-service
+      - user-service
+      - driver-service
+      - ride-service
+      - food-service
+      - order-service
+      - payment-service
+      - notification-service
+      - location-service
+      - admin-service
+    networks:
+      - tatx-network
+
+  # ===========================================
+  # Microservices
+  # ===========================================
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: tatx-auth-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user-service/Dockerfile
+    container_name: tatx-user-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  driver-service:
+    build:
+      context: .
+      dockerfile: services/driver-service/Dockerfile
+    container_name: tatx-driver-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  ride-service:
+    build:
+      context: .
+      dockerfile: services/ride-service/Dockerfile
+    container_name: tatx-ride-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3004:3004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  food-service:
+    build:
+      context: .
+      dockerfile: services/food-service/Dockerfile
+    container_name: tatx-food-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3005:3005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  order-service:
+    build:
+      context: .
+      dockerfile: services/order-service/Dockerfile
+    container_name: tatx-order-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3006
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3006:3006"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/payment-service/Dockerfile
+    container_name: tatx-payment-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3007
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_your-key}
+    ports:
+      - "3007:3007"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    container_name: tatx-notification-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3008
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://tatx:tatx123@rabbitmq:5672
+    ports:
+      - "3008:3008"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  location-service:
+    build:
+      context: .
+      dockerfile: services/location-service/Dockerfile
+    container_name: tatx-location-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3009
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-your-key}
+    ports:
+      - "3009:3009"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+  admin-service:
+    build:
+      context: .
+      dockerfile: services/admin-service/Dockerfile
+    container_name: tatx-admin-service
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tatx?schema=public
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3010:3010"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tatx-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  tatx-network:
+    driver: bridge

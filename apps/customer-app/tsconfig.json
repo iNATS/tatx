@@ -1,0 +1,9 @@
+{
+  "extends": "@tatx/config/tsconfig.next.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}

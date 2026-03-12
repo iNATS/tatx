@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    /* Tatx Brand Primary - #0F172A (Slate 900) */
+    --primary: 222 47% 11%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Tatx Brand Accent - #22C55E (Green 500) */
+    --accent: 142 71% 45%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222 47% 11%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    /* Tatx Brand Primary - #0F172A (Slate 900) */
+    --primary: 222 47% 11%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    /* Tatx Brand Accent - #22C55E (Green 500) */
+    --accent: 142 71% 45%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142 71% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Ride Booking Component Styles */
+@layer components {
+  /* Map marker animations */
+  .map-marker {
+    @apply relative;
+  }
+
+  .map-marker::after {
+    content: '';
+    @apply absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45;
+  }
+
+  .map-marker-pickup::after {
+    @apply bg-brand-600;
+  }
+
+  .map-marker-dropoff::after {
+    @apply bg-green-600;
+  }
+
+  /* Vehicle card hover effects */
+  .vehicle-card {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .vehicle-card:hover {
+    @apply shadow-lg -translate-y-0.5;
+  }
+
+  .vehicle-card-selected {
+    @apply ring-2 ring-brand-500 ring-offset-2;
+  }
+
+  /* Status step indicators */
+  .status-step {
+    @apply relative flex items-center justify-center;
+  }
+
+  .status-step::before {
+    content: '';
+    @apply absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10;
+  }
+
+  .status-step:last-child::before {
+    @apply hidden;
+  }
+
+  .status-step-active {
+    @apply text-brand-600;
+  }
+
+  .status-step-active::before {
+    @apply bg-brand-600;
+  }
+
+  .status-step-completed {
+    @apply text-green-600;
+  }
+
+  .status-step-completed::before {
+    @apply bg-green-600;
+  }
+
+  /* Pulse animation for driver location */
+  .driver-pulse {
+    @apply relative;
+  }
+
+  .driver-pulse::before {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-blue-400 opacity-75 animate-ping;
+  }
+
+  /* Surge pricing badge */
+  .surge-badge {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+    @apply bg-orange-100 text-orange-700 border border-orange-200;
+  }
+
+  /* Fare breakdown row */
+  .fare-row {
+    @apply flex items-center justify-between py-2 text-sm;
+  }
+
+  .fare-row-label {
+    @apply text-gray-600;
+  }
+
+  .fare-row-amount {
+    @apply font-medium text-gray-900;
+  }
+
+  .fare-row-discount {
+    @apply text-green-600;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+
+  /* Route line on map */
+  .route-line {
+    @apply absolute h-1 bg-gradient-to-r from-brand-500 to-green-500 rounded-full;
+  }
+
+  /* Quick action buttons */
+  .quick-action {
+    @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg border;
+    @apply bg-white hover:bg-gray-50 transition-colors;
+    @apply text-sm font-medium text-gray-700;
+  }
+
+  /* Dialog animations */
+  .dialog-enter {
+    animation: dialog-enter 0.2s ease-out;
+  }
+
+  .dialog-exit {
+    animation: dialog-exit 0.15s ease-in;
+  }
+
+  @keyframes dialog-enter {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes dialog-exit {
+    from {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+  }
+}
+
+/* Utility classes for ride booking */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .map-container {
+    @apply relative overflow-hidden rounded-xl;
+  }
+
+  .card-gradient {
+    @apply bg-gradient-to-br from-white to-gray-50;
+  }
+
+  .brand-gradient {
+    @apply bg-gradient-to-r from-brand-900 to-brand-700;
+  }
+
+  .success-gradient {
+    @apply bg-gradient-to-r from-success-600 to-success-500;
+  }
+}
