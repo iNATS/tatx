@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -84,10 +83,6 @@ export default function Home() {
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-8 right-8 left-8 text-right text-white">
-                  <h4 className="text-2xl font-black mb-2">أهلاً بك في تاتكس</h4>
-                  <p className="text-sm font-bold opacity-80">رفيقك اليومي في كل مكان وأي وقت.</p>
-                </div>
               </div>
               
               {/* Overlay Stat Card */}
