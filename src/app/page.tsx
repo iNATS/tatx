@@ -17,8 +17,11 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Input } from '@/components/ui/input';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <>
       <Navbar />
@@ -45,11 +48,12 @@ export default function Home() {
 
                 {/* MD3 Tonal Search Bar */}
                 <div className="relative max-w-xl mr-0 ml-auto mb-6">
-                  <div className="bg-white p-1.5 rounded-[2rem] shadow-md border border-border flex items-center flex-row-reverse group transition-all focus-within:ring-4 focus-within:ring-primary/10">
+                  <div className="bg-white p-1.5 rounded-[2rem] shadow-md border border-border flex items-center flex-row-reverse group transition-all focus-within:ring-4 focus-within:ring-primary/10 cursor-pointer" onClick={() => router.push('/search')}>
                     <div className="flex-1 px-4">
                       <Input 
                         placeholder="ابحث عن مطعم أو خدمة..." 
-                        className="border-none bg-transparent h-12 text-lg font-black placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none text-right"
+                        className="border-none bg-transparent h-12 text-lg font-black placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none text-right cursor-pointer"
+                        readOnly
                       />
                     </div>
                     <Button className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-white p-0 shrink-0 shadow-none border-none group-hover:scale-105 transition-transform">
