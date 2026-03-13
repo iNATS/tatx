@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { PROVIDERS, MENU_ITEMS } from '@/lib/data';
 import Image from 'next/image';
-import { Star, Clock, ShoppingBag, Plus, Minus, Search, ChevronLeft, ArrowRight } from 'lucide-react';
+import { Star, Clock, ShoppingBag, Plus, Minus, Search, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCart } from '@/store/use-cart';
@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 
 export default function ProviderPage() {
   const params = useParams();
@@ -134,12 +135,11 @@ export default function ProviderPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-8">
-            {/* Menu Items Grid */}
             <div className="text-right col-span-1">
               <div className="mb-12">
                 {menuItems.length > 0 ? (
                   <div className={cn(
-                    "grid gap-6",
+                    "grid gap-8",
                     isMarket 
                       ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6" 
                       : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
@@ -198,11 +198,11 @@ export default function ProviderPage() {
                         );
                       }
 
-                      // Booking Category Layout (Chalets, Halls, Services)
+                      // Booking Category Layout (Chalets, Halls, Services) - REDESIGNED
                       if (isBookingCategory) {
                         return (
                           <Link key={item.id} href={`/item/${item.id}`}>
-                            <Card className="overflow-hidden group border-none bg-secondary/20 rounded-3xl shadow-none hover:bg-secondary/40 transition-all cursor-pointer">
+                            <Card className="overflow-hidden group border-none bg-white rounded-3xl shadow-none hover:bg-secondary/5 transition-all cursor-pointer ring-1 ring-border/50">
                               <div className="flex flex-col h-full">
                                 <div className="relative w-full h-56">
                                   <Image 
@@ -217,19 +217,16 @@ export default function ProviderPage() {
                                     </Badge>
                                   </div>
                                 </div>
-                                <CardContent className="flex-1 p-6 flex flex-col justify-between text-right">
-                                  <div>
-                                    <div className="flex justify-between items-center mb-3 flex-row-reverse">
-                                      <h3 className="text-xl font-black group-hover:text-primary transition-colors">{item.name}</h3>
-                                      <ChevronLeft className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
-                                    </div>
-                                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4 font-bold">
+                                <CardContent className="flex-1 p-8 flex flex-col justify-between text-right">
+                                  <div className="flex flex-col items-end">
+                                    <h3 className="text-2xl font-black mb-3 group-hover:text-primary transition-colors text-right w-full">{item.name}</h3>
+                                    <p className="text-base text-muted-foreground line-clamp-2 mb-6 font-bold leading-relaxed text-right w-full">
                                       {item.description}
                                     </p>
                                   </div>
-                                  <div className="flex items-center gap-2 text-primary font-black text-sm">
+                                  <div className="flex items-center gap-3 text-primary font-black text-sm justify-end group-hover:translate-x-[-4px] transition-transform">
+                                    <ArrowLeft className="w-5 h-5" />
                                     <span>عرض التفاصيل والحجز</span>
-                                    <ArrowRight className="w-4 h-4 rotate-180" />
                                   </div>
                                 </CardContent>
                               </div>
@@ -240,7 +237,7 @@ export default function ProviderPage() {
 
                       // Standard Product Layout (Food, Pharmacy, etc.)
                       return (
-                        <Card key={item.id} className="overflow-hidden group border-none bg-secondary/20 rounded-3xl shadow-none">
+                        <Card key={item.id} className="overflow-hidden group border-none bg-secondary/10 rounded-3xl shadow-none">
                           <div className="flex flex-col h-full">
                             <div className="relative w-full h-48">
                               <Image 
@@ -250,13 +247,13 @@ export default function ProviderPage() {
                                 className="object-cover transition-transform group-hover:scale-105"
                               />
                             </div>
-                            <CardContent className="flex-1 p-5 flex flex-col justify-between text-right">
+                            <CardContent className="flex-1 p-6 flex flex-col justify-between text-right">
                               <div>
-                                <div className="flex justify-between items-start mb-2 flex-row-reverse">
-                                  <h3 className="text-lg font-black group-hover:text-primary transition-colors">{item.name}</h3>
-                                  <span className="text-primary font-black whitespace-nowrap">{item.price} ر.س</span>
+                                <div className="flex justify-between items-start mb-3 flex-row-reverse">
+                                  <h3 className="text-xl font-black group-hover:text-primary transition-colors">{item.name}</h3>
+                                  <span className="text-primary font-black whitespace-nowrap text-lg">{item.price} ر.س</span>
                                 </div>
-                                <p className="text-sm text-muted-foreground line-clamp-2 mb-4 font-bold">
+                                <p className="text-sm text-muted-foreground line-clamp-2 mb-6 font-bold">
                                   {item.description}
                                 </p>
                               </div>
@@ -285,7 +282,7 @@ export default function ProviderPage() {
                                 ) : (
                                   <Button 
                                     size="sm" 
-                                    className="rounded-full px-6 gap-2 font-black bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none"
+                                    className="rounded-full px-8 h-11 gap-2 font-black bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none"
                                     onClick={() => handleAddToCart(item)}
                                   >
                                     أضف للسلة
@@ -312,6 +309,3 @@ export default function ProviderPage() {
     </>
   );
 }
-
-import { Badge } from '@/components/ui/badge';
-
