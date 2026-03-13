@@ -4,7 +4,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { MapPin, Navigation, Search, Clock, ShieldCheck, CreditCard, Star, ChevronLeft, Map as MapIcon } from 'lucide-react';
+import { MapPin, Navigation, Search, Clock, ShieldCheck, CreditCard, Star, ChevronLeft, Map as MapIcon, Car, Package } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 import { Taxis } from '@/lib/data';
@@ -139,19 +139,26 @@ export default function TaxiUberPage() {
                   <Button variant="secondary" className="rounded-full shadow-none font-black px-6">حجز مسبق</Button>
                 </div>
                 
+                {/* Redesigned Selection Grid (Uber Style with Icons) */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-secondary/50 p-6 rounded-3xl flex flex-col items-center gap-2 cursor-pointer hover:bg-secondary transition-colors">
-                     <div className="w-16 h-10 relative">
-                        <Image src="https://picsum.photos/seed/uber-car/100/100" alt="Car" fill className="object-contain" />
+                  <button className="bg-secondary/40 p-6 rounded-3xl flex flex-col items-start gap-4 cursor-pointer hover:bg-secondary/60 transition-all text-right group border-none shadow-none outline-none">
+                     <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105">
+                        <Car className="w-8 h-8 text-black" />
                      </div>
-                     <span className="font-black">سيارة تاتكس</span>
-                  </div>
-                  <div className="bg-secondary/50 p-6 rounded-3xl flex flex-col items-center gap-2 cursor-pointer hover:bg-secondary transition-colors">
-                     <div className="w-16 h-10 relative">
-                        <Image src="https://picsum.photos/seed/uber-box/100/100" alt="Parcel" fill className="object-contain" />
+                     <div className="space-y-1">
+                        <span className="block font-black text-lg">سيارة تاتكس</span>
+                        <span className="block text-xs text-muted-foreground font-bold">مشاوير يومية مريحة</span>
                      </div>
-                     <span className="font-black">تاتكس طرود</span>
-                  </div>
+                  </button>
+                  <button className="bg-secondary/40 p-6 rounded-3xl flex flex-col items-start gap-4 cursor-pointer hover:bg-secondary/60 transition-all text-right group border-none shadow-none outline-none">
+                     <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105">
+                        <Package className="w-8 h-8 text-black" />
+                     </div>
+                     <div className="space-y-1">
+                        <span className="block font-black text-lg">تاتكس طرود</span>
+                        <span className="block text-xs text-muted-foreground font-bold">توصيل سريع وأمان</span>
+                     </div>
+                  </button>
                 </div>
 
                 <div className="space-y-4">
