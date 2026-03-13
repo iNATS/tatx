@@ -43,7 +43,7 @@ export default function Home() {
               </p>
 
               {/* Integrated Search Bar */}
-              <div className="relative max-w-2xl mr-0 ml-auto mb-20 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
+              <div className="relative max-w-2xl mr-0 ml-auto mb-10 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
                 <div className="bg-white p-3 rounded-[2.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.1)] border border-border flex items-center flex-row-reverse group transition-all focus-within:ring-4 focus-within:ring-[#E27E36]/10">
                   <div className="flex-1 px-6">
                     <Input 
@@ -54,33 +54,6 @@ export default function Home() {
                   <Button className="h-16 w-16 rounded-full bg-[#E27E36] hover:bg-[#E27E36]/90 text-white p-0 shrink-0 shadow-none border-none group-hover:scale-105 transition-transform">
                     <Search className="w-7 h-7" />
                   </Button>
-                </div>
-              </div>
-
-              {/* Trust & Stats Indicators */}
-              <div className="flex items-center gap-12 justify-start flex-row-reverse animate-in fade-in duration-1000 delay-500">
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2 mb-1 flex-row-reverse">
-                    <Users className="w-5 h-5 text-[#E27E36]" />
-                    <span className="text-2xl font-black">500K+</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground font-bold">مستخدم نشط</span>
-                </div>
-                <div className="w-px h-12 bg-border" />
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2 mb-1 flex-row-reverse">
-                    <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                    <span className="text-2xl font-black">4.9/5</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground font-bold">تقييم العملاء</span>
-                </div>
-                <div className="w-px h-12 bg-border" />
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2 mb-1 flex-row-reverse">
-                    <TrendingUp className="w-5 h-5 text-green-500" />
-                    <span className="text-2xl font-black">100%</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground font-bold">ضمان الخدمة</span>
                 </div>
               </div>
             </div>
@@ -127,7 +100,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-16">
           {/* Categories Slider */}
           <div className="mb-24">
-            <div className="text-right mb-10">
+            <div className="text-right mb-10 pr-0 ml-auto">
               <h2 className="text-4xl font-black mb-3">تصفح حسب الفئة</h2>
               <p className="text-lg text-muted-foreground font-bold">كل الخدمات التي تحتاجها منظمة لسهولة وصولك</p>
             </div>
