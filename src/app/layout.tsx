@@ -1,9 +1,9 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import {Toaster} from '@/components/ui/toaster';
 import {Footer} from '@/components/layout/Footer';
 import {AppDownloadCTA} from '@/components/layout/AppDownloadCTA';
+import {PartnerCTA} from '@/components/layout/PartnerCTA';
 
 export const metadata: Metadata = {
   title: 'تاتكس | Tatx - كل ما تحتاجه في مكان واحد',
@@ -25,6 +25,7 @@ export default function RootLayout({
       <body className="font-body antialiased min-h-screen flex flex-col" style={{ fontFamily: "'Cairo', sans-serif" }}>
         {children}
         <AppDownloadCTA />
+        <PartnerCTA />
         <Footer />
         <Toaster />
       </body>
