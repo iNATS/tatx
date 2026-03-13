@@ -23,13 +23,13 @@ export interface MenuItem {
 }
 
 export const CATEGORIES = [
+  { id: 'market', name: 'سوبر ماركت تاتكس', icon: 'Store' },
   { id: 'food', name: 'مطاعم تاتكس', icon: 'Utensils' },
-  { id: 'taxi', name: 'تاكسي تاتكس', icon: 'Car' },
+  { id: 'pharmacy', name: 'صيدلية تاتكس', icon: 'Pill' },
   { id: 'services', name: 'خدمات تاتكس', icon: 'Wrench' },
   { id: 'halls', name: 'قاعات تاتكس', icon: 'PartyPopper' },
   { id: 'chalets', name: 'شاليهات تاتكس', icon: 'Home' },
-  { id: 'market', name: 'سوبر ماركت تاتكس', icon: 'Store' },
-  { id: 'pharmacy', name: 'صيدلية تاتكس', icon: 'Pill' },
+  { id: 'taxi', name: 'تاكسي تاتكس', icon: 'Car' },
 ];
 
 export const PROVIDERS: Provider[] = [
