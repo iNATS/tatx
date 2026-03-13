@@ -168,10 +168,6 @@ export default function Home() {
                                 اطلب الآن
                                 <ArrowLeft className="w-5 h-5 group-hover/btn:-translate-x-1 transition-transform" />
                               </Button>
-                              <div className="flex items-center gap-1.5 text-white/60 text-sm font-bold">
-                                <Zap className="w-4 h-4 text-primary fill-primary" />
-                                <span>عرض لفترة محدودة</span>
-                              </div>
                             </div>
                           </CardContent>
                         </Card>
