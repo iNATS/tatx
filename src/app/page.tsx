@@ -30,12 +30,6 @@ export default function Home() {
           
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mr-0 ml-auto text-right">
-              {/* Top Announcement */}
-              <div className="inline-flex items-center gap-2 bg-[#E27E36]/10 px-4 py-1.5 rounded-full mb-8 animate-in fade-in slide-in-from-right-4 duration-700">
-                <Sparkles className="w-4 h-4 text-[#E27E36]" />
-                <span className="text-[#E27E36] font-black text-xs">منصتك المتكاملة لكل احتياجاتك اليومية</span>
-              </div>
-
               {/* Main Heading */}
               <h1 className="text-5xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tight text-foreground animate-in fade-in slide-in-from-right-8 duration-700 delay-100">
                 تاتكس.. <br />
