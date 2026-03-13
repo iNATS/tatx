@@ -155,7 +155,7 @@ export default function CartPage() {
                       className="w-full h-14 rounded-2xl text-lg font-black gap-2 border-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all shadow-none flex-row-reverse"
                     >
                       <Share2 className="w-5 h-5" />
-                      إرسال للدفع (واتساب)
+                      ارسال رابط الدفع
                     </Button>
                   </div>
 
