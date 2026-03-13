@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -10,7 +9,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Taxis } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import dynamic from 'dynamic';
+import dynamic from 'next/dynamic';
 
 // Dynamically import Map component to avoid SSR issues with Leaflet
 const TaxiMap = dynamic(() => import('@/components/taxi/TaxiMap'), { 
@@ -195,5 +194,3 @@ export default function TaxiUberPage() {
     </>
   );
 }
-
-import dynamic from 'next/dynamic';
