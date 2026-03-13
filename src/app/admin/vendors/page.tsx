@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { 
   Plus, 
   Search, 
@@ -30,12 +31,47 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PROVIDERS, CATEGORIES } from '@/lib/data';
 import Image from 'next/image';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminVendorsPage() {
+  const [vendors, setVendors] = useState(PROVIDERS);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { toast } = useToast();
+
+  const [newVendor, setNewVendor] = useState({
+    name: '',
+    category: '',
+    description: '',
+    rating: 5.0,
+    image: 'https://picsum.photos/seed/newvendor/600/400'
+  });
+
+  const filteredVendors = vendors.filter(v => 
+    v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    v.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const stats = [
-    { label: 'إجمالي الموردين', value: PROVIDERS.length.toString(), icon: Store, color: 'text-primary' },
+    { label: 'إجمالي الموردين', value: vendors.length.toString(), icon: Store, color: 'text-primary' },
     { label: 'نشط حالياً', value: '5', icon: CheckCircle2, color: 'text-green-500' },
     { label: 'طلبات الانضمام', value: '3', icon: AlertCircle, color: 'text-orange-500' },
     { label: 'متوسط التقييم', value: '4.8', icon: Star, color: 'text-yellow-400' },
@@ -43,6 +79,32 @@ export default function AdminVendorsPage() {
 
   const getCategoryName = (id: string) => {
     return CATEGORIES.find(c => c.id === id)?.name || id;
+  };
+
+  const handleAddVendor = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newVendor.name || !newVendor.category) return;
+
+    const vendorToAdd = {
+      ...newVendor,
+      id: `v-${Date.now()}`,
+      isPopular: false
+    };
+
+    setVendors([vendorToAdd, ...vendors]);
+    setIsDialogOpen(false);
+    setNewVendor({
+      name: '',
+      category: '',
+      description: '',
+      rating: 5.0,
+      image: `https://picsum.photos/seed/${Date.now()}/600/400`
+    });
+
+    toast({
+      title: "تمت الإضافة بنجاح",
+      description: `تم إضافة المورد ${vendorToAdd.name} إلى المنصة.`,
+    });
   };
 
   return (
@@ -55,10 +117,62 @@ export default function AdminVendorsPage() {
             <h1 className="text-4xl font-black mb-2">إدارة الموردين</h1>
             <p className="text-muted-foreground font-bold">تحكم في جميع الشركاء والمتاجر المسجلة في المنصة.</p>
           </div>
-          <Button className="h-14 px-8 rounded-2xl bg-primary text-white font-black text-lg gap-3 shadow-xl">
-             إضافة مورد جديد
-             <Plus className="w-6 h-6" />
-          </Button>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="h-14 px-8 rounded-2xl bg-primary text-white font-black text-lg gap-3 shadow-xl">
+                 إضافة مورد جديد
+                 <Plus className="w-6 h-6" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none shadow-2xl" dir="rtl">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black text-right mb-6">إضافة شريك جديد</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleAddVendor} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2 text-right">
+                    <Label htmlFor="name" className="font-black">اسم المورد / المتجر</Label>
+                    <Input 
+                      id="name" 
+                      placeholder="مثال: مطعم النخبة" 
+                      className="h-12 rounded-xl bg-secondary/50 border-none text-right font-bold"
+                      value={newVendor.name}
+                      onChange={(e) => setNewVendor({...newVendor, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2 text-right">
+                    <Label htmlFor="category" className="font-black">التصنيف الرئيسي</Label>
+                    <Select onValueChange={(value) => setNewVendor({...newVendor, category: value})}>
+                      <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-none text-right font-bold">
+                        <SelectValue placeholder="اختر التصنيف" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-none shadow-xl font-bold">
+                        {CATEGORIES.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id} className="text-right flex-row-reverse">{cat.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 text-right">
+                    <Label htmlFor="description" className="font-black">وصف مختصر</Label>
+                    <Input 
+                      id="description" 
+                      placeholder="وصف الخدمات التي يقدمها المورد" 
+                      className="h-12 rounded-xl bg-secondary/50 border-none text-right font-bold"
+                      value={newVendor.description}
+                      onChange={(e) => setNewVendor({...newVendor, description: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <DialogFooter className="mt-8 flex gap-3">
+                  <Button type="submit" className="flex-1 h-14 rounded-xl font-black text-lg bg-primary hover:bg-primary/90">تأكيد الإضافة</Button>
+                  <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-14 rounded-xl font-black">إلغاء</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </header>
 
         {/* Stats Grid */}
@@ -94,6 +208,8 @@ export default function AdminVendorsPage() {
                   <Input 
                     placeholder="بحث عن مورد..." 
                     className="pr-10 h-12 rounded-xl bg-secondary/50 border-none shadow-none text-right font-bold focus-visible:ring-primary"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
                 <Button variant="outline" className="h-12 rounded-xl border-2 gap-2 font-bold shadow-none">
@@ -115,7 +231,7 @@ export default function AdminVendorsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {PROVIDERS.map((provider) => (
+                {filteredVendors.map((provider) => (
                   <TableRow key={provider.id} className="border-b border-secondary/50 hover:bg-secondary/10 transition-colors">
                     <TableCell className="py-6">
                       <div className="flex items-center gap-4 flex-row-reverse text-right">
