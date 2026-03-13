@@ -125,7 +125,7 @@ export default function Home() {
 
           {/* Featured Items (MD3 Elevated Cards) */}
           <section className="mb-16">
-            <div className="flex items-center justify-between mb-8 flex-row-reverse">
+            <div className="flex items-center justify-between mb-8">
               <div className="text-right">
                 <h2 className="text-3xl md:text-4xl font-black mb-1 tracking-tight">عروض تاتكس المميزة</h2>
                 <p className="text-base text-muted-foreground font-bold">أفضل الأسعار والخدمات المختارة لك</p>
@@ -163,7 +163,7 @@ export default function Home() {
                             <p className="text-white/80 text-base font-bold line-clamp-2 mb-6">
                               {item.description}
                             </p>
-                            <div className="flex items-center justify-start">
+                            <div className="flex items-center justify-end">
                               <Button className="rounded-2xl font-black text-base px-8 py-6 bg-white text-black hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-3 flex-row-reverse group/btn border-none">
                                 اطلب الآن
                                 <ArrowLeft className="w-5 h-5 group-hover/btn:-translate-x-1 transition-transform" />
@@ -191,7 +191,7 @@ export default function Home() {
 
             return (
               <section key={cat.id} className="mb-12">
-                <div className="flex items-center justify-between mb-6 flex-row-reverse">
+                <div className="flex items-center justify-between mb-6">
                   <div className="text-right">
                     <h2 className="text-2xl font-black text-foreground tracking-tight">{cat.name}</h2>
                     <p className="text-xs text-muted-foreground font-bold mt-1">أفضل الخيارات في {cat.name}</p>
