@@ -5,7 +5,7 @@ import { CategorySlider } from '@/components/home/CategorySlider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, Clock, Heart, ArrowLeft, Search, Zap, MapPin } from 'lucide-react';
+import { Star, Clock, Heart, ArrowLeft, Search, Zap, MapPin, Car, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FEATURED_ITEMS, PROVIDERS, CATEGORIES, MENU_ITEMS } from '@/lib/data';
@@ -90,6 +90,39 @@ export default function Home() {
             <CategorySlider />
           </div>
 
+          {/* Taxi Service CTA Banner */}
+          <section className="mb-16">
+            <Link href="/taxi">
+              <Card className="relative overflow-hidden bg-black rounded-[2.5rem] min-h-[280px] flex items-center group cursor-pointer border-none">
+                <div className="absolute inset-0 opacity-40 group-hover:scale-105 transition-transform duration-700">
+                  <Image 
+                    src="https://picsum.photos/seed/taxi-bg/1200/400" 
+                    alt="تاكسي تاتكس" 
+                    fill 
+                    className="object-cover"
+                    data-ai-hint="taxi city"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
+                
+                <CardContent className="relative z-10 p-10 flex flex-col md:flex-row-reverse justify-between items-center w-full gap-8">
+                  <div className="text-right">
+                    <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-1.5 rounded-full font-black text-xs mb-4">
+                      <Car className="w-4 h-4" />
+                      جديد
+                    </div>
+                    <h2 className="text-3xl md:text-5xl font-black text-white mb-4">تاكسي تاتكس</h2>
+                    <p className="text-white/70 text-lg font-bold max-w-md">مشاويرك اليومية صارت أسهل وأسرع.. اطلب سيارتك الآن واستمتع برحلة آمنة ومريحة.</p>
+                  </div>
+                  <Button size="lg" className="h-16 px-10 rounded-2xl bg-white text-black hover:bg-primary hover:text-white font-black text-xl gap-3 transition-all">
+                    احجز مشوارك الآن
+                    <ArrowLeft className="w-6 h-6" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+          </section>
+
           {/* Featured Items (MD3 Elevated Cards) */}
           <section className="mb-16">
             <div className="flex items-center justify-between mb-8 flex-row-reverse">
@@ -109,31 +142,37 @@ export default function Home() {
                   {FEATURED_ITEMS.map((item) => (
                     <CarouselItem key={item.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
                       <Link href={['chalets', 'halls', 'services'].includes(item.category) ? `/item/${item.id}` : `/provider/${item.providerId}`}>
-                        <Card className="relative overflow-hidden group border-none bg-surface rounded-[2rem] shadow-sm h-[400px] transition-all duration-500 hover:shadow-lg hover:-translate-y-1">
+                        <Card className="relative overflow-hidden group border-none bg-surface rounded-[2rem] shadow-sm h-[420px] transition-all duration-500 hover:shadow-lg hover:-translate-y-1">
                           <Image 
                             src={item.image} 
                             alt={item.name} 
                             fill 
-                            className="object-cover transition-transform duration-700 group-hover:scale-105" 
+                            className="object-cover transition-transform duration-700 group-hover:scale-110" 
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
                           
-                          <div className="absolute top-4 right-4 z-20">
-                            <Badge className="bg-primary text-white font-black px-4 py-1.5 text-lg rounded-xl shadow-lg flex items-center gap-1.5 flex-row-reverse">
+                          <div className="absolute top-5 right-5 z-20">
+                            <Badge className="bg-primary text-white font-black px-4 py-2 text-xl rounded-2xl shadow-xl flex items-center gap-2 flex-row-reverse">
                               <span>{item.price}</span>
                               <span className="text-xs">ر.س</span>
                             </Badge>
                           </div>
 
-                          <CardContent className="absolute inset-0 p-6 flex flex-col justify-end text-right text-white z-10">
-                            <h3 className="text-xl font-black mb-2 group-hover:text-primary-foreground/90 transition-colors leading-tight">{item.name}</h3>
-                            <p className="text-white/80 text-sm font-bold line-clamp-2 mb-4">
+                          <CardContent className="absolute inset-0 p-8 flex flex-col justify-end text-right text-white z-10">
+                            <h3 className="text-2xl font-black mb-2 group-hover:text-primary transition-colors leading-tight">{item.name}</h3>
+                            <p className="text-white/80 text-base font-bold line-clamp-2 mb-6">
                               {item.description}
                             </p>
-                            <Button className="rounded-xl font-black text-sm px-6 py-4 bg-primary text-white hover:bg-white hover:text-primary transition-all shadow-md flex items-center gap-2 flex-row-reverse w-fit mr-0 ml-auto group/btn border-none">
-                               اطلب الآن
-                               <ArrowLeft className="w-4 h-4 group-hover/btn:-translate-x-1 transition-transform" />
-                            </Button>
+                            <div className="flex items-center justify-between flex-row-reverse">
+                              <Button className="rounded-2xl font-black text-base px-8 py-6 bg-white text-black hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-3 flex-row-reverse group/btn border-none">
+                                اطلب الآن
+                                <ArrowLeft className="w-5 h-5 group-hover/btn:-translate-x-1 transition-transform" />
+                              </Button>
+                              <div className="flex items-center gap-1.5 text-white/60 text-sm font-bold">
+                                <Zap className="w-4 h-4 text-primary fill-primary" />
+                                <span>عرض لفترة محدودة</span>
+                              </div>
+                            </div>
                           </CardContent>
                         </Card>
                       </Link>
