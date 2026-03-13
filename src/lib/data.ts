@@ -74,7 +74,7 @@ export const PROVIDERS: Provider[] = [
   },
   {
     id: 'chalet-1',
-    name: 'منتجعات تاتكس الفاخرة',
+    name: 'منتجع تاتكس الفاخر',
     description: 'أفضل الشاليهات للاستجمام العائلي والخصوصية التامة',
     rating: 4.9,
     image: 'https://picsum.photos/seed/chalet/600/400',
@@ -82,7 +82,7 @@ export const PROVIDERS: Provider[] = [
   },
   {
     id: 'hall-1',
-    name: 'قاعات تاتكس للمناسبات',
+    name: 'قاعة تاتكس للمناسبات',
     description: 'قاعات فخمة لجميع مناسباتكم السعيدة بتنظيم احترافي',
     rating: 5.0,
     image: 'https://picsum.photos/seed/halls/600/400',
@@ -92,7 +92,7 @@ export const PROVIDERS: Provider[] = [
 
 export const MENU_ITEMS: MenuItem[] = [
   // --- السوبر ماركت (12 items) ---
-  { id: 's1', providerId: 'market-tatx', name: 'بيبسي كرتون (30 علبة)', description: 'علب 325 مل الأصلية', price: 65, image: 'https://picsum.photos/seed/pepsi/400/400', category: 'market', subCategory: 'مشروبات' },
+  { id: 's1', providerId: 'market-tatx', name: 'بيبسي كرتون (30 علبة)', description: 'عرض التوفير الأسبوعي من تاتكس ماركت على المشروبات الباردة', price: 65, image: 'https://picsum.photos/seed/pepsi/400/400', category: 'market', subCategory: 'مشروبات', isFeatured: true },
   { id: 's2', providerId: 'market-tatx', name: 'أرز الشعلان 5 كجم', description: 'أرز بسمتي أبيض هندي', price: 42.5, image: 'https://picsum.photos/seed/rice/400/400', category: 'market', subCategory: 'أغذية' },
   { id: 's3', providerId: 'market-tatx', name: 'حليب المراعي 1 لتر', description: 'حليب طازج كامل الدسم', price: 6, image: 'https://picsum.photos/seed/milk/400/400', category: 'market', subCategory: 'ألبان' },
   { id: 's4', providerId: 'market-tatx', name: 'بيض طازج (30 حبة)', description: 'بيض مزارع وطني', price: 18, image: 'https://picsum.photos/seed/eggs/400/400', category: 'market', subCategory: 'ألبان' },
@@ -106,7 +106,7 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 's12', providerId: 'market-tatx', name: 'لبن عيران 1.5 لتر', description: 'لبن طازج ومنعش', price: 8, image: 'https://picsum.photos/seed/ayran/400/400', category: 'market', subCategory: 'ألبان' },
 
   // --- المطاعم (10 items) ---
-  { id: 'm1', providerId: 'rest-1', name: 'نصف حبة مندي دجاج', description: 'تقدم مع الأرز والسلطة الحارة', price: 38, image: 'https://picsum.photos/seed/mandi/400/300', category: 'food', subCategory: 'مندي', isFeatured: true },
+  { id: 'm1', providerId: 'rest-1', name: 'نصف حبة مندي دجاج', description: 'تقدم مع الأرز والسلطة الحارة بخلطة قصر المندي السرية', price: 38, image: 'https://picsum.photos/seed/mandi/400/300', category: 'food', subCategory: 'مندي', isFeatured: true },
   { id: 'm2', providerId: 'rest-1', name: 'مندي لحم نفر', description: 'لحم بلدي طازج مع الأرز', price: 75, image: 'https://picsum.photos/seed/mandi-meat/400/300', category: 'food', subCategory: 'مندي' },
   { id: 'm3', providerId: 'rest-1', name: 'مندي دجاج حبة كاملة', description: 'دجاج متبل بخلطة خاصة', price: 70, image: 'https://picsum.photos/seed/chicken-whole/400/300', category: 'food', subCategory: 'مندي' },
   { id: 'm4', providerId: 'rest-1', name: 'جريش سعودي', description: 'طبق شعبي أصيل باللبن', price: 25, image: 'https://picsum.photos/seed/jareesh/400/300', category: 'food', subCategory: 'شعبي' },
@@ -118,7 +118,7 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'm10', providerId: 'rest-1', name: 'سمبوسة لحم (6 حبات)', description: 'مقرمشة ومحشوة باللحم الطازج', price: 18, image: 'https://picsum.photos/seed/sambosa/400/300', category: 'food', subCategory: 'مقبلات' },
 
   // --- الصيدلية (10 items) ---
-  { id: 'p1', providerId: 'pharma-1', name: 'بندول إكسترا 24 قرص', description: 'مسكن للآلام وخافض حرارة', price: 12.5, image: 'https://picsum.photos/seed/panadol/400/400', category: 'pharmacy', subCategory: 'مسكنات', isFeatured: true },
+  { id: 'p1', providerId: 'pharma-1', name: 'بندول إكسترا 24 قرص', description: 'مسكن للآلام وخافض حرارة متوفر للتوصيل الفوري', price: 12.5, image: 'https://picsum.photos/seed/panadol/400/400', category: 'pharmacy', subCategory: 'مسكنات', isFeatured: true },
   { id: 'p2', providerId: 'pharma-1', name: 'فيتامين سي فوار', description: 'لتعزيز المناعة اليومية', price: 25, image: 'https://picsum.photos/seed/vitc/400/400', category: 'pharmacy', subCategory: 'فيتامينات' },
   { id: 'p3', providerId: 'pharma-1', name: 'مطهر يدين 500 مل', description: 'حماية فعالة ضد الجراثيم', price: 15, image: 'https://picsum.photos/seed/sanitizer/400/400', category: 'pharmacy', subCategory: 'عناية' },
   { id: 'p4', providerId: 'pharma-1', name: 'كمامات طبية 50 حبة', description: 'حماية تنفسية عالية الجودة', price: 20, image: 'https://picsum.photos/seed/mask/400/400', category: 'pharmacy', subCategory: 'عناية' },
@@ -130,7 +130,7 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'p10', providerId: 'pharma-1', name: 'شرائط قياس السكر', description: 'لأجهزة قياس السكر المنزلية', price: 85, image: 'https://picsum.photos/seed/test-strips/400/400', category: 'pharmacy', subCategory: 'أجهزة' },
 
   // --- خدمات (10 items) ---
-  { id: 'ser1', providerId: 'serv-1', name: 'تنظيف مكيف سبليت', description: 'تنظيف شامل بضمان تاتكس', price: 150, image: 'https://picsum.photos/seed/ac/400/400', category: 'services', subCategory: 'تكييف' },
+  { id: 'ser1', providerId: 'serv-1', name: 'تنظيف مكيف سبليت', description: 'خدمة احترافية تشمل التنظيف الشامل بضمان تاتكس', price: 150, image: 'https://picsum.photos/seed/ac/400/400', category: 'services', subCategory: 'تكييف', isFeatured: true },
   { id: 'ser2', providerId: 'serv-1', name: 'صيانة سباكة عامة', description: 'إصلاح التسريبات والتركيبات', price: 100, image: 'https://picsum.photos/seed/plumbing/400/400', category: 'services', subCategory: 'سباكة' },
   { id: 'ser3', providerId: 'serv-1', name: 'فحص كهرباء منزلي', description: 'كشف الأعطال وتغيير الأفياش', price: 120, image: 'https://picsum.photos/seed/electric/400/400', category: 'services', subCategory: 'كهرباء' },
   { id: 'ser4', providerId: 'serv-1', name: 'تنظيف سجاد عميق', description: 'تنظيف بالبخار لإزالة البقع', price: 200, image: 'https://picsum.photos/seed/carpet/400/400', category: 'services', subCategory: 'نظافة' },
@@ -142,7 +142,7 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'ser10', providerId: 'serv-1', name: 'تركيب شاشات جدارية', description: 'تركيب احترافي مع حامل جداري', price: 80, image: 'https://picsum.photos/seed/tv-mount/400/400', category: 'services', subCategory: 'صيانة' },
 
   // --- شاليهات (10 items) ---
-  { id: 'ch1', providerId: 'chalet-1', name: 'شاليه تاتكس رويال', description: 'مسبح خاص، مسطحات خضراء واسعة', price: 1200, image: 'https://picsum.photos/seed/chalet1/400/400', category: 'chalets', subCategory: 'شاليهات' },
+  { id: 'ch1', providerId: 'chalet-1', name: 'شاليه تاتكس رويال', description: 'مسبح خاص، مسطحات خضراء واسعة، وجلسات فاخرة للاستجمام', price: 1200, image: 'https://picsum.photos/seed/chalet1/400/400', category: 'chalets', subCategory: 'شاليهات', isFeatured: true },
   { id: 'ch2', providerId: 'chalet-1', name: 'شاليه اللافندر الهادئ', description: 'خصوصية تامة واستجمام عائلي', price: 900, image: 'https://picsum.photos/seed/chalet2/400/400', category: 'chalets', subCategory: 'شاليهات' },
   { id: 'ch3', providerId: 'chalet-1', name: 'منتجع تاتكس سكاي', description: 'إطلالة بانورامية ومسبح تدفئة', price: 1800, image: 'https://picsum.photos/seed/chalet3/400/400', category: 'chalets', subCategory: 'منتجعات' },
   { id: 'ch4', providerId: 'chalet-1', name: 'شاليه الياسمين للعائلات', description: 'ألعاب مائية للأطفال وجلسات خارجية', price: 850, image: 'https://picsum.photos/seed/chalet4/400/400', category: 'chalets', subCategory: 'شاليهات' },
@@ -154,7 +154,7 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'ch10', providerId: 'chalet-1', name: 'استراحة البركة الخاصة', description: 'مسبح داخلي وجلسات عائلية مغلقة', price: 1000, image: 'https://picsum.photos/seed/chalet10/400/400', category: 'chalets', subCategory: 'استراحات' },
 
   // --- قاعات (10 items) ---
-  { id: 'h1', providerId: 'hall-1', name: 'قاعة الأساطير الكبرى', description: 'فخامة لا توصف للمناسبات الكبيرة', price: 15000, image: 'https://picsum.photos/seed/hall1/400/400', category: 'halls', subCategory: 'أعراس' },
+  { id: 'h1', providerId: 'hall-1', name: 'قاعة الأساطير الكبرى', description: 'أفخم القاعات في الرياض بتصميم ملكي وتجهيزات متكاملة', price: 15000, image: 'https://picsum.photos/seed/hall1/400/400', category: 'halls', subCategory: 'أعراس', isFeatured: true },
   { id: 'h2', providerId: 'hall-1', name: 'قاعة ليلة العمر الصغرى', description: 'مناسبة للمناسبات العائلية الخاصة', price: 8000, image: 'https://picsum.photos/seed/hall2/400/400', category: 'halls', subCategory: 'أعراس' },
   { id: 'h3', providerId: 'hall-1', name: 'قاعة تاتكس بيزنس', description: 'مجهزة للاجتماعات والمؤتمرات الذكية', price: 3000, image: 'https://picsum.photos/seed/hall3/400/400', category: 'halls', subCategory: 'مؤتمرات' },
   { id: 'h4', providerId: 'hall-1', name: 'خيمة المناسبات الملكية', description: 'تصميم تراثي فخم وتجهيزات كاملة', price: 12000, image: 'https://picsum.photos/seed/hall4/400/400', category: 'halls', subCategory: 'احتفالات' },
