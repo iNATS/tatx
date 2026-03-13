@@ -15,13 +15,6 @@ export function AppDownloadCTA() {
             
             {/* Content Section */}
             <div className="flex-1 text-right order-1 lg:order-2 w-full">
-              <div className="flex items-center gap-2 mb-6 justify-start flex-row-reverse">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-                  <Download className="w-6 h-6" />
-                </div>
-                <span className="text-sm font-black text-primary uppercase tracking-wider">تطبيق تاتكس الجديد</span>
-              </div>
-              
               <h2 className="text-4xl md:text-6xl font-black text-zinc-900 mb-8 leading-[1.2]">
                 كل ما تحتاجه..<br />
                 <span className="text-primary">في جيبك الآن.</span>
