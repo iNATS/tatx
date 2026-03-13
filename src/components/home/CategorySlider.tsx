@@ -20,8 +20,8 @@ export function CategorySlider() {
   const pathname = usePathname();
 
   return (
-    <div className="w-full overflow-x-auto no-scrollbar py-6">
-      <div className="flex gap-4 min-w-max flex-row-reverse">
+    <div className="w-full overflow-x-auto no-scrollbar py-6" dir="rtl">
+      <div className="flex gap-4 min-w-full justify-start flex-row-reverse">
         <Link href="/">
           <button
             className={cn(
@@ -61,7 +61,7 @@ export function CategorySlider() {
                   "w-12 h-12 rounded-full flex items-center justify-center transition-colors shadow-none",
                   isActive ? "bg-white/20" : "bg-secondary"
                 )}>
-                  <Icon className={cn("w-6 h-6", isActive ? "text-white" : "text-primary")} />
+                  {Icon && <Icon className={cn("w-6 h-6", isActive ? "text-white" : "text-primary")} />}
                 </div>
                 <span className="text-sm font-bold">{cat.name}</span>
               </button>
