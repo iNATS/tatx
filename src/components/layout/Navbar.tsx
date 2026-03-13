@@ -34,20 +34,20 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-border shadow-none">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-6">
-        {/* Brand Logo - MD3 Style */}
+        {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-11 h-11 bg-primary rounded-[1rem] flex items-center justify-center text-white font-black text-2xl shadow-lg transition-all group-hover:scale-105 group-active:scale-95">
             T
           </div>
-          <span className="text-2xl font-black hidden sm:block tracking-tight">
+          <span className="text-2xl font-black hidden md:block tracking-tight">
             تاتكس<span className="text-primary">Tatx</span>
           </span>
         </Link>
 
-        {/* MD3 Location Picker */}
+        {/* Location Picker - Hidden on Mobile */}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <div className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-secondary/50 rounded-full cursor-pointer hover:bg-secondary transition-all border border-transparent hover:border-border">
+            <div className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-secondary/50 rounded-full cursor-pointer hover:bg-secondary transition-all border border-transparent hover:border-border">
               <MapPin className="w-4 h-4 text-primary" />
               <span className="text-sm font-bold truncate max-w-[150px]">التوصيل إلى: {selectedLocation.district}</span>
               <ChevronDown className="w-3 h-3 text-muted-foreground" />
@@ -95,12 +95,8 @@ export function Navbar() {
           </DialogContent>
         </Dialog>
 
-        {/* Actions - MD3 Icons and Buttons */}
+        {/* Desktop Actions - Hidden on Mobile */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="md:hidden shadow-none rounded-full h-12 w-12">
-            <Search className="w-6 h-6" />
-          </Button>
-          
           <Link href="/profile" className="hidden md:block">
             <Button variant="ghost" className="flex gap-2 font-black shadow-none hover:bg-secondary rounded-full px-6 h-12">
               <User className="w-5 h-5" />
@@ -122,8 +118,9 @@ export function Navbar() {
             </Button>
           </Link>
 
+          {/* Simple Search Toggle for Mobile Tablet */}
           <Button variant="ghost" size="icon" className="md:hidden shadow-none rounded-full h-12 w-12">
-            <Menu className="w-6 h-6" />
+            <Search className="w-6 h-6" />
           </Button>
         </div>
       </div>
