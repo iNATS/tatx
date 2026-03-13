@@ -163,7 +163,7 @@ export default function Home() {
                             <p className="text-white/80 text-base font-bold line-clamp-2 mb-6">
                               {item.description}
                             </p>
-                            <div className="flex items-center justify-between flex-row-reverse">
+                            <div className="flex items-center justify-start">
                               <Button className="rounded-2xl font-black text-base px-8 py-6 bg-white text-black hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-3 flex-row-reverse group/btn border-none">
                                 اطلب الآن
                                 <ArrowLeft className="w-5 h-5 group-hover/btn:-translate-x-1 transition-transform" />
