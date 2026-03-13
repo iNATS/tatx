@@ -98,19 +98,21 @@ export default function Home() {
                             </Button>
                           </div>
 
-                          {/* Bottom Content */}
-                          <CardContent className="absolute inset-0 p-8 flex flex-col justify-end text-right text-white z-10">
-                            <div className="space-y-4">
-                              <div className="flex justify-between items-end flex-row-reverse">
-                                <div className="bg-primary text-white font-black px-4 py-1.5 text-xl rounded-xl shadow-xl flex items-center gap-1 flex-row-reverse">
-                                  <span>{item.price}</span>
-                                  <span className="text-xs">ر.س</span>
-                                </div>
-                                <Badge className="bg-white/20 backdrop-blur text-white border-none font-black px-3 py-1 rounded-lg">
-                                  {CATEGORIES.find(c => c.id === item.category)?.name}
-                                </Badge>
+                          {/* Content Overlay */}
+                          <CardContent className="absolute inset-0 p-8 flex flex-col justify-between text-right text-white z-10">
+                            {/* Top info - Price moved here */}
+                            <div className="flex justify-between items-start flex-row-reverse">
+                              <div className="bg-primary text-white font-black px-4 py-1.5 text-xl rounded-xl shadow-xl flex items-center gap-1 flex-row-reverse">
+                                <span>{item.price}</span>
+                                <span className="text-xs">ر.س</span>
                               </div>
-                              
+                              <Badge className="bg-white/20 backdrop-blur text-white border-none font-black px-3 py-1 rounded-lg">
+                                {CATEGORIES.find(c => c.id === item.category)?.name}
+                              </Badge>
+                            </div>
+                            
+                            {/* Bottom info */}
+                            <div className="space-y-4">
                               <div>
                                 <h3 className="text-3xl font-black mb-2 leading-tight group-hover:text-primary transition-colors">{item.name}</h3>
                                 <p className="text-white/80 text-sm font-bold line-clamp-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
