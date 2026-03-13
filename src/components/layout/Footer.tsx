@@ -78,12 +78,6 @@ export function Footer() {
           <p className="text-muted-foreground font-bold text-sm">
             © {new Date().getFullYear()} تاتكس Tatx. جميع الحقوق محفوظة.
           </p>
-          <div className="flex gap-4">
-             {/* Payment Icons Placeholder */}
-             <div className="w-12 h-8 bg-white border rounded flex items-center justify-center font-black text-[8px] text-blue-600">VISA</div>
-             <div className="w-12 h-8 bg-white border rounded flex items-center justify-center font-black text-[8px] text-red-600">Master</div>
-             <div className="w-12 h-8 bg-white border rounded flex items-center justify-center font-black text-[8px] text-green-600">Mada</div>
-          </div>
         </div>
       </div>
     </footer>
