@@ -142,35 +142,7 @@ export default function Home() {
           </section>
 
           {/* Dynamic Sections per Category - Slider Layout */}
-          {CATEGORIES.map((cat) => {
-            if (cat.id === 'taxi') {
-              return (
-                <section key={cat.id} className="mb-20">
-                   <div className="flex items-center justify-between mb-8 flex-row border-r-8 border-primary pr-6">
-                    <Link href="/taxi">
-                      <Button variant="ghost" className="text-primary font-black text-lg gap-3 flex-row-reverse p-0 hover:bg-transparent shadow-none">
-                        اطلب الآن
-                        <ArrowLeft className="w-6 h-6" />
-                      </Button>
-                    </Link>
-                    <h2 className="text-4xl font-black text-right">{cat.name}</h2>
-                  </div>
-                  <Link href="/taxi">
-                    <Card className="group border-none shadow-none hover:bg-secondary/20 transition-all rounded-[2.5rem] p-8 lg:p-12 bg-secondary/10 overflow-hidden flex flex-col md:flex-row-reverse items-center gap-8">
-                       <div className="relative w-full md:w-80 h-48 md:h-64 rounded-3xl overflow-hidden shrink-0">
-                          <Image src="https://picsum.photos/seed/tatx-taxi-home/600/400" alt="Taxi" fill className="object-cover group-hover:scale-105 duration-700" />
-                       </div>
-                       <div className="text-right flex-1">
-                          <h3 className="text-3xl font-black mb-4">مشاوير تاتكس السريعة</h3>
-                          <p className="text-xl text-muted-foreground font-bold mb-6">احجز رحلتك القادمة الآن بأمان تام وأسعار منافسة تبدأ من 15 ريال فقط.</p>
-                          <Button className="rounded-2xl px-12 py-7 text-xl font-black bg-primary shadow-none border-none">احجز الآن</Button>
-                       </div>
-                    </Card>
-                  </Link>
-                </section>
-              );
-            }
-
+          {CATEGORIES.filter(cat => cat.id !== 'taxi').map((cat) => {
             const categoryItems = MENU_ITEMS.filter(item => item.category === cat.id).slice(0, 10);
             const provider = PROVIDERS.find(p => p.category === cat.id);
             const href = `/provider/${provider?.id}`;
