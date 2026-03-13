@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Star, Clock, Heart, ArrowLeft, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FEATURED_ITEMS, PROVIDERS, CATEGORIES } from '@/lib/data';
+import { FEATURED_ITEMS, PROVIDERS, CATEGORIES, MENU_ITEMS } from '@/lib/data';
 import {
   Carousel,
   CarouselContent,
@@ -124,6 +124,7 @@ export default function Home() {
             if (!provider && cat.id !== 'taxi') return null;
 
             const href = cat.id === 'taxi' ? '/taxi' : `/provider/${provider?.id}`;
+            const isMarket = cat.id === 'market';
 
             return (
               <section key={cat.id} className="mb-20">
@@ -136,8 +137,8 @@ export default function Home() {
                   </Link>
                   <h2 className="text-3xl font-black text-right">{cat.name}</h2>
                 </div>
-                <Card className="group border-none shadow-none hover:bg-secondary/20 transition-all rounded-3xl p-6 bg-secondary/10">
-                  <div className="flex flex-col md:flex-row-reverse gap-8 items-center">
+                <Card className="group border-none shadow-none hover:bg-secondary/20 transition-all rounded-3xl p-6 lg:p-10 bg-secondary/10 overflow-hidden">
+                  <div className="flex flex-col md:flex-row-reverse gap-8 lg:gap-12 items-center mb-8">
                     <div className="relative w-full md:w-64 h-64 rounded-3xl overflow-hidden flex-shrink-0">
                       <Image 
                         src={cat.id === 'taxi' ? 'https://picsum.photos/seed/tatx-taxi/600/400' : provider?.image || ''} 
@@ -163,6 +164,36 @@ export default function Home() {
                       </Link>
                     </div>
                   </div>
+
+                  {/* Sample Products for Market */}
+                  {isMarket && (
+                    <div className="mt-12 pt-10 border-t border-primary/10">
+                      <div className="flex items-center justify-between mb-6 flex-row">
+                         <Link href={href}>
+                           <Button variant="link" className="text-primary font-black p-0 h-auto shadow-none">تصفح السوبر ماركت</Button>
+                         </Link>
+                         <h4 className="text-xl font-black">وصلنا حديثاً</h4>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        {MENU_ITEMS.filter(item => item.providerId === 'market-tatx').slice(0, 6).map(item => (
+                          <Link href={href} key={item.id}>
+                            <div className="bg-white rounded-2xl p-3 flex flex-col items-center text-center group cursor-pointer transition-all border border-transparent hover:border-primary/20">
+                              <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
+                                <Image 
+                                  src={item.image} 
+                                  alt={item.name} 
+                                  fill 
+                                  className="object-cover transition-transform group-hover:scale-110" 
+                                />
+                              </div>
+                              <span className="text-xs font-black line-clamp-1 mb-1">{item.name}</span>
+                              <span className="text-primary font-black text-sm">{item.price} ر.س</span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </Card>
               </section>
             );
