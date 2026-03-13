@@ -80,30 +80,34 @@ export const PROVIDERS: Provider[] = [
     isPopular: true
   },
 
-  // --- فئات التاكسي (نظام أوبر) ---
+  // --- خدمات ---
   {
-    id: 'taxi-economy',
-    name: 'تاتكس توفير',
-    description: 'رحلات يومية بأسعار اقتصادية',
+    id: 'serv-1',
+    name: 'تاتكس للخدمات المنزلية',
+    description: 'سباكة، كهرباء، صيانة مكيفات بضمان تاتكس',
     rating: 4.8,
-    image: 'https://picsum.photos/seed/taxi-eco/600/400',
-    category: 'taxi'
+    image: 'https://picsum.photos/seed/services/600/400',
+    category: 'services'
   },
+
+  // --- شاليهات ---
   {
-    id: 'taxi-vip',
-    name: 'تاتكس VIP',
-    description: 'سيارات فاخرة وخدمة متميزة',
-    rating: 5.0,
-    image: 'https://picsum.photos/seed/taxi-lux/600/400',
-    category: 'taxi'
-  },
-  {
-    id: 'taxi-family',
-    name: 'تاتكس عائلي',
-    description: 'سيارات واسعة تكفي لـ 7 ركاب',
+    id: 'chalet-1',
+    name: 'منتجعات تاتكس الفاخرة',
+    description: 'أفضل الشاليهات للاستجمام العائلي',
     rating: 4.9,
-    image: 'https://picsum.photos/seed/taxi-fam/600/400',
-    category: 'taxi'
+    image: 'https://picsum.photos/seed/chalet/600/400',
+    category: 'chalets'
+  },
+
+  // --- قاعات ---
+  {
+    id: 'hall-1',
+    name: 'قاعات تاتكس للمناسبات',
+    description: 'قاعات فخمة لجميع مناسباتكم السعيدة',
+    rating: 5.0,
+    image: 'https://picsum.photos/seed/halls/600/400',
+    category: 'halls'
   }
 ];
 
@@ -118,7 +122,13 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'm3', providerId: 'rest-2', name: 'برجر تاتكس دبل', description: 'قطعتين لحم مع الجبن', price: 45, image: 'https://picsum.photos/seed/burger/400/300', category: 'food', subCategory: 'برجر' },
 
   // --- الصيدلية ---
-  { id: 'p1', providerId: 'pharma-1', name: 'بندول إكسترا 24 قرص', description: 'مسكن للآلام وخافض حرارة', price: 12.5, image: 'https://picsum.photos/seed/panadol/400/400', category: 'pharmacy', subCategory: 'مسكنات', isFeatured: true }
+  { id: 'p1', providerId: 'pharma-1', name: 'بندول إكسترا 24 قرص', description: 'مسكن للآلام وخافض حرارة', price: 12.5, image: 'https://picsum.photos/seed/panadol/400/400', category: 'pharmacy', subCategory: 'مسكنات', isFeatured: true },
+  
+  // --- خدمات ---
+  { id: 'ser1', providerId: 'serv-1', name: 'تنظيف مكيف سبليت', description: 'تنظيف شامل مع فحص الفريون', price: 150, image: 'https://picsum.photos/seed/ac/400/400', category: 'services', subCategory: 'تكييف' },
+  
+  // --- شاليهات ---
+  { id: 'ch1', providerId: 'chalet-1', name: 'شاليه تاتكس رويال', description: 'مسبح خاص، مسطحات خضراء، صالة ألعاب', price: 1200, image: 'https://picsum.photos/seed/chalet1/400/400', category: 'chalets', subCategory: 'شاليهات' }
 ];
 
 export const FEATURED_ITEMS: MenuItem[] = MENU_ITEMS.filter(item => item.isFeatured);
