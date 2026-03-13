@@ -83,16 +83,6 @@ export default function Home() {
                   <span className="text-xs text-muted-foreground font-bold">تجهيز الطلب في 20 ثانية</span>
                 </div>
               </div>
-
-              <div className="absolute bottom-20 -left-12 bg-white/95 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-2xl border border-border flex items-center gap-5 flex-row-reverse animate-float-delayed">
-                <div className="w-14 h-14 bg-green-500 rounded-3xl flex items-center justify-center text-white shadow-xl -rotate-6">
-                  <ShieldCheck className="w-8 h-8" />
-                </div>
-                <div className="text-right">
-                  <span className="block font-black text-lg">دفع آمن</span>
-                  <span className="text-xs text-muted-foreground font-bold">أموالك محمية مع تاتكس</span>
-                </div>
-              </div>
             </div>
           </div>
         </section>
