@@ -15,7 +15,7 @@ export function AppDownloadCTA() {
             
             {/* Content Section */}
             <div className="flex-1 text-right order-1 lg:order-2 w-full">
-              <div className="flex items-center gap-2 mb-6 justify-end flex-row-reverse">
+              <div className="flex items-center gap-2 mb-6 justify-start flex-row-reverse">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
                   <Download className="w-6 h-6" />
                 </div>
@@ -27,7 +27,7 @@ export function AppDownloadCTA() {
                 <span className="text-primary">في جيبك الآن.</span>
               </h2>
               
-              <p className="text-xl text-zinc-600 font-bold mb-10 max-w-xl leading-relaxed ml-0 mr-auto">
+              <p className="text-xl text-zinc-600 font-bold mb-10 max-w-xl leading-relaxed mr-0 ml-auto">
                 استمتع بتجربة "تاتكس" الكاملة عبر التطبيق. اطلب وجباتك، احجز مشاويرك، أو نسق لمناسباتك القادمة بسرعة وسهولة فائقة.
               </p>
               
