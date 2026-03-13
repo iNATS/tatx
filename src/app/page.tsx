@@ -69,23 +69,6 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-
-              {/* Quick Action Badges */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-12 animate-in fade-in duration-1000 delay-500">
-                {[
-                  { label: 'توصيل سريع', icon: Zap, color: 'bg-yellow-50 text-yellow-600' },
-                  { label: 'دفع آمن', icon: ShieldCheck, color: 'bg-blue-50 text-blue-600' },
-                  { label: 'دعم 24/7', icon: Clock, color: 'bg-green-50 text-green-600' },
-                  { label: 'مزودين موثوقين', icon: Star, color: 'bg-purple-50 text-purple-600' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 flex-row-reverse justify-start">
-                    <div className={`w-10 h-10 rounded-xl ${item.color} flex items-center justify-center`}>
-                      <item.icon className="w-5 h-5" />
-                    </div>
-                    <span className="font-black text-sm">{item.label}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
 
