@@ -162,11 +162,6 @@ export default function ProviderPage() {
             {/* Menu Items Grid */}
             <div className={cn("text-right", isMarket ? "lg:col-span-4" : "lg:col-span-3")}>
               <div className="mb-12">
-                <h2 className="text-2xl font-black mb-8 flex items-center justify-start gap-3 flex-row-reverse">
-                  <div className="w-2 h-8 bg-primary rounded-full" />
-                  {activeFilter === 'الكل' ? (isMarket ? 'جميع المنتجات' : 'جميع الأصناف') : activeFilter}
-                </h2>
-                
                 {menuItems.length > 0 ? (
                   <div className={cn(
                     "grid gap-6",
