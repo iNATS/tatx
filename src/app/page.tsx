@@ -26,53 +26,91 @@ export default function Home() {
     <>
       <Navbar />
       <main className="flex-1 bg-background">
-        {/* Material Design 3 Hero Section - 2 Columns Layout */}
-        <section className="relative pt-12 pb-20 overflow-hidden bg-primary/5">
+        {/* Material Design 3 Hero Section - Redesigned 2 Columns Layout */}
+        <section className="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden bg-gradient-to-b from-primary/[0.03] to-transparent">
+          {/* Decorative Background Element */}
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+          
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               
               {/* Right Column: Content */}
-              <div className="text-right order-1 lg:order-1">
-                <Badge className="bg-primary/10 text-primary border-none font-black px-4 py-1.5 rounded-full mb-6 text-sm">
+              <div className="text-right order-1 flex flex-col items-end">
+                <Badge className="bg-primary/10 text-primary border-none font-black px-5 py-2 rounded-full mb-8 text-sm md-elevation-1">
                   أهلاً بك في عالم تاتكس الجديد ✨
                 </Badge>
                 
-                <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight tracking-tight text-foreground">
+                <h1 className="text-5xl md:text-7xl font-black mb-8 leading-[1.1] tracking-tight text-foreground">
                   كل احتياجاتك..<br />
-                  <span className="text-primary">بلمسة واحدة.</span>
+                  <span className="text-primary relative inline-block">
+                    بلمسة واحدة.
+                    <div className="absolute bottom-2 left-0 w-full h-3 bg-primary/10 -z-10 rounded-full" />
+                  </span>
                 </h1>
                 
-                <p className="text-lg md:text-xl mb-8 text-muted-foreground font-bold max-w-xl mr-0 ml-auto leading-relaxed">
+                <p className="text-xl md:text-2xl mb-12 text-muted-foreground font-bold max-w-xl leading-relaxed">
                   من وجبتك المفضلة إلى حجز قاعتك الخاصة.. كل ما تحتاجه في مكان واحد بأمان وسرعة فائقة.
                 </p>
 
-                {/* MD3 Tonal Search Bar */}
-                <div className="relative max-w-xl mr-0 ml-auto mb-6">
-                  <div className="bg-white p-1.5 rounded-[2rem] shadow-md border border-border flex items-center flex-row-reverse group transition-all focus-within:ring-4 focus-within:ring-primary/10 cursor-pointer" onClick={() => router.push('/search')}>
-                    <div className="flex-1 px-4">
+                {/* MD3 Tonal Search Bar - Pill Shaped */}
+                <div className="relative w-full max-w-xl">
+                  <div 
+                    className="bg-white p-2 rounded-full shadow-xl border border-border flex items-center flex-row-reverse group transition-all focus-within:ring-4 focus-within:ring-primary/10 cursor-pointer md-elevation-2 hover:md-elevation-3" 
+                    onClick={() => router.push('/search')}
+                  >
+                    <div className="flex-1 px-6">
                       <Input 
                         placeholder="ابحث عن مطعم أو خدمة..." 
-                        className="border-none bg-transparent h-12 text-lg font-black placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none text-right cursor-pointer"
+                        className="border-none bg-transparent h-14 text-xl font-black placeholder:text-muted-foreground/40 focus-visible:ring-0 shadow-none text-right cursor-pointer"
                         readOnly
                       />
                     </div>
-                    <Button className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-white p-0 shrink-0 shadow-none border-none group-hover:scale-105 transition-transform">
-                      <Search className="w-6 h-6" />
+                    <Button className="h-14 w-14 rounded-full bg-primary hover:bg-primary/90 text-white p-0 shrink-0 shadow-none border-none group-hover:scale-105 transition-transform">
+                      <Search className="w-7 h-7" />
                     </Button>
+                  </div>
+                </div>
+
+                {/* Trust Badges */}
+                <div className="mt-12 flex flex-wrap justify-end gap-8 opacity-60 grayscale hover:grayscale-0 transition-all">
+                  <div className="flex items-center gap-2 flex-row-reverse">
+                    <Zap className="w-5 h-5 text-primary" />
+                    <span className="text-sm font-black">توصيل برق</span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-row-reverse">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    <span className="text-sm font-black">تغطية شاملة</span>
                   </div>
                 </div>
               </div>
 
-              {/* Left Column: Mobile Mockup */}
-              <div className="order-2 lg:order-2 flex justify-center lg:justify-start">
-                <div className="relative w-full max-w-[320px] aspect-[9/18.5] bg-foreground rounded-[3rem] p-3 shadow-2xl border-[8px] border-foreground overflow-hidden">
-                  <Image 
-                    src="https://picsum.photos/seed/tatx-app-hero/600/1200" 
-                    alt="تطبيق تاتكس" 
-                    fill 
-                    className="object-cover rounded-[2rem]"
-                    data-ai-hint="mobile app"
-                  />
+              {/* Left Column: Mobile Mockup - Professional Frame */}
+              <div className="order-2 flex justify-center lg:justify-start">
+                <div className="relative w-full max-w-[340px] perspective-1000">
+                  {/* Glowing Aura behind the phone */}
+                  <div className="absolute inset-0 bg-primary/20 rounded-[4rem] blur-[60px] animate-pulse pointer-events-none" />
+                  
+                  <div className="relative w-full aspect-[9/18.5] bg-foreground rounded-[3.5rem] p-3 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] border-[10px] border-foreground overflow-hidden md-elevation-3">
+                    {/* Inner Screen Content */}
+                    <div className="relative w-full h-full rounded-[2.8rem] overflow-hidden bg-white">
+                      <Image 
+                        src="https://picsum.photos/seed/tatx-app-hero/600/1200" 
+                        alt="تطبيق تاتكس" 
+                        fill 
+                        className="object-cover"
+                        data-ai-hint="mobile app"
+                        priority
+                      />
+                      {/* Fake Status Bar */}
+                      <div className="absolute top-0 left-0 w-full h-8 bg-black/10 backdrop-blur-sm flex justify-between items-center px-6 text-[10px] text-white font-bold z-10">
+                        <span>9:41</span>
+                        <div className="flex gap-1">
+                          <div className="w-3 h-3 rounded-full bg-white/20" />
+                          <div className="w-3 h-3 rounded-full bg-white/20" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -93,7 +131,7 @@ export default function Home() {
           {/* Taxi Service CTA Banner */}
           <section className="mb-16">
             <Link href="/taxi">
-              <Card className="relative overflow-hidden bg-black rounded-[2.5rem] min-h-[280px] flex items-center group cursor-pointer border-none">
+              <Card className="relative overflow-hidden bg-black rounded-[2.5rem] min-h-[280px] flex items-center group cursor-pointer border-none md-elevation-2">
                 <div className="absolute inset-0 opacity-40 group-hover:scale-105 transition-transform duration-700">
                   <Image 
                     src="https://picsum.photos/seed/taxi-bg/1200/400" 
@@ -125,7 +163,7 @@ export default function Home() {
 
           {/* Featured Items (MD3 Elevated Cards) */}
           <section className="mb-16">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-8 flex-row-reverse">
               <div className="text-right">
                 <h2 className="text-3xl md:text-4xl font-black mb-1 tracking-tight">عروض تاتكس المميزة</h2>
                 <p className="text-base text-muted-foreground font-bold">أفضل الأسعار والخدمات المختارة لك</p>
@@ -163,7 +201,7 @@ export default function Home() {
                             <p className="text-white/80 text-base font-bold line-clamp-2 mb-6">
                               {item.description}
                             </p>
-                            <div className="flex items-center justify-end">
+                            <div className="flex items-center justify-end flex-row-reverse">
                               <Button className="rounded-2xl font-black text-base px-8 py-6 bg-white text-black hover:bg-primary hover:text-white transition-all shadow-md flex items-center gap-3 flex-row-reverse group/btn border-none">
                                 اطلب الآن
                                 <ArrowLeft className="w-5 h-5 group-hover/btn:-translate-x-1 transition-transform" />
@@ -191,7 +229,7 @@ export default function Home() {
 
             return (
               <section key={cat.id} className="mb-12">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-6 flex-row-reverse">
                   <div className="text-right">
                     <h2 className="text-2xl font-black text-foreground tracking-tight">{cat.name}</h2>
                     <p className="text-xs text-muted-foreground font-bold mt-1">أفضل الخيارات في {cat.name}</p>
