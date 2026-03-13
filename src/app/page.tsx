@@ -53,14 +53,6 @@ export default function Home() {
                     <Search className="w-6 h-6" />
                   </Button>
                 </div>
-                
-                {/* Popular Tags */}
-                <div className="flex flex-wrap gap-3 mt-4 justify-start flex-row-reverse pr-4">
-                  <span className="text-xs font-black text-muted-foreground">شائع الآن:</span>
-                  {['مندي', 'شاليهات الملقا', 'صيانة مكيفات', 'تاكسي مطار'].map((tag) => (
-                    <button key={tag} className="text-xs font-black text-foreground hover:text-[#E27E36] transition-colors">#{tag}</button>
-                  ))}
-                </div>
               </div>
             </div>
           </div>
