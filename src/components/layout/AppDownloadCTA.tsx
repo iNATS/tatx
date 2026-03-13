@@ -2,7 +2,7 @@
 "use client";
 
 import Image from 'next/image';
-import { Star, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function AppDownloadCTA() {
@@ -75,16 +75,6 @@ export function AppDownloadCTA() {
                       className="object-cover"
                       data-ai-hint="smartphone interface"
                     />
-                    {/* Floating Trust Card */}
-                    <div className="absolute top-10 right-[-20px] bg-white p-4 rounded-2xl shadow-xl border border-zinc-100 flex items-center gap-3 flex-row-reverse animate-bounce-slow">
-                       <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white">
-                          <Star className="w-5 h-5 fill-white" />
-                       </div>
-                       <div className="text-right">
-                          <span className="block font-black text-sm">4.9 تقييم</span>
-                          <span className="text-[10px] text-zinc-400 font-bold">أكثر من 500ألف مستخدم</span>
-                       </div>
-                    </div>
                  </div>
               </div>
             </div>
@@ -92,16 +82,6 @@ export function AppDownloadCTA() {
           </div>
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-bounce-slow {
-          animation: bounce-slow 4s ease-in-out infinite;
-        }
-      `}</style>
     </section>
   );
 }
