@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { PROVIDERS, MENU_ITEMS } from '@/lib/data';
 import Image from 'next/image';
-import { Star, Clock, ShoppingBag, Plus, Minus, Search } from 'lucide-react';
+import { Star, Clock, ShoppingBag, Plus, Minus, Search, ChevronLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCart } from '@/store/use-cart';
@@ -14,9 +14,11 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function ProviderPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const provider = PROVIDERS.find(p => p.id === id);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +28,7 @@ export default function ProviderPage() {
   const { toast } = useToast();
 
   const isMarket = provider?.category === 'market';
+  const isBookingCategory = ['chalets', 'halls', 'services'].includes(provider?.category || '');
 
   const menuItems = useMemo(() => {
     let items = MENU_ITEMS.filter(m => m.providerId === id);
@@ -88,7 +91,7 @@ export default function ProviderPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                <span>{provider.deliveryTime || 'توصيل فوري'}</span>
+                <span>{provider.deliveryTime || 'خدمة فورية'}</span>
               </div>
               {provider.minOrder !== undefined && (
                 <div className="flex items-center gap-2">
@@ -195,6 +198,47 @@ export default function ProviderPage() {
                         );
                       }
 
+                      // Booking Category Layout (Chalets, Halls, Services)
+                      if (isBookingCategory) {
+                        return (
+                          <Link key={item.id} href={`/item/${item.id}`}>
+                            <Card className="overflow-hidden group border-none bg-secondary/20 rounded-3xl shadow-none hover:bg-secondary/40 transition-all cursor-pointer">
+                              <div className="flex flex-col h-full">
+                                <div className="relative w-full h-56">
+                                  <Image 
+                                    src={item.image} 
+                                    alt={item.name} 
+                                    fill 
+                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                  />
+                                  <div className="absolute bottom-4 left-4">
+                                    <Badge className="bg-primary text-white font-black px-4 py-2 rounded-xl text-lg shadow-none">
+                                      {item.price} ر.س
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <CardContent className="flex-1 p-6 flex flex-col justify-between text-right">
+                                  <div>
+                                    <div className="flex justify-between items-center mb-3 flex-row-reverse">
+                                      <h3 className="text-xl font-black group-hover:text-primary transition-colors">{item.name}</h3>
+                                      <ChevronLeft className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                                    </div>
+                                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4 font-bold">
+                                      {item.description}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-primary font-black text-sm">
+                                    <span>عرض التفاصيل والحجز</span>
+                                    <ArrowRight className="w-4 h-4 rotate-180" />
+                                  </div>
+                                </CardContent>
+                              </div>
+                            </Card>
+                          </Link>
+                        );
+                      }
+
+                      // Standard Product Layout (Food, Pharmacy, etc.)
                       return (
                         <Card key={item.id} className="overflow-hidden group border-none bg-secondary/20 rounded-3xl shadow-none">
                           <div className="flex flex-col h-full">
@@ -212,7 +256,7 @@ export default function ProviderPage() {
                                   <h3 className="text-lg font-black group-hover:text-primary transition-colors">{item.name}</h3>
                                   <span className="text-primary font-black whitespace-nowrap">{item.price} ر.س</span>
                                 </div>
-                                <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                                <p className="text-sm text-muted-foreground line-clamp-2 mb-4 font-bold">
                                   {item.description}
                                 </p>
                               </div>
@@ -268,3 +312,6 @@ export default function ProviderPage() {
     </>
   );
 }
+
+import { Badge } from '@/components/ui/badge';
+
