@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -17,16 +16,15 @@ export default function SignupPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // تحويل المستخدم بناءً على الدور المختار للمحاكاة
     if (role === 'admin') router.push('/admin');
     else if (role === 'vendor') router.push('/vendor');
     else if (role === 'driver') router.push('/delivery');
-    else router.push('/');
+    else router.push('/profile');
   };
 
   return (
     <div className="min-h-screen bg-[#F5F2F0] flex items-center justify-center p-4 font-body" dir="rtl">
-      <Card className="w-full max-w-xl border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white">
+      <Card className="w-full max-w-2xl border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white">
         <div className="grid grid-cols-1 md:grid-cols-5 h-full">
           <div className="md:col-span-2 bg-primary p-8 text-white flex flex-col justify-between items-end text-right">
             <div>

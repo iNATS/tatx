@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -15,8 +14,10 @@ import {
   CreditCard,
   MessageSquare,
   Bell,
-  Star
+  Star,
+  Store
 } from 'lucide-react';
+import { Button } from '../ui/button';
 
 interface SidebarItem {
   icon: any;
@@ -110,6 +111,3 @@ export function PortalSidebar({ role, title }: PortalSidebarProps) {
     </aside>
   );
 }
-
-import { Store } from 'lucide-react';
-import { Button } from '../ui/button';

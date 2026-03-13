@@ -1,24 +1,23 @@
-
 "use client";
 
 import { PortalSidebar } from '@/components/layout/PortalSidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, MapPin, CreditCard, Bell, Heart, LogOut, ChevronLeft } from 'lucide-react';
+import { MapPin, CreditCard, Bell, Heart, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
 
 export default function CustomerProfilePage() {
   const addresses = [
-    { id: 1, label: 'المنزل', detail: 'حي الملقا، شارع الأمير محمد، الرياض', type: 'home' },
-    { id: 2, label: 'المكتب', detail: 'مركز الملك عبدالله المالي، الرياض', type: 'work' },
+    { id: 1, label: 'المنزل', detail: 'حي الملقا، شارع الأمير محمد، الرياض' },
+    { id: 2, label: 'المكتب', detail: 'مركز الملك عبدالله المالي، الرياض' },
   ];
 
   return (
     <div className="flex bg-[#F8F9FA] min-h-screen" dir="rtl">
       <PortalSidebar role="customer" title="Profile" />
       
-      <main className="flex-1 p-10">
+      <main className="flex-1 p-10 overflow-y-auto">
         <header className="mb-12 text-right">
           <h1 className="text-4xl font-black mb-2">حسابي الشخصي</h1>
           <p className="text-muted-foreground font-bold">إدارة تفضيلاتك وعناوينك المفضلة.</p>
@@ -38,14 +37,12 @@ export default function CustomerProfilePage() {
                 </div>
                 <div className="flex gap-3 justify-center">
                    <Badge className="bg-primary text-white border-none font-black px-4 py-1.5 rounded-xl">عضو بلاتيني</Badge>
-                   <Badge className="bg-orange-100 text-orange-600 border-none font-black px-4 py-1.5 rounded-xl">150 نقطة</Badge>
                 </div>
-                <Button variant="outline" className="w-full rounded-2xl h-12 font-black border-2 border-primary/20 text-primary hover:bg-primary/5 shadow-none">تعديل الملف الشخصي</Button>
+                <Button variant="outline" className="w-full rounded-2xl h-12 font-black border-2 border-primary/20 text-primary shadow-none">تعديل الملف الشخصي</Button>
               </div>
             </Card>
 
             <div className="space-y-4">
-               <h3 className="text-xl font-black text-right px-4">تفضيلات سريعة</h3>
                {[
                  { label: 'المتاجر المفضلة', icon: Heart, count: '12' },
                  { icon: Bell, label: 'التنبيهات', count: '5' },
@@ -85,30 +82,9 @@ export default function CustomerProfilePage() {
                              <p className="text-sm text-muted-foreground font-bold">{addr.detail}</p>
                           </div>
                        </div>
-                       <Button variant="ghost" className="text-muted-foreground hover:text-primary font-black shadow-none">تعديل</Button>
                     </div>
                   ))}
                </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-sm rounded-[2rem] bg-white p-8">
-               <CardTitle className="text-xl font-black mb-8 text-right">أمان الحساب</CardTitle>
-               <div className="space-y-6">
-                  <div className="flex items-center justify-between flex-row-reverse p-6 bg-secondary/30 rounded-3xl">
-                     <div className="text-right">
-                        <span className="block font-black text-base">كلمة المرور</span>
-                        <span className="text-xs text-muted-foreground font-bold">تم التغيير منذ 3 أشهر</span>
-                     </div>
-                     <Button variant="outline" className="rounded-xl h-11 px-6 font-black border-2 shadow-none">تغيير</Button>
-                  </div>
-                  <div className="flex items-center justify-between flex-row-reverse p-6 bg-secondary/30 rounded-3xl">
-                     <div className="text-right">
-                        <span className="block font-black text-base">المصادقة الثنائية</span>
-                        <span className="text-xs text-muted-foreground font-bold">غير مفعلة لزيادة الأمان</span>
-                     </div>
-                     <Button className="rounded-xl h-11 px-6 font-black bg-black text-white shadow-none border-none">تفعيل</Button>
-                  </div>
-               </div>
             </Card>
           </div>
         </div>

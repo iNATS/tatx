@@ -1,4 +1,3 @@
-
 "use client";
 
 import { PortalSidebar } from '@/components/layout/PortalSidebar';
@@ -45,22 +44,11 @@ export default function AdminDashboard() {
     <div className="flex bg-[#F8F9FA] min-h-screen" dir="rtl">
       <PortalSidebar role="admin" title="Admin" />
       
-      <main className="flex-1 p-10">
+      <main className="flex-1 p-10 overflow-y-auto">
         <header className="flex justify-between items-end mb-12">
           <div className="text-right">
             <h1 className="text-4xl font-black mb-2">لوحة التحكم المركزية</h1>
             <p className="text-muted-foreground font-bold">أهلاً بك مجدداً، مدير تاتكس.</p>
-          </div>
-          <div className="flex gap-4">
-             <div className="bg-white p-4 rounded-2xl shadow-sm border border-border flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-                <div className="text-right">
-                   <span className="block text-[10px] text-muted-foreground font-bold">حالة النظام</span>
-                   <span className="block text-sm font-black text-green-500">مستقر</span>
-                </div>
-             </div>
           </div>
         </header>
 

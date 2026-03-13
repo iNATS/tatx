@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -16,11 +15,10 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // محاكاة تسجيل الدخول بناءً على الإيميل
     if (email.includes('admin')) router.push('/admin');
     else if (email.includes('vendor')) router.push('/vendor');
     else if (email.includes('driver')) router.push('/delivery');
-    else router.push('/');
+    else router.push('/profile');
   };
 
   return (
