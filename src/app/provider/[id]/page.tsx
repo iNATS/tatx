@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useParams } from 'next/navigation';
@@ -24,6 +25,8 @@ export default function ProviderPage() {
   const { addItem, cart, updateQuantity } = useCart();
   const { toast } = useToast();
 
+  const isMarket = provider?.category === 'market';
+
   const menuItems = useMemo(() => {
     let items = MENU_ITEMS.filter(m => m.providerId === id);
     
@@ -38,7 +41,6 @@ export default function ProviderPage() {
     return items;
   }, [id, searchQuery, activeFilter]);
 
-  // استخراج التصنيفات الفرعية للموفر
   const subCategories = useMemo(() => {
     const cats = MENU_ITEMS.filter(m => m.providerId === id).map(i => i.subCategory).filter(Boolean);
     return ['الكل', ...Array.from(new Set(cats))];
@@ -69,7 +71,7 @@ export default function ProviderPage() {
       <Navbar />
       <main className="flex-1 bg-white" dir="rtl">
         {/* Header Section */}
-        <section className="relative h-[350px]">
+        <section className="relative h-[250px] md:h-[350px]">
           <Image 
             src={provider.image}
             alt={provider.name}
@@ -78,35 +80,34 @@ export default function ProviderPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
           <div className="container mx-auto px-4 h-full flex flex-col justify-end pb-12 relative z-10 text-white text-right">
-            <h1 className="text-4xl md:text-6xl font-black mb-6">{provider.name}</h1>
-            <div className="flex flex-wrap items-center justify-start gap-6 text-sm md:text-lg font-bold">
-              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur px-4 py-2 rounded-full border border-white/20">
-                <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                <span>{provider.rating} (أكثر من 500 تقييم)</span>
+            <h1 className="text-3xl md:text-6xl font-black mb-4">{provider.name}</h1>
+            <div className="flex flex-wrap items-center justify-start gap-4 text-xs md:text-lg font-bold">
+              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur px-3 py-1.5 rounded-full border border-white/20">
+                <Star className="w-4 h-4 md:w-5 md:h-5 fill-yellow-400 text-yellow-400" />
+                <span>{provider.rating}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-primary" />
+                <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                 <span>{provider.deliveryTime || 'توصيل فوري'}</span>
               </div>
               {provider.minOrder !== undefined && (
                 <div className="flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5 text-primary" />
+                  <ShoppingBag className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                   <span>الحد الأدنى {provider.minOrder} ر.س</span>
                 </div>
               )}
             </div>
-            <p className="mt-6 text-white/80 max-w-2xl text-lg font-medium">{provider.description}</p>
           </div>
         </section>
 
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-8">
           {/* Filters & Search */}
-          <div className="flex flex-col md:flex-row-reverse justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row-reverse justify-between gap-6 mb-8">
             <div className="relative w-full md:w-96">
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input 
-                placeholder="ابحث في هذا المتجر..." 
-                className="pr-12 h-12 rounded-2xl bg-secondary/50 border-none shadow-none text-right font-bold"
+                placeholder="ابحث عن منتج..." 
+                className="pr-12 h-12 rounded-2xl bg-secondary/50 border-none shadow-none text-right font-bold focus-visible:ring-primary"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -118,7 +119,7 @@ export default function ProviderPage() {
                   key={cat}
                   variant={activeFilter === cat ? "default" : "secondary"}
                   className={cn(
-                    "rounded-2xl px-6 h-12 font-black shadow-none transition-all",
+                    "rounded-2xl px-6 h-12 font-black shadow-none transition-all whitespace-nowrap",
                     activeFilter === cat ? "bg-primary text-white" : "bg-secondary text-foreground hover:bg-secondary/80"
                   )}
                   onClick={() => setActiveFilter(cat!)}
@@ -129,45 +130,104 @@ export default function ProviderPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            {/* Sidebar Categories (Desktop) */}
-            <aside className="hidden lg:block">
-              <div className="sticky top-24 text-right">
-                <h3 className="text-xl font-black mb-6 border-r-4 border-primary pr-3 flex items-center justify-end gap-2">
-                   التصنيفات
-                  <Filter className="w-4 h-4 text-primary" />
-                </h3>
-                <nav className="space-y-2">
-                  {subCategories.map((cat) => (
-                    <button 
-                      key={cat} 
-                      onClick={() => setActiveFilter(cat!)}
-                      className={cn(
-                        "w-full text-right px-4 py-3 rounded-2xl font-bold transition-all",
-                        activeFilter === cat 
-                          ? "bg-primary/10 text-primary border-r-4 border-primary" 
-                          : "hover:bg-secondary text-muted-foreground"
-                      )}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-            </aside>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Sidebar Categories (Only for Non-Market) */}
+            {!isMarket && (
+              <aside className="hidden lg:block">
+                <div className="sticky top-24 text-right">
+                  <h3 className="text-xl font-black mb-6 border-r-4 border-primary pr-3 flex items-center justify-end gap-2">
+                    التصنيفات
+                    <Filter className="w-4 h-4 text-primary" />
+                  </h3>
+                  <nav className="space-y-2">
+                    {subCategories.map((cat) => (
+                      <button 
+                        key={cat} 
+                        onClick={() => setActiveFilter(cat!)}
+                        className={cn(
+                          "w-full text-right px-4 py-3 rounded-2xl font-bold transition-all",
+                          activeFilter === cat 
+                            ? "bg-primary/10 text-primary border-r-4 border-primary" 
+                            : "hover:bg-secondary text-muted-foreground"
+                        )}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              </aside>
+            )}
 
             {/* Menu Items Grid */}
-            <div className="lg:col-span-3 text-right">
+            <div className={cn("text-right", isMarket ? "lg:col-span-4" : "lg:col-span-3")}>
               <div className="mb-12">
                 <h2 className="text-2xl font-black mb-8 flex items-center justify-start gap-3 flex-row-reverse">
                   <div className="w-2 h-8 bg-primary rounded-full" />
-                  {activeFilter === 'الكل' ? 'جميع الأصناف' : activeFilter}
+                  {activeFilter === 'الكل' ? (isMarket ? 'جميع المنتجات' : 'جميع الأصناف') : activeFilter}
                 </h2>
                 
                 {menuItems.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className={cn(
+                    "grid gap-6",
+                    isMarket 
+                      ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6" 
+                      : "grid-cols-1 md:grid-cols-2"
+                  )}>
                     {menuItems.map((item) => {
                       const quantity = getItemQuantity(item.id);
+                      
+                      if (isMarket) {
+                        return (
+                          <Card key={item.id} className="overflow-hidden group border-none bg-secondary/20 rounded-2xl shadow-none flex flex-col">
+                            <div className="relative aspect-square w-full">
+                              <Image 
+                                src={item.image} 
+                                alt={item.name} 
+                                fill 
+                                className="object-cover transition-transform group-hover:scale-105"
+                              />
+                            </div>
+                            <CardContent className="flex-1 p-3 flex flex-col text-right">
+                              <h3 className="text-sm font-black mb-1 line-clamp-2 min-h-[40px]">{item.name}</h3>
+                              <span className="text-primary font-black text-sm mb-3 block">{item.price} ر.س</span>
+                              
+                              <div className="mt-auto">
+                                {quantity > 0 ? (
+                                  <div className="flex items-center justify-between bg-primary text-white rounded-xl px-1 py-1">
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      className="h-7 w-7 rounded-lg text-white hover:bg-white/20 shadow-none"
+                                      onClick={() => updateQuantity(item.id, -1)}
+                                    >
+                                      <Minus className="w-3 h-3" />
+                                    </Button>
+                                    <span className="font-black text-sm">{quantity}</span>
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      className="h-7 w-7 rounded-lg text-white hover:bg-white/20 shadow-none"
+                                      onClick={() => updateQuantity(item.id, 1)}
+                                    >
+                                      <Plus className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <Button 
+                                    size="sm" 
+                                    className="w-full rounded-xl gap-2 font-black bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none text-xs h-9"
+                                    onClick={() => handleAddToCart(item)}
+                                  >
+                                    أضف
+                                  </Button>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      }
+
                       return (
                         <Card key={item.id} className="overflow-hidden group border-none bg-secondary/20 rounded-3xl shadow-none">
                           <div className="flex flex-col sm:flex-row-reverse">
@@ -233,8 +293,7 @@ export default function ProviderPage() {
                   </div>
                 )}
               </div>
-
-              <Separator className="my-12 opacity-50" />
+              <Separator className="my-12 opacity-50 shadow-none" />
             </div>
           </div>
         </div>
