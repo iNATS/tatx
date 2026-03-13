@@ -67,7 +67,7 @@ export default function Home() {
             <CategorySlider />
           </div>
 
-          {/* Featured Items Section */}
+          {/* Featured Items Section - Redesigned with Full Background Images */}
           <section className="mb-20">
             <div className="flex items-center justify-between mb-8 flex-row">
               <Button variant="link" className="text-primary font-black text-lg p-0 shadow-none">عرض الكل</Button>
@@ -78,47 +78,68 @@ export default function Home() {
                 <CarouselContent className="-ml-4">
                   {FEATURED_ITEMS.map((item) => (
                     <CarouselItem key={item.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                      <Card className="overflow-hidden group border-none bg-white rounded-[2rem] ring-1 ring-border/50 shadow-none h-full hover:bg-secondary/5 transition-colors">
-                        <div className="relative h-64 overflow-hidden">
-                          <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                          <div className="absolute top-5 right-5 z-10">
-                            <Button size="icon" className="rounded-full bg-white/95 text-primary hover:bg-white shadow-none border-none h-11 w-11">
-                              <Heart className="w-5 h-5" />
+                      <Link href={['chalets', 'halls', 'services'].includes(item.category) ? `/item/${item.id}` : `/provider/${item.providerId}`}>
+                        <Card className="relative overflow-hidden group border-none bg-black rounded-[2.5rem] shadow-none h-[450px] transition-all duration-500 hover:ring-4 hover:ring-primary/20">
+                          {/* Background Image */}
+                          <Image 
+                            src={item.image} 
+                            alt={item.name} 
+                            fill 
+                            className="object-cover transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-60" 
+                          />
+                          
+                          {/* Gradient Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+                          {/* Top Badges */}
+                          <div className="absolute top-6 right-6 z-20 flex flex-col gap-3">
+                            <Button size="icon" className="rounded-full bg-white/10 backdrop-blur text-white hover:bg-primary hover:text-white transition-all shadow-none border-none h-12 w-12">
+                              <Heart className="w-6 h-6" />
                             </Button>
                           </div>
-                          <div className="absolute bottom-5 left-5 z-10">
-                            <div className="bg-primary text-white font-black px-5 py-2 text-xl rounded-2xl shadow-xl flex items-center gap-1 flex-row-reverse">
-                              <span>{item.price}</span>
-                              <span className="text-xs">ر.س</span>
+
+                          {/* Bottom Content */}
+                          <CardContent className="absolute inset-0 p-8 flex flex-col justify-end text-right text-white z-10">
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-end flex-row-reverse">
+                                <div className="bg-primary text-white font-black px-4 py-1.5 text-xl rounded-xl shadow-xl flex items-center gap-1 flex-row-reverse">
+                                  <span>{item.price}</span>
+                                  <span className="text-xs">ر.س</span>
+                                </div>
+                                <Badge className="bg-white/20 backdrop-blur text-white border-none font-black px-3 py-1 rounded-lg">
+                                  {CATEGORIES.find(c => c.id === item.category)?.name}
+                                </Badge>
+                              </div>
+                              
+                              <div>
+                                <h3 className="text-3xl font-black mb-2 leading-tight group-hover:text-primary transition-colors">{item.name}</h3>
+                                <p className="text-white/80 text-sm font-bold line-clamp-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                                  {item.description}
+                                </p>
+                              </div>
+
+                              <div className="pt-2">
+                                <Button className="rounded-xl font-black text-base px-8 bg-primary text-white hover:bg-white hover:text-primary transition-all shadow-none flex items-center gap-2 flex-row-reverse w-fit mr-0 ml-auto">
+                                   {['chalets', 'halls', 'services'].includes(item.category) ? 'تفاصيل الحجز' : 'اطلب الآن'}
+                                   <ArrowLeft className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                        </div>
-                        <CardContent className="p-8 text-right flex flex-col items-end justify-between min-h-[220px]">
-                          <div className="w-full space-y-3">
-                            <h3 className="text-2xl font-black group-hover:text-primary transition-colors text-right leading-tight">{item.name}</h3>
-                            <p className="text-muted-foreground text-base font-bold line-clamp-2 leading-relaxed text-right opacity-80">{item.description}</p>
-                          </div>
-                          <Link href={['chalets', 'halls', 'services'].includes(item.category) ? `/item/${item.id}` : `/provider/${item.providerId}`} className="w-full mt-6">
-                            <Button className="w-full rounded-2xl font-black text-lg py-7 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none flex items-center justify-center gap-3 group/btn">
-                               {['chalets', 'halls', 'services'].includes(item.category) ? 'عرض التفاصيل' : 'تسوق الآن'}
-                               <ArrowLeft className="w-5 h-5 group-hover/btn:-translate-x-1 transition-transform" />
-                            </Button>
-                          </Link>
-                        </CardContent>
-                      </Card>
+                          </CardContent>
+                        </Card>
+                      </Link>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
                 <div className="hidden md:block">
-                  <CarouselPrevious className="absolute -left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-12 w-12 hover:bg-white" />
-                  <CarouselNext className="absolute -right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-12 w-12 hover:bg-white" />
+                  <CarouselPrevious className="absolute -left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-12 w-12 hover:bg-white text-primary" />
+                  <CarouselNext className="absolute -right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-12 w-12 hover:bg-white text-primary" />
                 </div>
               </Carousel>
             </div>
           </section>
 
-          {/* Dynamic Sections per Category */}
+          {/* Dynamic Sections per Category - Slider Layout */}
           {CATEGORIES.map((cat) => {
             if (cat.id === 'taxi') {
               return (
@@ -148,7 +169,7 @@ export default function Home() {
               );
             }
 
-            const categoryItems = MENU_ITEMS.filter(item => item.category === cat.id);
+            const categoryItems = MENU_ITEMS.filter(item => item.category === cat.id).slice(0, 10);
             const provider = PROVIDERS.find(p => p.category === cat.id);
             const href = `/provider/${provider?.id}`;
 
@@ -194,8 +215,8 @@ export default function Home() {
                       })}
                     </CarouselContent>
                     <div className="hidden md:block">
-                      <CarouselPrevious className="absolute -left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-10 w-10 hover:bg-white" />
-                      <CarouselNext className="absolute -right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-10 w-10 hover:bg-white" />
+                      <CarouselPrevious className="absolute -left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-10 w-10 hover:bg-white text-primary" />
+                      <CarouselNext className="absolute -right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-10 w-10 hover:bg-white text-primary" />
                     </div>
                   </Carousel>
                 </div>
