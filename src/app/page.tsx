@@ -6,7 +6,7 @@ import { CategorySlider } from '@/components/home/CategorySlider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, Clock, Heart, ArrowLeft, ArrowRight, Car, Package, ChevronLeft } from 'lucide-react';
+import { Star, Clock, Heart, ArrowLeft, ArrowRight, Car, Package, ChevronLeft, ShieldCheck, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FEATURED_ITEMS, PROVIDERS, CATEGORIES, MENU_ITEMS } from '@/lib/data';
@@ -24,65 +24,91 @@ export default function Home() {
     <>
       <Navbar />
       <main className="flex-1 bg-white">
-        {/* Redesigned Hero Section */}
-        <section className="relative min-h-[550px] md:min-h-[650px] flex items-center overflow-hidden">
-          {/* Background with premium overlay */}
-          <div className="absolute inset-0 z-0">
-            <Image 
-              src="https://picsum.photos/seed/tatx-hero-luxury/1920/1080"
-              alt="تاتكس - كل احتياجاتك"
-              fill
-              className="object-cover brightness-[0.35] scale-105"
-              priority
-              data-ai-hint="lifestyle delivery"
-            />
-            <div className="absolute inset-0 bg-gradient-to-l from-black/90 via-black/40 to-transparent" />
-          </div>
+        {/* New Modern Hero Section */}
+        <section className="relative pt-20 pb-32 overflow-hidden bg-[#fafafa]">
+          {/* Background Decorative Elements */}
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 rounded-bl-[100px] -z-10" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10" />
+          
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Text Content */}
+              <div className="text-right order-2 lg:order-1 animate-in fade-in slide-in-from-right-10 duration-1000">
+                <div className="inline-flex items-center gap-2 mb-6 bg-white px-4 py-2 rounded-2xl shadow-sm border border-border/50">
+                  <Badge className="bg-primary text-white border-none px-2 py-0.5 rounded-lg text-[10px] font-black uppercase">جديد</Badge>
+                  <span className="text-muted-foreground font-bold text-xs">تاتكس برو - استمتع بتوصيل مجاني غير محدود</span>
+                </div>
 
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl animate-in fade-in slide-in-from-right-10 duration-1000 text-right mr-0 ml-auto">
-              {/* Trust Signal Badge */}
-              <div className="inline-flex items-center gap-3 mb-8 bg-white/10 backdrop-blur-xl px-5 py-2.5 rounded-2xl border border-white/20 shadow-2xl">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                </span>
-                <span className="text-white font-black text-sm tracking-wide">أكثر من 100,000 مستخدم يثقون في تاتكس</span>
-              </div>
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 leading-[1.1] tracking-tight text-foreground">
+                  كل ما تتمناه <br />
+                  <span className="text-primary italic">في متناول يدك.</span>
+                </h1>
+                
+                <p className="text-lg md:text-xl mb-12 text-muted-foreground font-medium max-w-xl mr-0 ml-auto leading-relaxed">
+                  تاتكس هو رفيقك الرقمي الأول في المملكة. اطلب طعامك، مشوارك، أو حتى صيانة منزلك بضغطة زر واحدة بكل أمان وسهولة من مكان واحد.
+                </p>
 
-              <h1 className="text-5xl md:text-8xl font-black mb-8 leading-[1.1] text-white tracking-tighter">
-                عالمك الرقمي <br />
-                <span className="text-primary italic">في تطبيق واحد.</span>
-              </h1>
-              
-              <p className="text-xl md:text-2xl mb-12 text-white/80 font-bold max-w-xl mr-0 ml-auto leading-relaxed">
-                تاتكس هو رفيقك اليومي الشامل في المملكة. اطلب طعامك، مشوارك، أو حتى صيانة منزلك بضغطة زر واحدة بكل أمان وسهولة.
-              </p>
-
-              <div className="flex flex-wrap gap-5 justify-start flex-row-reverse mb-16">
-                <Button size="lg" className="rounded-[1.25rem] px-12 text-xl font-black bg-primary hover:bg-primary/90 h-16 shadow-[0_20px_50px_-10px_rgba(239,68,68,0.5)] transition-all hover:scale-105 active:scale-95 border-none">
-                  ابدأ التجربة
-                </Button>
-                <Link href="/taxi">
-                  <Button size="lg" variant="outline" className="rounded-[1.25rem] px-10 text-xl font-black bg-white/10 backdrop-blur-xl text-white border-white/20 hover:bg-white/20 h-16 transition-all hover:scale-105 active:scale-95 shadow-none">
-                    اطلب مشوارك
+                <div className="flex flex-wrap gap-4 justify-start flex-row-reverse mb-12">
+                  <Button size="lg" className="rounded-2xl px-10 text-lg font-black bg-primary hover:bg-primary/90 h-16 shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 border-none">
+                    استكشف الخدمات
                   </Button>
-                </Link>
+                  <Link href="/taxi">
+                    <Button size="lg" variant="outline" className="rounded-2xl px-10 text-lg font-black bg-white text-foreground border-2 hover:bg-secondary h-16 transition-all hover:scale-105 active:scale-95 shadow-none">
+                      اطلب مشوار الآن
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Features Row */}
+                <div className="flex items-center gap-8 justify-start flex-row-reverse">
+                  <div className="flex items-center gap-3 text-right">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-primary">
+                      <ShieldCheck className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="block font-black text-sm">أمان تام</span>
+                      <span className="text-[10px] text-muted-foreground font-bold">بضمان تاتكس</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-right">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-primary">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="block font-black text-sm">توصيل برق</span>
+                      <span className="text-[10px] text-muted-foreground font-bold">خلال دقائق</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Quick Stats/Features */}
-              <div className="flex items-center gap-10 justify-start flex-row-reverse opacity-80 border-r-4 border-primary/40 pr-8">
-                <div className="flex flex-col items-end">
-                  <span className="text-white text-3xl font-black">24/7</span>
-                  <span className="text-white/60 text-[10px] font-black uppercase tracking-widest">خدمة مستمرة</span>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-white text-3xl font-black">15د</span>
-                  <span className="text-white/60 text-[10px] font-black uppercase tracking-widest">متوسط التوصيل</span>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-white text-3xl font-black">100%</span>
-                  <span className="text-white/60 text-[10px] font-black uppercase tracking-widest">ضمان تاتكس</span>
+              {/* Visual Element */}
+              <div className="relative order-1 lg:order-2 h-[400px] md:h-[550px] animate-in fade-in zoom-in-95 duration-1000">
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-[4rem] -rotate-3 scale-95" />
+                <div className="relative h-full w-full rounded-[4rem] overflow-hidden shadow-2xl ring-1 ring-border">
+                  <Image 
+                    src="https://picsum.photos/seed/tatx-lifestyle-1/1200/1200"
+                    alt="تاتكس - أسلوب حياة"
+                    fill
+                    className="object-cover"
+                    priority
+                    data-ai-hint="lifestyle Saudi"
+                  />
+                  {/* Floating App Card */}
+                  <div className="absolute bottom-10 right-10 left-10 bg-white/90 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-2xl border border-white/20 flex items-center justify-between flex-row-reverse">
+                    <div className="flex items-center gap-4 flex-row-reverse">
+                       <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white">
+                          <Car className="w-7 h-7" />
+                       </div>
+                       <div className="text-right">
+                          <span className="block font-black text-base">تاكسي تاتكس</span>
+                          <span className="text-xs text-muted-foreground font-bold">مشوارك الآن في 3 دقائق</span>
+                       </div>
+                    </div>
+                    <div className="bg-primary/10 text-primary font-black px-4 py-2 rounded-xl text-sm">
+                       اطلب
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -110,27 +136,19 @@ export default function Home() {
                     <CarouselItem key={item.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
                       <Link href={['chalets', 'halls', 'services'].includes(item.category) ? `/item/${item.id}` : `/provider/${item.providerId}`}>
                         <Card className="relative overflow-hidden group border-none bg-black rounded-[2.5rem] shadow-none h-[450px] transition-all duration-500 hover:ring-4 hover:ring-primary/20">
-                          {/* Background Image */}
                           <Image 
                             src={item.image} 
                             alt={item.name} 
                             fill 
                             className="object-cover transition-transform duration-1000 group-hover:scale-110 opacity-70 group-hover:opacity-60" 
                           />
-                          
-                          {/* Gradient Overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-
-                          {/* Top Badges */}
                           <div className="absolute top-6 right-6 z-20 flex flex-col gap-3">
                             <Button size="icon" className="rounded-full bg-white/10 backdrop-blur text-white hover:bg-primary hover:text-white transition-all shadow-none border-none h-12 w-12">
                               <Heart className="w-6 h-6" />
                             </Button>
                           </div>
-
-                          {/* Content Overlay */}
                           <CardContent className="absolute inset-0 p-8 flex flex-col justify-between text-right text-white z-10">
-                            {/* Top info */}
                             <div className="flex justify-between items-start flex-row-reverse">
                               <div className="bg-primary text-white font-black px-4 py-1.5 text-xl rounded-xl shadow-xl flex items-center gap-1 flex-row-reverse">
                                 <span>{item.price}</span>
@@ -140,8 +158,6 @@ export default function Home() {
                                 {CATEGORIES.find(c => c.id === item.category)?.name}
                               </Badge>
                             </div>
-                            
-                            {/* Bottom info */}
                             <div className="space-y-4">
                               <div>
                                 <h3 className="text-3xl font-black mb-2 leading-tight group-hover:text-primary transition-colors">{item.name}</h3>
@@ -149,7 +165,6 @@ export default function Home() {
                                   {item.description}
                                 </p>
                               </div>
-
                               <div className="pt-2">
                                 <Button className="rounded-xl font-black text-base px-8 bg-primary text-white hover:bg-white hover:text-primary transition-all shadow-none flex items-center gap-2 flex-row-reverse w-fit mr-0 ml-auto">
                                    {['chalets', 'halls', 'services'].includes(item.category) ? 'تفاصيل الحجز' : 'اطلب الآن'}
