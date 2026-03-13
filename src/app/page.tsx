@@ -24,36 +24,66 @@ export default function Home() {
     <>
       <Navbar />
       <main className="flex-1 bg-white">
-        {/* Hero Section */}
-        <section className="relative h-[450px] flex items-center overflow-hidden">
-          <Image 
-            src="https://picsum.photos/seed/tatx-hero/1200/600"
-            alt="تاتكس - كل احتياجاتك"
-            fill
-            className="object-cover brightness-[0.5]"
-            priority
-          />
-          <div className="container mx-auto px-4 relative z-10 text-white">
-            <div className="max-w-2xl animate-in slide-in-from-right duration-700 text-right">
-              <Badge className="mb-4 bg-primary text-white border-none font-black px-6 py-2 text-sm rounded-full shadow-none">
-                منصة تاتكس الشاملة
-              </Badge>
-              <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
-                كل احتياجاتك <br />
-                <span className="text-primary italic">من منصة واحدة.</span>
+        {/* Redesigned Hero Section */}
+        <section className="relative min-h-[550px] md:min-h-[650px] flex items-center overflow-hidden">
+          {/* Background with premium overlay */}
+          <div className="absolute inset-0 z-0">
+            <Image 
+              src="https://picsum.photos/seed/tatx-hero-luxury/1920/1080"
+              alt="تاتكس - كل احتياجاتك"
+              fill
+              className="object-cover brightness-[0.35] scale-105"
+              priority
+              data-ai-hint="lifestyle delivery"
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-black/90 via-black/40 to-transparent" />
+          </div>
+
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl animate-in fade-in slide-in-from-right-10 duration-1000 text-right mr-0 ml-auto">
+              {/* Trust Signal Badge */}
+              <div className="inline-flex items-center gap-3 mb-8 bg-white/10 backdrop-blur-xl px-5 py-2.5 rounded-2xl border border-white/20 shadow-2xl">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                </span>
+                <span className="text-white font-black text-sm tracking-wide">أكثر من 100,000 مستخدم يثقون في تاتكس</span>
+              </div>
+
+              <h1 className="text-5xl md:text-8xl font-black mb-8 leading-[1.1] text-white tracking-tighter">
+                عالمك الرقمي <br />
+                <span className="text-primary italic">في تطبيق واحد.</span>
               </h1>
-              <p className="text-xl mb-10 text-gray-200 font-medium">
-                تاتكس توفر لك كل شيء مباشرة: طعام، مستلزمات منزلية، أدوية، وحتى مشوارك القادم.
+              
+              <p className="text-xl md:text-2xl mb-12 text-white/80 font-bold max-w-xl mr-0 ml-auto leading-relaxed">
+                تاتكس هو رفيقك اليومي الشامل في المملكة. اطلب طعامك، مشوارك، أو حتى صيانة منزلك بضغطة زر واحدة بكل أمان وسهولة.
               </p>
-              <div className="flex gap-4 justify-start flex-row-reverse">
-                <Button size="lg" className="rounded-full px-10 text-xl font-black bg-primary hover:bg-primary/90 h-14 shadow-none">
-                  ابدأ التسوق
+
+              <div className="flex flex-wrap gap-5 justify-start flex-row-reverse mb-16">
+                <Button size="lg" className="rounded-[1.25rem] px-12 text-xl font-black bg-primary hover:bg-primary/90 h-16 shadow-[0_20px_50px_-10px_rgba(239,68,68,0.5)] transition-all hover:scale-105 active:scale-95 border-none">
+                  ابدأ التجربة
                 </Button>
                 <Link href="/taxi">
-                  <Button size="lg" variant="outline" className="rounded-full px-10 text-xl font-black bg-white/10 backdrop-blur text-white border-white/40 hover:bg-white/20 h-14 shadow-none">
-                    اطلب تاكسي
+                  <Button size="lg" variant="outline" className="rounded-[1.25rem] px-10 text-xl font-black bg-white/10 backdrop-blur-xl text-white border-white/20 hover:bg-white/20 h-16 transition-all hover:scale-105 active:scale-95 shadow-none">
+                    اطلب مشوارك
                   </Button>
                 </Link>
+              </div>
+
+              {/* Quick Stats/Features */}
+              <div className="flex items-center gap-10 justify-start flex-row-reverse opacity-80 border-r-4 border-primary/40 pr-8">
+                <div className="flex flex-col items-end">
+                  <span className="text-white text-3xl font-black">24/7</span>
+                  <span className="text-white/60 text-[10px] font-black uppercase tracking-widest">خدمة مستمرة</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-white text-3xl font-black">15د</span>
+                  <span className="text-white/60 text-[10px] font-black uppercase tracking-widest">متوسط التوصيل</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-white text-3xl font-black">100%</span>
+                  <span className="text-white/60 text-[10px] font-black uppercase tracking-widest">ضمان تاتكس</span>
+                </div>
               </div>
             </div>
           </div>
@@ -63,11 +93,11 @@ export default function Home() {
           {/* Categories Slider */}
           <div className="mb-16">
             <h2 className="text-3xl font-black mb-2 text-right">الأقسام</h2>
-            <p className="text-muted-foreground text-right mb-4">ما الذي تبحث عنه اليوم؟</p>
+            <p className="text-muted-foreground text-right mb-4 font-bold">ما الذي تبحث عنه اليوم؟</p>
             <CategorySlider />
           </div>
 
-          {/* Featured Items Section - Redesigned with Full Background Images */}
+          {/* Featured Items Section */}
           <section className="mb-20">
             <div className="flex items-center justify-between mb-8 flex-row">
               <Button variant="link" className="text-primary font-black text-lg p-0 shadow-none">عرض الكل</Button>
@@ -100,7 +130,7 @@ export default function Home() {
 
                           {/* Content Overlay */}
                           <CardContent className="absolute inset-0 p-8 flex flex-col justify-between text-right text-white z-10">
-                            {/* Top info - Price moved here */}
+                            {/* Top info */}
                             <div className="flex justify-between items-start flex-row-reverse">
                               <div className="bg-primary text-white font-black px-4 py-1.5 text-xl rounded-xl shadow-xl flex items-center gap-1 flex-row-reverse">
                                 <span>{item.price}</span>
@@ -141,7 +171,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Dynamic Sections per Category - Slider Layout */}
+          {/* Dynamic Sections per Category */}
           {CATEGORIES.filter(cat => cat.id !== 'taxi').map((cat) => {
             const categoryItems = MENU_ITEMS.filter(item => item.category === cat.id).slice(0, 10);
             const provider = PROVIDERS.find(p => p.category === cat.id);
