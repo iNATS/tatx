@@ -78,28 +78,31 @@ export default function Home() {
                 <CarouselContent className="-ml-4">
                   {FEATURED_ITEMS.map((item) => (
                     <CarouselItem key={item.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                      <Card className="overflow-hidden group border-none bg-white rounded-[2rem] ring-1 ring-border/50 shadow-none h-full">
-                        <div className="relative h-56">
-                          <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
-                          <div className="absolute top-4 right-4">
-                            <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-none">
+                      <Card className="overflow-hidden group border-none bg-white rounded-[2rem] ring-1 ring-border/50 shadow-none h-full hover:bg-secondary/5 transition-colors">
+                        <div className="relative h-64 overflow-hidden">
+                          <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                          <div className="absolute top-5 right-5 z-10">
+                            <Button size="icon" className="rounded-full bg-white/95 text-primary hover:bg-white shadow-none border-none h-11 w-11">
                               <Heart className="w-5 h-5" />
                             </Button>
                           </div>
-                          <div className="absolute bottom-4 left-4">
-                            <Badge className="bg-primary text-white font-black px-4 py-2 text-lg shadow-none rounded-xl">
-                              {item.price} ر.س
-                            </Badge>
+                          <div className="absolute bottom-5 left-5 z-10">
+                            <div className="bg-primary text-white font-black px-5 py-2 text-xl rounded-2xl shadow-xl flex items-center gap-1 flex-row-reverse">
+                              <span>{item.price}</span>
+                              <span className="text-xs">ر.س</span>
+                            </div>
                           </div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                         </div>
-                        <CardContent className="p-8 text-right flex flex-col items-end justify-between h-[200px]">
-                          <div className="w-full">
-                            <h3 className="text-2xl font-black mb-3 group-hover:text-primary transition-colors text-right">{item.name}</h3>
-                            <p className="text-muted-foreground text-base font-bold mb-4 line-clamp-1 text-right">{item.description}</p>
+                        <CardContent className="p-8 text-right flex flex-col items-end justify-between min-h-[220px]">
+                          <div className="w-full space-y-3">
+                            <h3 className="text-2xl font-black group-hover:text-primary transition-colors text-right leading-tight">{item.name}</h3>
+                            <p className="text-muted-foreground text-base font-bold line-clamp-2 leading-relaxed text-right opacity-80">{item.description}</p>
                           </div>
-                          <Link href={['chalets', 'halls', 'services'].includes(item.category) ? `/item/${item.id}` : `/provider/${item.providerId}`} className="w-full">
-                            <Button className="w-full rounded-2xl font-black text-lg py-7 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none">
-                              {['chalets', 'halls', 'services'].includes(item.category) ? 'عرض التفاصيل' : 'تسوق الآن'}
+                          <Link href={['chalets', 'halls', 'services'].includes(item.category) ? `/item/${item.id}` : `/provider/${item.providerId}`} className="w-full mt-6">
+                            <Button className="w-full rounded-2xl font-black text-lg py-7 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none flex items-center justify-center gap-3 group/btn">
+                               {['chalets', 'halls', 'services'].includes(item.category) ? 'عرض التفاصيل' : 'تسوق الآن'}
+                               <ArrowLeft className="w-5 h-5 group-hover/btn:-translate-x-1 transition-transform" />
                             </Button>
                           </Link>
                         </CardContent>
@@ -108,8 +111,8 @@ export default function Home() {
                   ))}
                 </CarouselContent>
                 <div className="hidden md:block">
-                  <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2" />
-                  <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2" />
+                  <CarouselPrevious className="absolute -left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-12 w-12 hover:bg-white" />
+                  <CarouselNext className="absolute -right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-12 w-12 hover:bg-white" />
                 </div>
               </Carousel>
             </div>
@@ -191,8 +194,8 @@ export default function Home() {
                       })}
                     </CarouselContent>
                     <div className="hidden md:block">
-                      <CarouselPrevious className="absolute -left-6 top-1/2 -translate-y-1/2" />
-                      <CarouselNext className="absolute -right-6 top-1/2 -translate-y-1/2" />
+                      <CarouselPrevious className="absolute -left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-10 w-10 hover:bg-white" />
+                      <CarouselNext className="absolute -right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur shadow-none border-none h-10 w-10 hover:bg-white" />
                     </div>
                   </Carousel>
                 </div>
