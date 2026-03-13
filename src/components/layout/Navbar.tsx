@@ -12,11 +12,11 @@ export function Navbar() {
   const itemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white border-b shadow-sm">
+    <nav className="sticky top-0 z-50 w-full bg-white border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
+          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-2xl transition-transform group-hover:scale-105">
             T
           </div>
           <span className="text-2xl font-black hidden sm:block">
@@ -36,25 +36,25 @@ export function Navbar() {
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input 
             placeholder="بحث عن خدمات، مطاعم..." 
-            className="pr-10 bg-muted/50 border-none focus-visible:ring-primary text-right"
+            className="pr-10 bg-muted/50 border-none focus-visible:ring-primary text-right shadow-none rounded-2xl"
           />
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="lg:hidden">
+          <Button variant="ghost" size="icon" className="lg:hidden shadow-none">
             <Search className="w-5 h-5" />
           </Button>
           
           <Link href="/profile" className="hidden md:block">
-            <Button variant="ghost" className="flex gap-2 font-bold">
+            <Button variant="ghost" className="flex gap-2 font-bold shadow-none">
               <User className="w-5 h-5" />
               <span>دخول</span>
             </Button>
           </Link>
 
           <Link href="/cart">
-            <Button className="relative gap-2 font-black rounded-full px-6 bg-primary hover:bg-primary/90">
+            <Button className="relative gap-2 font-black rounded-full px-6 bg-primary hover:bg-primary/90 shadow-none">
               <ShoppingBag className="w-5 h-5" />
               <span className="hidden sm:inline">السلة</span>
               {itemCount > 0 && (
@@ -67,7 +67,7 @@ export function Navbar() {
             </Button>
           </Link>
 
-          <Button variant="ghost" size="icon" className="md:hidden">
+          <Button variant="ghost" size="icon" className="md:hidden shadow-none">
             <Menu className="w-6 h-6" />
           </Button>
         </div>

@@ -5,7 +5,7 @@ import { CategorySlider } from '@/components/home/CategorySlider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, Clock, ShoppingBag, ArrowLeft, Heart } from 'lucide-react';
+import { Star, Clock, Heart, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FEATURED_ITEMS, PROVIDERS, CATEGORIES } from '@/lib/data';
@@ -40,10 +40,10 @@ export default function Home() {
                 اطلب طعامك، احجز تاكسي، نسق مناسباتك، وتسوق بكل سهولة.
               </p>
               <div className="flex gap-4 justify-start flex-row-reverse">
-                <Button size="lg" className="rounded-full px-10 text-xl font-black bg-primary hover:bg-primary/90 h-14 shadow-xl shadow-primary/30">
+                <Button size="lg" className="rounded-full px-10 text-xl font-black bg-primary hover:bg-primary/90 h-14 shadow-none">
                   ابدأ الآن
                 </Button>
-                <Button size="lg" variant="outline" className="rounded-full px-10 text-xl font-black bg-white/10 backdrop-blur text-white border-white/40 hover:bg-white/20 h-14">
+                <Button size="lg" variant="outline" className="rounded-full px-10 text-xl font-black bg-white/10 backdrop-blur text-white border-white/40 hover:bg-white/20 h-14 shadow-none">
                   اكتشف الخدمات
                 </Button>
               </div>
@@ -61,17 +61,17 @@ export default function Home() {
 
           {/* 1. Featured Items Section */}
           <section className="mb-20">
-            <div className="flex items-center justify-between mb-8 flex-row-reverse">
+            <div className="flex items-center justify-between mb-8 flex-row">
+              <Button variant="link" className="text-primary font-black text-lg p-0">عرض الكل</Button>
               <h2 className="text-3xl font-black text-right">عروض مميزة لك</h2>
-              <Button variant="link" className="text-primary font-black text-lg">عرض الكل</Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {FEATURED_ITEMS.map((item) => (
-                <Card key={item.id} className="overflow-hidden group hover:shadow-2xl transition-all border-none bg-secondary/30 rounded-3xl">
+                <Card key={item.id} className="overflow-hidden group border-none bg-secondary/30 rounded-3xl shadow-none">
                   <div className="relative h-56">
                     <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute top-4 right-4">
-                      <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-lg">
+                      <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-none">
                         <Heart className="w-5 h-5" />
                       </Button>
                     </div>
@@ -84,7 +84,7 @@ export default function Home() {
                   <CardContent className="p-6 text-right">
                     <h3 className="text-2xl font-black mb-2 group-hover:text-primary transition-colors">{item.name}</h3>
                     <p className="text-muted-foreground text-sm mb-6 line-clamp-2">{item.description}</p>
-                    <Button className="w-full rounded-2xl font-black text-lg py-6 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all">
+                    <Button className="w-full rounded-2xl font-black text-lg py-6 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none">
                       أضف للسلة
                     </Button>
                   </CardContent>
@@ -95,14 +95,14 @@ export default function Home() {
 
           {/* 2. Most Popular Providers Section */}
           <section className="mb-20">
-            <div className="flex items-center justify-between mb-8 flex-row-reverse">
+            <div className="flex items-center justify-between mb-8 flex-row">
+              <Button variant="link" className="text-primary font-black text-lg p-0">عرض الكل</Button>
               <h2 className="text-3xl font-black text-right">الأكثر شيوعاً</h2>
-              <Button variant="link" className="text-primary font-black text-lg">عرض الكل</Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {popularProviders.map((provider) => (
                 <Link key={provider.id} href={`/provider/${provider.id}`}>
-                  <Card className="overflow-hidden group hover:shadow-xl transition-all border-none bg-white rounded-3xl shadow-sm">
+                  <Card className="overflow-hidden group border-none bg-white rounded-3xl shadow-none border-2 border-secondary/50">
                     <div className="relative h-44">
                       <Image src={provider.image} alt={provider.name} fill className="object-cover" />
                       <div className="absolute top-3 right-3">
@@ -135,12 +135,12 @@ export default function Home() {
             if (catProviders.length === 0) return null;
             return (
               <section key={cat.id} className="mb-20">
-                <div className="flex items-center justify-between mb-8 flex-row-reverse border-r-4 border-primary pr-4">
-                  <h2 className="text-3xl font-black text-right">{cat.name}</h2>
-                  <Button variant="ghost" className="text-primary font-black gap-2 flex-row-reverse">
+                <div className="flex items-center justify-between mb-8 flex-row border-r-4 border-primary pr-4">
+                  <Button variant="ghost" className="text-primary font-black gap-2 flex-row-reverse p-0 hover:bg-transparent">
                     اكتشف المزيد
                     <ArrowLeft className="w-5 h-5" />
                   </Button>
+                  <h2 className="text-3xl font-black text-right">{cat.name}</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {catProviders.map((provider) => (
@@ -152,7 +152,7 @@ export default function Home() {
                           </div>
                           <div className="flex-1 text-right py-2">
                             <h3 className="text-2xl font-black mb-2">{provider.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-4">{provider.description}</p>
+                            <p className="text-sm text-muted-foreground mb-4 line-clamp-1">{provider.description}</p>
                             <div className="flex items-center gap-4 flex-row-reverse text-sm font-bold text-primary">
                                <span className="flex items-center gap-1"><Star className="w-4 h-4 fill-primary" /> {provider.rating}</span>
                                <span className="text-muted-foreground">|</span>
@@ -178,17 +178,17 @@ export default function Home() {
                 استمتع بخصومات حصرية، تتبع مباشر لطلباتك، وتجربة تسوق لا مثيل لها عبر تطبيق الهاتف.
               </p>
               <div className="flex gap-4 justify-end">
-                <div className="w-48 h-16 bg-black rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-80 transition-all shadow-xl">
+                <div className="w-48 h-16 bg-black rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-80 transition-all">
                   <span className="text-white text-lg font-black">App Store</span>
                 </div>
-                <div className="w-48 h-16 bg-black rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-80 transition-all shadow-xl">
+                <div className="w-48 h-16 bg-black rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-80 transition-all">
                   <span className="text-white text-lg font-black">Google Play</span>
                 </div>
               </div>
             </div>
             <div className="flex-1 relative h-[600px] w-full max-w-md">
               <div className="absolute inset-0 bg-primary/20 rounded-[4rem] rotate-6 scale-95" />
-              <div className="absolute inset-0 bg-white rounded-[4rem] shadow-2xl overflow-hidden border-[12px] border-black">
+              <div className="absolute inset-0 bg-white rounded-[4rem] overflow-hidden border-[12px] border-black">
                 <Image 
                   src="https://picsum.photos/seed/tatx-phone/400/800"
                   alt="Tatx App"
