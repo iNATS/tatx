@@ -7,23 +7,51 @@ import { MENU_ITEMS, PROVIDERS } from '@/lib/data';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, Clock, MapPin, Share2, Heart, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Star, Clock, MapPin, Share2, Heart, ShieldCheck, CheckCircle2, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useCart } from '@/store/use-cart';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { useState, useEffect } from 'react';
 
 export default function ItemDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { addItem } = useCart();
   const { toast } = useToast();
+  const [api, setApi] = useState<any>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
   
   const id = params.id as string;
   const item = MENU_ITEMS.find(i => i.id === id);
   const provider = item ? PROVIDERS.find(p => p.id === item.providerId) : null;
 
+  useEffect(() => {
+    if (!api) return;
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
   if (!item) return <div className="text-center py-20 font-black text-2xl">العنصر غير موجود</div>;
+
+  const images = [
+    item.image,
+    `https://picsum.photos/seed/${item.id}1/1200/800`,
+    `https://picsum.photos/seed/${item.id}2/1200/800`,
+    `https://picsum.photos/seed/${item.id}3/1200/800`,
+    `https://picsum.photos/seed/${item.id}4/1200/800`,
+  ];
 
   const handleBooking = () => {
     addItem({
@@ -45,7 +73,6 @@ export default function ItemDetailsPage() {
       <Navbar />
       <main className="flex-1 bg-white pb-20" dir="rtl">
         <div className="container mx-auto px-4 py-8">
-          {/* Top Navigation */}
           <Button 
             variant="ghost" 
             className="mb-6 font-black gap-2 flex-row-reverse shadow-none"
@@ -56,27 +83,38 @@ export default function ItemDetailsPage() {
           </Button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Image Gallery Mockup */}
-              <div className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden group">
-                <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute top-6 right-6 flex gap-3">
-                  <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-none">
-                    <Heart className="w-5 h-5" />
-                  </Button>
-                  <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-none">
-                    <Share2 className="w-5 h-5" />
-                  </Button>
-                </div>
-                <div className="absolute bottom-6 left-6">
-                   <Badge className="bg-black/60 backdrop-blur text-white border-none px-4 py-2 font-black rounded-full shadow-none">
-                      1/5 صور
-                   </Badge>
-                </div>
+              <div className="relative rounded-3xl overflow-hidden group">
+                <Carousel setApi={setApi} className="w-full" opts={{ direction: 'rtl' }}>
+                  <CarouselContent>
+                    {images.map((src, index) => (
+                      <CarouselItem key={index}>
+                        <div className="relative h-[400px] md:h-[500px]">
+                          <Image src={src} alt={`${item.name} ${index + 1}`} fill className="object-cover" />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <div className="absolute top-6 right-6 flex gap-3 z-20">
+                    <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-none">
+                      <Heart className="w-5 h-5" />
+                    </Button>
+                    <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-none">
+                      <Share2 className="w-5 h-5" />
+                    </Button>
+                  </div>
+                  <div className="absolute bottom-6 left-6 z-20">
+                     <Badge className="bg-black/60 backdrop-blur text-white border-none px-4 py-2 font-black rounded-full shadow-none">
+                        {current}/{count} صور
+                     </Badge>
+                  </div>
+                  <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 pointer-events-none">
+                    <CarouselPrevious className="relative left-0 pointer-events-auto bg-white/50 backdrop-blur hover:bg-white border-none shadow-none" />
+                    <CarouselNext className="relative right-0 pointer-events-auto bg-white/50 backdrop-blur hover:bg-white border-none shadow-none" />
+                  </div>
+                </Carousel>
               </div>
 
-              {/* Info Header */}
               <div className="text-right">
                 <div className="flex items-center gap-2 mb-4 justify-end flex-row-reverse">
                    <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black px-4 py-1 rounded-full shadow-none">
@@ -105,7 +143,6 @@ export default function ItemDetailsPage() {
 
               <Separator className="opacity-50 shadow-none" />
 
-              {/* Description */}
               <div className="text-right">
                 <h3 className="text-2xl font-black mb-4">عن الخدمة</h3>
                 <p className="text-xl text-muted-foreground leading-relaxed font-bold">
@@ -113,7 +150,6 @@ export default function ItemDetailsPage() {
                 </p>
               </div>
 
-              {/* Features List */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                  {[
                    'دفع آمن ومضمون',
@@ -131,7 +167,6 @@ export default function ItemDetailsPage() {
               </div>
             </div>
 
-            {/* Sticky Booking Sidebar */}
             <div className="lg:col-span-1">
               <Card className="sticky top-24 border-none shadow-none bg-white rounded-[2.5rem] overflow-hidden border-t-8 border-primary ring-1 ring-border">
                 <CardContent className="p-8 text-right">
@@ -173,7 +208,6 @@ export default function ItemDetailsPage() {
                 </CardContent>
               </Card>
 
-              {/* Provider Info Small */}
               <Card className="mt-6 border-none shadow-none bg-secondary/20 rounded-3xl p-6">
                  <div className="flex items-center gap-4 flex-row-reverse text-right">
                     <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white">

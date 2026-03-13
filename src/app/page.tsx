@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -9,6 +10,13 @@ import { Star, Clock, Heart, ArrowLeft, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FEATURED_ITEMS, PROVIDERS, CATEGORIES } from '@/lib/data';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export default function Home() {
   const popularProviders = PROVIDERS.filter(p => p.isPopular);
@@ -60,39 +68,53 @@ export default function Home() {
             <CategorySlider />
           </div>
 
-          {/* 1. Featured Items Section */}
+          {/* 1. Featured Items Carousel Section */}
           <section className="mb-20">
             <div className="flex items-center justify-between mb-8 flex-row">
               <Button variant="link" className="text-primary font-black text-lg p-0 shadow-none">عرض الكل</Button>
               <h2 className="text-3xl font-black text-right">عروض تاتكس المميزة</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {FEATURED_ITEMS.map((item) => (
-                <Card key={item.id} className="overflow-hidden group border-none bg-secondary/30 rounded-3xl shadow-none">
-                  <div className="relative h-56">
-                    <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute top-4 right-4">
-                      <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-none">
-                        <Heart className="w-5 h-5" />
-                      </Button>
-                    </div>
-                    <div className="absolute bottom-4 left-4">
-                      <Badge className="bg-primary text-white font-black px-3 py-1 text-lg shadow-none">
-                        {item.price} ر.س
-                      </Badge>
-                    </div>
-                  </div>
-                  <CardContent className="p-6 text-right">
-                    <h3 className="text-2xl font-black mb-2 group-hover:text-primary transition-colors">{item.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-6 line-clamp-2">{item.description}</p>
-                    <Link href={`/provider/${item.providerId}`}>
-                      <Button className="w-full rounded-2xl font-black text-lg py-6 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none">
-                        تسوق الآن
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="relative px-4">
+              <Carousel className="w-full" opts={{ direction: 'rtl', align: 'start' }}>
+                <CarouselContent className="-ml-4">
+                  {FEATURED_ITEMS.map((item) => (
+                    <CarouselItem key={item.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                      <Card className="overflow-hidden group border-none bg-secondary/30 rounded-3xl shadow-none h-full">
+                        <div className="relative h-56">
+                          <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
+                          <div className="absolute top-4 right-4">
+                            <Button size="icon" className="rounded-full bg-white/90 text-primary hover:bg-white shadow-none">
+                              <Heart className="w-5 h-5" />
+                            </Button>
+                          </div>
+                          <div className="absolute bottom-4 left-4">
+                            <Badge className="bg-primary text-white font-black px-3 py-1 text-lg shadow-none">
+                              {item.price} ر.س
+                            </Badge>
+                          </div>
+                        </div>
+                        <CardContent className="p-6 text-right flex flex-col justify-between h-[200px]">
+                          <div>
+                            <h3 className="text-2xl font-black mb-2 group-hover:text-primary transition-colors">{item.name}</h3>
+                            <p className="text-muted-foreground text-sm mb-6 line-clamp-2">{item.description}</p>
+                          </div>
+                          <Link href={item.category === 'market' ? `/provider/${item.providerId}` : `/item/${item.id}`}>
+                            <Button className="w-full rounded-2xl font-black text-lg py-6 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all shadow-none">
+                              {['chalets', 'halls', 'services'].includes(item.category) ? 'احجز الآن' : 'تسوق الآن'}
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <div className="absolute top-1/2 -left-4 -translate-y-1/2 z-10">
+                  <CarouselPrevious className="relative left-0 bg-white/80 backdrop-blur shadow-none border-none hover:bg-white" />
+                </div>
+                <div className="absolute top-1/2 -right-4 -translate-y-1/2 z-10">
+                  <CarouselNext className="relative right-0 bg-white/80 backdrop-blur shadow-none border-none hover:bg-white" />
+                </div>
+              </Carousel>
             </div>
           </section>
 
@@ -101,7 +123,6 @@ export default function Home() {
             const provider = PROVIDERS.find(p => p.category === cat.id);
             if (!provider && cat.id !== 'taxi') return null;
 
-            // Special handling for Taxi
             const href = cat.id === 'taxi' ? '/taxi' : `/provider/${provider?.id}`;
 
             return (
