@@ -11,7 +11,7 @@ import { useCart } from '@/store/use-cart';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 
-export default function RestaurantPage() {
+export default function ProviderPage() {
   const params = useParams();
   const id = params.id as string;
   const provider = PROVIDERS.find(p => p.id === id);

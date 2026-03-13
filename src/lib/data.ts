@@ -119,3 +119,25 @@ export const FEATURED_ITEMS: MenuItem[] = [
     isFeatured: true
   }
 ];
+
+export const MENU_ITEMS: MenuItem[] = [
+  ...FEATURED_ITEMS,
+  {
+    id: 'm1',
+    providerId: '1',
+    name: 'برجر دبل تشيز',
+    description: 'قطعتين لحم، جبنة شيدر، صوص تاتكس الخاص',
+    price: 45,
+    image: 'https://picsum.photos/seed/m1/400/300',
+    category: 'food'
+  },
+  {
+    id: 'm2',
+    providerId: '6',
+    name: 'صندوق الإسعافات الأولية',
+    description: 'يحتوي على جميع الأساسيات الطبية للطورائ',
+    price: 85,
+    image: 'https://picsum.photos/seed/m2/400/300',
+    category: 'pharmacy'
+  }
+];
