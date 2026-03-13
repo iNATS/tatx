@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { PROVIDERS, MENU_ITEMS } from '@/lib/data';
 import Image from 'next/image';
-import { Star, Clock, ShoppingBag, Plus, Minus, Search, Filter } from 'lucide-react';
+import { Star, Clock, ShoppingBag, Plus, Minus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCart } from '@/store/use-cart';
@@ -130,44 +130,16 @@ export default function ProviderPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar Categories (Only for Non-Market) */}
-            {!isMarket && (
-              <aside className="hidden lg:block">
-                <div className="sticky top-24 text-right">
-                  <h3 className="text-xl font-black mb-6 border-r-4 border-primary pr-3 flex items-center justify-end gap-2">
-                    التصنيفات
-                    <Filter className="w-4 h-4 text-primary" />
-                  </h3>
-                  <nav className="space-y-2">
-                    {subCategories.map((cat) => (
-                      <button 
-                        key={cat} 
-                        onClick={() => setActiveFilter(cat!)}
-                        className={cn(
-                          "w-full text-right px-4 py-3 rounded-2xl font-bold transition-all",
-                          activeFilter === cat 
-                            ? "bg-primary/10 text-primary border-r-4 border-primary" 
-                            : "hover:bg-secondary text-muted-foreground"
-                        )}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </nav>
-                </div>
-              </aside>
-            )}
-
+          <div className="grid grid-cols-1 gap-8">
             {/* Menu Items Grid */}
-            <div className={cn("text-right", isMarket ? "lg:col-span-4" : "lg:col-span-3")}>
+            <div className="text-right col-span-1">
               <div className="mb-12">
                 {menuItems.length > 0 ? (
                   <div className={cn(
                     "grid gap-6",
                     isMarket 
                       ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6" 
-                      : "grid-cols-1 md:grid-cols-2"
+                      : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                   )}>
                     {menuItems.map((item) => {
                       const quantity = getItemQuantity(item.id);
@@ -225,8 +197,8 @@ export default function ProviderPage() {
 
                       return (
                         <Card key={item.id} className="overflow-hidden group border-none bg-secondary/20 rounded-3xl shadow-none">
-                          <div className="flex flex-col sm:flex-row-reverse">
-                            <div className="relative w-full sm:w-40 h-40">
+                          <div className="flex flex-col h-full">
+                            <div className="relative w-full h-48">
                               <Image 
                                 src={item.image} 
                                 alt={item.name} 
