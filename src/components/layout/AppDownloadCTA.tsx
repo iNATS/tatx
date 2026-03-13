@@ -2,7 +2,7 @@
 "use client";
 
 import Image from 'next/image';
-import { CheckCircle2, Star, Download } from 'lucide-react';
+import { Star, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function AppDownloadCTA() {
@@ -27,24 +27,10 @@ export function AppDownloadCTA() {
                 <span className="text-primary">في جيبك الآن.</span>
               </h2>
               
-              <p className="text-xl text-zinc-600 font-bold mb-10 max-w-xl leading-relaxed mr-0 ml-auto">
+              <p className="text-xl text-zinc-600 font-bold mb-10 max-w-xl leading-relaxed mr-0 ml-auto text-right">
                 استمتع بتجربة "تاتكس" الكاملة عبر التطبيق. اطلب وجباتك، احجز مشاويرك، أو نسق لمناسباتك القادمة بسرعة وسهولة فائقة.
               </p>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
-                {[
-                  'تتبع مباشر وحي لطلبك',
-                  'عروض حصرية لمستخدمي التطبيق',
-                  'دفع آمن بلمسة واحدة',
-                  'دعم فني فوري 24/7'
-                ].map((feature, i) => (
-                  <div key={i} className="flex items-center gap-3 text-zinc-700 font-black flex-row-reverse justify-end">
-                    <CheckCircle2 className="w-5 h-5 text-green-600" />
-                    <span className="text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
-
               {/* Official Store Buttons - Right Aligned */}
               <div className="flex flex-wrap gap-4 justify-end flex-row-reverse">
                 {/* App Store Button */}
