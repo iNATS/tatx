@@ -32,30 +32,30 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white border-b shadow-none">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-2xl transition-transform group-hover:scale-105">
+    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-border shadow-none">
+      <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-6">
+        {/* Brand Logo - MD3 Style */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-11 h-11 bg-primary rounded-[1rem] flex items-center justify-center text-white font-black text-2xl shadow-lg transition-all group-hover:scale-105 group-active:scale-95">
             T
           </div>
-          <span className="text-2xl font-black hidden sm:block">
+          <span className="text-2xl font-black hidden sm:block tracking-tight">
             تاتكس<span className="text-primary">Tatx</span>
           </span>
         </Link>
 
-        {/* Address Picker */}
+        {/* MD3 Location Picker */}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-secondary rounded-full cursor-pointer hover:bg-secondary/80 transition-colors">
+            <div className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-secondary/50 rounded-full cursor-pointer hover:bg-secondary transition-all border border-transparent hover:border-border">
               <MapPin className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold">التوصيل إلى: {selectedLocation.city}، {selectedLocation.district}</span>
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-bold truncate max-w-[150px]">التوصيل إلى: {selectedLocation.district}</span>
+              <ChevronDown className="w-3 h-3 text-muted-foreground" />
             </div>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] rounded-3xl border-none shadow-none" dir="rtl">
+          <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-none shadow-2xl p-8" dir="rtl">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-black text-right mb-4">اختر موقع التوصيل</DialogTitle>
+              <DialogTitle className="text-2xl font-black text-right mb-6">اختر موقع التوصيل</DialogTitle>
             </DialogHeader>
             <RadioGroup 
               defaultValue={selectedLocation.id} 
@@ -73,54 +73,48 @@ export function Navbar() {
                   <RadioGroupItem value={loc.id} id={loc.id} className="peer sr-only" />
                   <Label
                     htmlFor={loc.id}
-                    className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl cursor-pointer hover:bg-secondary transition-all peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-white font-bold"
+                    className="flex items-center justify-between p-5 bg-secondary/40 rounded-2xl cursor-pointer hover:bg-secondary/60 transition-all peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-white font-black"
                   >
-                    <div className="flex items-center gap-3">
-                      <MapPin className="w-5 h-5" />
-                      <span>{loc.city}، {loc.district}</span>
+                    <div className="flex items-center gap-4">
+                      <MapPin className="w-5 h-5 opacity-70" />
+                      <div className="flex flex-col text-right">
+                        <span>{loc.district}</span>
+                        <span className="text-[10px] opacity-60 font-bold">{loc.city}</span>
+                      </div>
                     </div>
                     {selectedLocation.id === loc.id && <Check className="w-5 h-5" />}
                   </Label>
                 </div>
               ))}
             </RadioGroup>
-            <div className="mt-6">
-              <Button variant="outline" className="w-full rounded-2xl font-bold h-12 border-2 shadow-none">
+            <div className="mt-8">
+              <Button className="w-full rounded-2xl font-black h-14 bg-white text-primary border-2 border-primary/20 hover:bg-primary/5 shadow-none">
                 إضافة عنوان جديد
               </Button>
             </div>
           </DialogContent>
         </Dialog>
 
-        {/* Search */}
-        <div className="flex-1 max-w-md relative hidden lg:block">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
-            placeholder="بحث عن خدمات، منتجات..." 
-            className="pr-10 bg-muted/50 border-none focus-visible:ring-primary text-right shadow-none rounded-2xl h-10 font-bold"
-          />
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="lg:hidden shadow-none">
-            <Search className="w-5 h-5" />
+        {/* Actions - MD3 Icons and Buttons */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="md:hidden shadow-none rounded-full h-12 w-12">
+            <Search className="w-6 h-6" />
           </Button>
           
           <Link href="/profile" className="hidden md:block">
-            <Button variant="ghost" className="flex gap-2 font-bold shadow-none hover:bg-transparent">
+            <Button variant="ghost" className="flex gap-2 font-black shadow-none hover:bg-secondary rounded-full px-6 h-12">
               <User className="w-5 h-5" />
               <span>دخول</span>
             </Button>
           </Link>
 
           <Link href="/cart">
-            <Button className="relative gap-2 font-black rounded-full px-6 bg-primary hover:bg-primary/90 shadow-none border-none">
+            <Button className="relative gap-2 font-black rounded-full px-7 h-12 bg-primary hover:bg-primary/90 shadow-lg border-none transition-all active:scale-95">
               <ShoppingBag className="w-5 h-5" />
               <span className="hidden sm:inline">السلة</span>
               {itemCount > 0 && (
                 <Badge 
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] bg-black text-white border-2 border-white shadow-none"
+                  className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center p-0 text-[10px] bg-foreground text-background border-2 border-white shadow-xl rounded-full"
                 >
                   {itemCount}
                 </Badge>
@@ -128,7 +122,7 @@ export function Navbar() {
             </Button>
           </Link>
 
-          <Button variant="ghost" size="icon" className="md:hidden shadow-none">
+          <Button variant="ghost" size="icon" className="md:hidden shadow-none rounded-full h-12 w-12">
             <Menu className="w-6 h-6" />
           </Button>
         </div>

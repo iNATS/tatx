@@ -4,47 +4,41 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* Material Design 3 (MD3) Light Theme Color Palette */
+    --background: 0 0% 98%;
     --foreground: 0 0% 10%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 10%;
+    
+    /* Primary (Tatx Signature) */
     --primary: 0 84% 60%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 84% 60%;
-    --muted: 0 0% 92%;
-    --muted-foreground: 0 0% 40%;
+    
+    /* Secondary (Tonal Palette) */
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 40%;
+    
+    /* Surface and Outline (MD3 specific) */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
     --accent: 0 84% 60%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
     --ring: 0 84% 60%;
-    --radius: 1rem;
-  }
-  .dark {
-    --background: 0 0% 5%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 0 84% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 84% 60%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 0 84% 60%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 84% 60%;
+    
+    /* MD3 Radius Values */
+    --radius: 1.5rem; /* Large/Extra large rounding (24px) */
+    --radius-sm: 0.5rem; /* 8px */
+    --radius-md: 0.75rem; /* 12px */
+    --radius-lg: 1rem; /* 16px */
+    --radius-xl: 1.75rem; /* 28px */
+    --radius-2xl: 2.5rem; /* 40px */
   }
 }
 
@@ -53,10 +47,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body;
+    @apply bg-background text-foreground font-body antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-headline font-bold tracking-tight;
+    @apply font-headline font-black tracking-tight leading-tight;
   }
 }
 
@@ -66,4 +60,15 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Custom MD3 Elevations */
+.md-elevation-1 {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+.md-elevation-2 {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+.md-elevation-3 {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
 }

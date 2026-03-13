@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Utensils, Car, Wrench, PartyPopper, Home, Store, Pill } from 'lucide-react';
@@ -21,29 +20,29 @@ export function CategorySlider() {
   const pathname = usePathname();
 
   return (
-    <div className="w-full overflow-x-auto no-scrollbar py-6" dir="rtl">
-      <div className="flex gap-6 min-w-full justify-start px-4">
-        {/* "All" Category Button */}
+    <div className="w-full overflow-x-auto no-scrollbar py-4" dir="rtl">
+      <div className="flex gap-4 min-w-full justify-start px-2">
+        {/* "All" Category Chip - MD3 Style */}
         <Link href="/">
           <div
             className={cn(
-              "flex flex-col items-center gap-3 p-5 min-w-[120px] rounded-[2.5rem] transition-all duration-500 cursor-pointer group",
+              "flex items-center gap-3 px-6 py-3 min-w-[120px] rounded-full transition-all duration-300 cursor-pointer group border-2 shadow-sm",
               pathname === '/'
-                ? "bg-primary text-white shadow-[0_20px_40px_-15px_rgba(226,126,54,0.4)] translate-y-[-6px]" 
-                : "bg-white hover:bg-white text-muted-foreground shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:translate-y-[-6px]"
+                ? "bg-primary border-primary text-white md-elevation-2 translate-y-[-2px]" 
+                : "bg-surface border-border text-muted-foreground hover:bg-secondary hover:translate-y-[-2px]"
             )}
           >
             <div className={cn(
-              "w-16 h-16 rounded-[1.8rem] flex items-center justify-center transition-all duration-500",
-              pathname === '/' ? "bg-white/20 rotate-12 scale-110" : "bg-secondary group-hover:bg-primary/10 group-hover:rotate-12 group-hover:scale-110"
+              "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300",
+              pathname === '/' ? "bg-white/20" : "bg-primary/10"
             )}>
-              <Store className={cn("w-8 h-8 transition-colors duration-500", pathname === '/' ? "text-white" : "text-primary")} />
+              <Store className={cn("w-4 h-4", pathname === '/' ? "text-white" : "text-primary")} />
             </div>
-            <span className="text-[13px] font-black tracking-tight whitespace-nowrap">الكل</span>
+            <span className="text-sm font-black whitespace-nowrap">الكل</span>
           </div>
         </Link>
 
-        {/* Dynamic Category Buttons */}
+        {/* Dynamic MD3 Chips */}
         {CATEGORIES.map((cat) => {
           const Icon = iconMap[cat.icon];
           const provider = PROVIDERS.find(p => p.category === cat.id);
@@ -54,19 +53,19 @@ export function CategorySlider() {
             <Link key={cat.id} href={href}>
               <div
                 className={cn(
-                  "flex flex-col items-center gap-3 p-5 min-w-[120px] rounded-[2.5rem] transition-all duration-500 cursor-pointer group",
+                  "flex items-center gap-3 px-6 py-3 min-w-[140px] rounded-full transition-all duration-300 cursor-pointer group border-2 shadow-sm",
                   isActive 
-                    ? "bg-primary text-white shadow-[0_20px_40px_-15px_rgba(226,126,54,0.4)] translate-y-[-6px]" 
-                    : "bg-white hover:bg-white text-muted-foreground shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:translate-y-[-6px]"
+                    ? "bg-primary border-primary text-white md-elevation-2 translate-y-[-2px]" 
+                    : "bg-surface border-border text-muted-foreground hover:bg-secondary hover:translate-y-[-2px]"
                 )}
               >
                 <div className={cn(
-                  "w-16 h-16 rounded-[1.8rem] flex items-center justify-center transition-all duration-500",
-                  isActive ? "bg-white/20 rotate-12 scale-110" : "bg-secondary group-hover:bg-primary/10 group-hover:rotate-12 group-hover:scale-110"
+                  "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300",
+                  isActive ? "bg-white/20" : "bg-primary/10"
                 )}>
-                  {Icon && <Icon className={cn("w-8 h-8 transition-colors duration-500", isActive ? "text-white" : "text-primary")} />}
+                  {Icon && <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-primary")} />}
                 </div>
-                <span className="text-[13px] font-black tracking-tight whitespace-nowrap">{cat.name}</span>
+                <span className="text-sm font-black whitespace-nowrap">{cat.name}</span>
               </div>
             </Link>
           );

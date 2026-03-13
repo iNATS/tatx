@@ -6,40 +6,40 @@ import Link from 'next/link';
 
 export function PartnerCTA() {
   return (
-    <section className="bg-zinc-50 pb-16 md:pb-24" dir="rtl">
+    <section className="bg-background pb-16 md:pb-28" dir="rtl">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
-          {/* Driver Registration Card */}
-          <div className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 md:p-12 flex flex-col justify-between hover:shadow-md transition-shadow">
+          {/* Driver Registration Card - MD3 Tonal Surface */}
+          <div className="bg-white border border-border rounded-[3rem] p-10 md:p-14 flex flex-col justify-between hover:shadow-xl hover:md-elevation-2 transition-all duration-500 group">
             <div className="text-right">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-8 mr-0 ml-auto">
+              <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center text-primary mb-10 mr-0 ml-auto transition-transform group-hover:rotate-12">
                 <Car className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-black text-zinc-900 mb-4">انضم ككابتن تاتكس</h3>
-              <p className="text-lg text-zinc-600 font-bold mb-8 leading-relaxed">
+              <h3 className="text-3xl md:text-4xl font-black text-foreground mb-6 tracking-tight">انضم ككابتن تاتكس</h3>
+              <p className="text-lg text-muted-foreground font-bold mb-10 leading-relaxed">
                 هل تملك سيارة وترغب في زيادة دخلك؟ انضم إلى فريق كباتن تاتكس واستمتع بساعات عمل مرنة ودعم مستمر.
               </p>
             </div>
             <Link href="/register/driver">
               <Button 
                 size="lg" 
-                className="w-full md:w-fit rounded-2xl h-14 px-10 text-lg font-black gap-3 flex-row-reverse bg-zinc-900 text-white hover:bg-zinc-800 shadow-none border-none"
+                className="w-full md:w-fit rounded-2xl h-16 px-12 text-xl font-black gap-3 flex-row-reverse bg-foreground text-background hover:bg-foreground/90 shadow-xl border-none transition-all active:scale-95"
               >
                 سجل الآن ككابتن
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-6 h-6" />
               </Button>
             </Link>
           </div>
 
-          {/* Vendor Registration Card */}
-          <div className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 md:p-12 flex flex-col justify-between hover:shadow-md transition-shadow">
+          {/* Vendor Registration Card - MD3 Tonal Surface */}
+          <div className="bg-white border border-border rounded-[3rem] p-10 md:p-14 flex flex-col justify-between hover:shadow-xl hover:md-elevation-2 transition-all duration-500 group">
             <div className="text-right">
-              <div className="w-16 h-16 bg-[#E27E36]/10 rounded-2xl flex items-center justify-center text-[#E27E36] mb-8 mr-0 ml-auto">
+              <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center text-primary mb-10 mr-0 ml-auto transition-transform group-hover:rotate-12">
                 <Store className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-black text-zinc-900 mb-4">انضم كمزود خدمة</h3>
-              <p className="text-lg text-zinc-600 font-bold mb-8 leading-relaxed">
+              <h3 className="text-3xl md:text-4xl font-black text-foreground mb-6 tracking-tight">انضم كمزود خدمة</h3>
+              <p className="text-lg text-muted-foreground font-bold mb-10 leading-relaxed">
                 سواء كنت تملك مطعماً، سوبر ماركت، أو تقدم خدمات صيانة؛ تاتكس هو بوابتك للوصول لآلاف العملاء يومياً.
               </p>
             </div>
@@ -47,10 +47,10 @@ export function PartnerCTA() {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="w-full md:w-fit rounded-2xl h-14 px-10 text-lg font-black gap-3 flex-row-reverse border-2 border-zinc-900 text-zinc-900 hover:bg-zinc-50 shadow-none"
+                className="w-full md:w-fit rounded-2xl h-16 px-12 text-xl font-black gap-3 flex-row-reverse border-2 border-foreground text-foreground hover:bg-secondary shadow-xl transition-all active:scale-95"
               >
                 سجل متجرك الآن
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-6 h-6" />
               </Button>
             </Link>
           </div>
