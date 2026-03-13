@@ -10,7 +10,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Taxis } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import dynamic from 'next/dynamic';
+import dynamic from 'dynamic';
 
 // Dynamically import Map component to avoid SSR issues with Leaflet
 const TaxiMap = dynamic(() => import('@/components/taxi/TaxiMap'), { 
@@ -22,6 +22,7 @@ export default function TaxiUberPage() {
   const [pickup, setPickup] = useState('موقعي الحالي');
   const [destination, setDestination] = useState('');
   const [selectedType, setSelectedType] = useState(Taxis[0].id);
+  const [serviceMode, setServiceMode] = useState<'ride' | 'parcel'>('ride');
 
   const selectedCar = Taxis.find(t => t.id === selectedType);
   const estimatedPrice = destination ? (selectedCar?.price || 1) * 20 : 0;
@@ -63,7 +64,7 @@ export default function TaxiUberPage() {
           </Card>
         </div>
 
-        {/* Bottom Booking Interface - REDESIGNED TO BE SMALLER */}
+        {/* Bottom Booking Interface */}
         <div className="mt-auto relative z-10">
           <Card className="max-w-md mx-auto border-none shadow-none bg-white rounded-t-3xl p-5 ring-1 ring-border">
             {destination ? (
@@ -126,23 +127,45 @@ export default function TaxiUberPage() {
                   <Button variant="secondary" className="rounded-full shadow-none font-black px-4 py-1 h-8 bg-secondary text-foreground text-xs">حجز مسبق</Button>
                 </div>
                 
-                {/* Uber-style Selection Grid with Icons - SMALLER */}
+                {/* Uber-style Selection Grid with Icons */}
                 <div className="grid grid-cols-2 gap-3">
-                  <button className="bg-secondary/30 p-4 rounded-2xl flex flex-col items-start gap-2 cursor-pointer hover:bg-secondary/50 transition-all text-right group border-none shadow-none outline-none">
-                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
-                        <Car className="w-6 h-6 text-black" />
+                  <button 
+                    onClick={() => setServiceMode('ride')}
+                    className={cn(
+                      "p-4 rounded-2xl flex flex-col items-start gap-2 cursor-pointer transition-all text-right group border-2 outline-none shadow-none",
+                      serviceMode === 'ride' 
+                        ? "bg-primary/5 border-primary" 
+                        : "bg-secondary/30 border-transparent hover:bg-secondary/50"
+                    )}
+                  >
+                     <div className={cn(
+                       "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105",
+                       serviceMode === 'ride' ? "bg-primary text-white" : "bg-white text-black"
+                     )}>
+                        <Car className="w-6 h-6" />
                      </div>
                      <div className="space-y-0.5">
-                        <span className="block font-black text-base">سيارة تاتكس</span>
+                        <span className={cn("block font-black text-base", serviceMode === 'ride' && "text-primary")}>سيارة تاتكس</span>
                         <span className="block text-[10px] text-muted-foreground font-bold">مشاوير يومية مريحة</span>
                      </div>
                   </button>
-                  <button className="bg-secondary/30 p-4 rounded-2xl flex flex-col items-start gap-2 cursor-pointer hover:bg-secondary/50 transition-all text-right group border-none shadow-none outline-none">
-                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
-                        <Package className="w-6 h-6 text-black" />
+                  <button 
+                    onClick={() => setServiceMode('parcel')}
+                    className={cn(
+                      "p-4 rounded-2xl flex flex-col items-start gap-2 cursor-pointer transition-all text-right group border-2 outline-none shadow-none",
+                      serviceMode === 'parcel' 
+                        ? "bg-primary/5 border-primary" 
+                        : "bg-secondary/30 border-transparent hover:bg-secondary/50"
+                    )}
+                  >
+                     <div className={cn(
+                       "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105",
+                       serviceMode === 'parcel' ? "bg-primary text-white" : "bg-white text-black"
+                     )}>
+                        <Package className="w-6 h-6" />
                      </div>
                      <div className="space-y-0.5">
-                        <span className="block font-black text-base">تاتكس طرود</span>
+                        <span className={cn("block font-black text-base", serviceMode === 'parcel' && "text-primary")}>تاتكس طرود</span>
                         <span className="block text-[10px] text-muted-foreground font-bold">توصيل سريع وأمان</span>
                      </div>
                   </button>
@@ -173,3 +196,4 @@ export default function TaxiUberPage() {
   );
 }
 
+import dynamic from 'next/dynamic';
