@@ -1,0 +1,15 @@
+/* Cairo Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+
+/* Apply Cairo font globally */
+* {
+  font-family: 'Cairo', sans-serif !important;
+}
+
+body {
+  font-family: 'Cairo', sans-serif !important;
+}
+
+#root {
+  font-family: 'Cairo', sans-serif !important;
+}

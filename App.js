@@ -1,20 +1,43 @@
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { I18nManager, ActivityIndicator, View } from 'react-native';
+import { AppProvider } from './src/context/AppContext';
+import AppNavigator from './src/navigation/AppNavigator';
+import { loadFonts } from './src/utils/loadFonts';
+import { fonts } from './src/constants/theme';
+
+// Enable RTL for Arabic
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
 
 export default function App() {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadAppFonts = async () => {
+      try {
+        await loadFonts();
+        setFontsLoaded(true);
+      } catch (error) {
+        console.error('Error loading fonts:', error);
+        setFontsLoaded(true); // Continue even if fonts fail to load
+      }
+    };
+    loadAppFonts();
+  }, []);
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#E91E63' }}>
+        <ActivityIndicator size="large" color="#FFFFFF" />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <AppProvider>
+      <StatusBar style="light" />
+      <AppNavigator />
+    </AppProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
