@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { products } from '../data/staticData';
 import { useApp } from '../context/AppContext';
-import FilterTabs from '../components/FilterTabs';
 import ItemDetailModal from '../components/ItemDetailModal';
 
 const ProductScreen = ({ navigation }) => {
@@ -13,24 +13,16 @@ const ProductScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [selectedFilter, setSelectedFilter] = useState('الكل');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('popular');
   const [selectedItem, setSelectedItem] = useState(null);
   const [showItemModal, setShowItemModal] = useState(false);
 
   const filters = [
-    { id: 'الكل', label: 'الكل', icon: 'apps' },
-    { id: 'اطعمة', label: 'طعام', icon: 'fast-food' },
-    { id: 'البان', label: 'ألبان', icon: 'wine' },
-    { id: 'عنايه شخصية', label: 'عناية', icon: 'sparkles' },
-    { id: 'مشروبات', label: 'مشروبات', icon: 'water' },
-    { id: 'حلويات', label: 'حلويات', icon: 'ice-cream' },
-  ];
-
-  const sortOptions = [
-    { id: 'popular', label: 'الأكثر شعبية' },
-    { id: 'price_low', label: 'السعر: الأقل' },
-    { id: 'price_high', label: 'السعر: الأعلى' },
-    { id: 'newest', label: 'الأحدث' },
+    { id: 'الكل', label: 'الكل', icon: 'apps', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200' },
+    { id: 'اطعمة', label: 'طعام', icon: 'fast-food', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200' },
+    { id: 'البان', label: 'ألبان', icon: 'wine', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200' },
+    { id: 'عنايه شخصية', label: 'عناية', icon: 'sparkles', image: 'https://images.unsplash.com/photo-1556228720-19875c4d84b6?w=200' },
+    { id: 'مشروبات', label: 'مشروبات', icon: 'water', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=200' },
+    { id: 'حلويات', label: 'حلويات', icon: 'ice-cream', image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=200' },
   ];
 
   const filteredProducts = products.filter((product) => {
@@ -52,80 +44,81 @@ const ProductScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>تاتكس ماركت</Text>
-          <Text style={styles.subtitle}>تسوق من أفضل المتاجر</Text>
-        </View>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Cart')}
-          style={styles.cartButton}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="cart" size={22} color={colors.white} />
-          {cartCount > 0 && (
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>{cartCount}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      {/* Search */}
-      <View style={styles.searchSection}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color={colors.textSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="ابحث عن منتج..."
-            placeholderTextColor={colors.textSecondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-
-      {/* Filter Tabs */}
-      <FilterTabs 
-        filters={filters}
-        selectedFilter={selectedFilter}
-        onSelectFilter={setSelectedFilter}
-      />
-
-      {/* Sort Options */}
-      <View style={styles.sortRow}>
-        <Text style={styles.sortLabel}>ترتيب حسب:</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.sortOptions}>
-            {sortOptions.map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={[
-                  styles.sortChip,
-                  sortBy === option.id && styles.sortChipActive,
-                ]}
-                onPress={() => setSortBy(option.id)}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={[
-                    styles.sortText,
-                    sortBy === option.id && styles.sortTextActive,
-                  ]}
-                >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+      {/* iOS 18 Header */}
+      <View style={[styles.headerContainer, { paddingTop: Math.max(insets.top, 8) }]}>
+        <View style={styles.headerTop}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={28} color={colors.primary} />
+          </TouchableOpacity>
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>تاتكس ماركت</Text>
+            <Text style={styles.headerSubtitle}>تسوق من أفضل المتاجر</Text>
           </View>
-        </ScrollView>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Cart')} 
+            style={styles.cartButton}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="cart" size={24} color={colors.white} />
+            {cartCount > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>{cartCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color={colors.textTertiary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="ابحث عن منتج..."
+              placeholderTextColor={colors.textTertiary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Ionicons name="close-circle" size={20} color={colors.textTertiary} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
       </View>
+
+      {/* Filter Pills with Images */}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filtersContainer}
+      >
+        {filters.map((filter) => {
+          const isSelected = selectedFilter === filter.id;
+          return (
+            <TouchableOpacity
+              key={filter.id}
+              style={[
+                styles.filterCard,
+                isSelected && styles.filterCardSelected,
+              ]}
+              onPress={() => setSelectedFilter(filter.id)}
+              activeOpacity={0.85}
+            >
+              <Image source={{ uri: filter.image }} style={styles.filterImage} />
+              <LinearGradient 
+                colors={isSelected ? [colors.primary + 'DD', colors.primary + 'AA'] : ['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.4)']}
+                style={styles.filterOverlay}
+              />
+              <View style={styles.filterContent}>
+                <Ionicons name={filter.icon} size={20} color={colors.white} />
+                <Text style={styles.filterText}>{filter.label}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
 
       {/* Products Grid */}
       <ScrollView 
@@ -137,7 +130,7 @@ const ProductScreen = ({ navigation }) => {
             <TouchableOpacity 
               key={product.id} 
               style={styles.productCard}
-              activeOpacity={0.8}
+              activeOpacity={0.85}
               onPress={() => handleProductPress(product)}
             >
               <View style={styles.productImageContainer}>
@@ -147,6 +140,7 @@ const ProductScreen = ({ navigation }) => {
                     <Text style={styles.discountText}>{product.discount}%</Text>
                   </View>
                 )}
+                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={styles.productGradient} />
                 <TouchableOpacity 
                   style={styles.wishlistBtn}
                   activeOpacity={0.8}
@@ -158,10 +152,10 @@ const ProductScreen = ({ navigation }) => {
                 <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
                 <View style={styles.productFooter}>
                   <View>
-                    <Text style={styles.productPrice}>{product.price} ر.س</Text>
                     {product.oldPrice && (
                       <Text style={styles.productOldPrice}>{product.oldPrice} ر.س</Text>
                     )}
+                    <Text style={styles.productPrice}>{product.price} ر.س</Text>
                   </View>
                   <TouchableOpacity
                     style={styles.addButton}
@@ -171,7 +165,7 @@ const ProductScreen = ({ navigation }) => {
                     }}
                     activeOpacity={0.8}
                   >
-                    <Ionicons name="add" size={18} color={colors.white} />
+                    <Ionicons name="add" size={20} color={colors.white} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -183,25 +177,28 @@ const ProductScreen = ({ navigation }) => {
         <View style={{ height: cartCount > 0 ? 100 : 40 }} />
       </ScrollView>
 
-      {/* Cart Summary */}
+      {/* Cart Summary - iOS Style */}
       {cartCount > 0 && (
         <TouchableOpacity
-          style={[styles.cartSummary, { bottom: spacing.md }]}
+          style={[styles.cartSummary, { bottom: Math.max(insets.bottom, spacing.md) }]}
           onPress={() => navigation.navigate('Cart')}
           activeOpacity={0.9}
         >
-          <View style={styles.cartSummaryRight}>
-            <View style={styles.cartIconWrapper}>
-              <Ionicons name="cart" size={18} color={colors.white} />
-              <Text style={styles.cartCount}>{cartCount}</Text>
+          <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.cartSummaryGradient} />
+          <View style={styles.cartSummaryContent}>
+            <View style={styles.cartSummaryRight}>
+              <View style={styles.cartIconWrapper}>
+                <Ionicons name="cart" size={18} color={colors.white} />
+                <Text style={styles.cartCount}>{cartCount}</Text>
+              </View>
+              <Text style={styles.cartSummaryText}>
+                {cartCount} {cartCount === 1 ? 'منتج' : 'منتجات'}
+              </Text>
             </View>
-            <Text style={styles.cartSummaryText}>
-              {cartCount} {cartCount === 1 ? 'منتج' : 'منتجات'}
-            </Text>
-          </View>
-          <View style={styles.cartSummaryLeft}>
-            <Text style={styles.cartSummaryTotal}>{cartTotal} ر.س</Text>
-            <Ionicons name="arrow-forward" size={20} color={colors.white} />
+            <View style={styles.cartSummaryLeft}>
+              <Text style={styles.cartSummaryTotal}>{cartTotal} ر.س</Text>
+              <Ionicons name="arrow-forward" size={20} color={colors.white} />
+            </View>
           </View>
         </TouchableOpacity>
       )}
@@ -222,23 +219,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  headerContainer: {
+    backgroundColor: colors.card,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
-    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
-  headerContent: {
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.cardSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerCenter: {
     flex: 1,
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 22,
+  headerTitle: {
+    fontSize: 20,
     fontWeight: '800',
     color: colors.text,
   },
-  subtitle: {
+  headerSubtitle: {
     fontSize: 13,
     color: colors.textSecondary,
     marginTop: 2,
@@ -259,101 +270,97 @@ const styles = StyleSheet.create({
     right: -2,
     backgroundColor: colors.error,
     borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    minWidth: 22,
+    height: 22,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: colors.card,
   },
   cartBadgeText: {
-    fontSize: 10,
-    fontWeight: 'bold',
+    fontSize: 11,
+    fontWeight: '800',
     color: colors.white,
   },
-  scrollContent: {
-    paddingBottom: 120,
-  },
-  // Search Section
-  searchSection: {
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.md,
+  searchContainer: {
+    marginBottom: spacing.sm,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.cardSecondary,
     borderRadius: borderRadius.xl,
     paddingHorizontal: spacing.md,
-    height: 50,
+    height: 48,
     gap: spacing.sm,
-    ...shadows.sm,
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     color: colors.text,
   },
-  // Sort Row
-  sortRow: {
-    flexDirection: 'row',
+  filtersContainer: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    gap: spacing.md,
+    backgroundColor: colors.card,
+    marginBottom: spacing.md,
+  },
+  filterCard: {
+    width: 90,
+    height: 90,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.md,
+  },
+  filterCardSelected: {
+    ...shadows.lg,
+  },
+  filterImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  filterOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  filterContent: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    marginTop: spacing.md,
-    gap: spacing.sm,
+    gap: 4,
   },
-  sortLabel: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  sortOptions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  sortChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.white,
-    ...shadows.sm,
-  },
-  sortChipActive: {
-    backgroundColor: colors.primary + '15',
-    borderColor: colors.primary,
-    borderWidth: 1,
-  },
-  sortText: {
+  filterText: {
     fontSize: 12,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  sortTextActive: {
-    color: colors.primary,
     fontWeight: '700',
+    color: colors.white,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
-  // Products Grid
   productsContent: {
     padding: spacing.sm,
   },
   productsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   productCard: {
     width: '48.5%',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
-    ...shadows.md,
+    ...shadows.lg,
   },
   productImageContainer: {
     position: 'relative',
   },
   productImage: {
     width: '100%',
-    height: 140,
-    backgroundColor: colors.grayLight,
+    height: 160,
+    backgroundColor: colors.cardSecondary,
   },
   discountBadge: {
     position: 'absolute',
@@ -361,35 +368,43 @@ const styles = StyleSheet.create({
     left: spacing.sm,
     backgroundColor: colors.error,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: borderRadius.full,
+    zIndex: 10,
   },
   discountText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     color: colors.white,
+  },
+  productGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 60,
   },
   wishlistBtn: {
     position: 'absolute',
     top: spacing.sm,
     right: spacing.sm,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 10,
   },
   productInfo: {
     padding: spacing.md,
   },
   productName: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: colors.text,
     marginBottom: spacing.sm,
-    minHeight: 36,
-    textAlign: 'right',
+    minHeight: 40,
   },
   productFooter: {
     flexDirection: 'row',
@@ -398,36 +413,39 @@ const styles = StyleSheet.create({
   },
   productPrice: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: colors.primary,
   },
   productOldPrice: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     textDecorationLine: 'line-through',
+    marginBottom: 2,
   },
   addButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadows.sm,
+    ...shadows.md,
   },
-  // Cart Summary
   cartSummary: {
     position: 'absolute',
-    bottom: 0,
     left: spacing.md,
     right: spacing.md,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.xl,
+  },
+  cartSummaryGradient: {
+    padding: spacing.md,
+  },
+  cartSummaryContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: colors.primary,
-    padding: spacing.md,
-    borderRadius: borderRadius.xl,
-    ...shadows.lg,
   },
   cartSummaryRight: {
     flexDirection: 'row',
@@ -439,18 +457,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.2)',
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingVertical: 3,
     borderRadius: borderRadius.full,
   },
   cartCount: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     color: colors.white,
     marginLeft: 2,
   },
   cartSummaryText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.white,
   },
   cartSummaryLeft: {
@@ -459,8 +477,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   cartSummaryTotal: {
-    fontSize: 17,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '800',
     color: colors.white,
   },
 });
