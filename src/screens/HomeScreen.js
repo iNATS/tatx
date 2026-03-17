@@ -25,8 +25,9 @@ const HomeScreen = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showItemModal, setShowItemModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const scrollY = useRef(0);
 
-  // TATX Services with Full Image Backgrounds
+  // TATX Services - Circular Profile Icon Style
   const tatxServices = [
     { 
       id: 'taxi', 
@@ -34,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
       icon: 'taxi', 
       screen: 'Taxi',
       image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400',
-      gradient: ['rgba(233,30,99,0.9)', 'rgba(233,30,99,0.7)']
+      color: colors.taxi
     },
     { 
       id: 'food', 
@@ -43,7 +44,7 @@ const HomeScreen = ({ navigation }) => {
       screen: 'Category', 
       params: { name: 'طعام' },
       image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400',
-      gradient: ['rgba(16,185,129,0.9)', 'rgba(16,185,129,0.7)']
+      color: colors.food
     },
     { 
       id: 'market', 
@@ -52,7 +53,7 @@ const HomeScreen = ({ navigation }) => {
       screen: 'Category', 
       params: { name: 'سوبرماركت' },
       image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
-      gradient: ['rgba(59,130,246,0.9)', 'rgba(59,130,246,0.7)']
+      color: colors.market
     },
     { 
       id: 'pharmacy', 
@@ -61,7 +62,7 @@ const HomeScreen = ({ navigation }) => {
       screen: 'Category', 
       params: { name: 'صيدلية' },
       image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400',
-      gradient: ['rgba(239,68,68,0.9)', 'rgba(239,68,68,0.7)']
+      color: colors.pharmacy
     },
     { 
       id: 'grocery', 
@@ -70,7 +71,7 @@ const HomeScreen = ({ navigation }) => {
       screen: 'Category', 
       params: { name: 'بقالة' },
       image: 'https://images.unsplash.com/photo-1606851096779-93d580154689?w=400',
-      gradient: ['rgba(16,185,129,0.9)', 'rgba(16,185,129,0.7)']
+      color: colors.grocery
     },
     { 
       id: 'gifts', 
@@ -79,7 +80,7 @@ const HomeScreen = ({ navigation }) => {
       screen: 'Category', 
       params: { name: 'هدايا' },
       image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400',
-      gradient: ['rgba(245,158,11,0.9)', 'rgba(245,158,11,0.7)']
+      color: colors.gifts
     },
     { 
       id: 'electronics', 
@@ -88,7 +89,7 @@ const HomeScreen = ({ navigation }) => {
       screen: 'Category', 
       params: { name: 'إلكترونيات' },
       image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400',
-      gradient: ['rgba(255,64,129,0.9)', 'rgba(255,64,129,0.7)']
+      color: colors.electronics
     },
     { 
       id: 'fashion', 
@@ -97,7 +98,7 @@ const HomeScreen = ({ navigation }) => {
       screen: 'Category', 
       params: { name: 'أزياء' },
       image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400',
-      gradient: ['rgba(255,87,34,0.9)', 'rgba(255,87,34,0.7)']
+      color: colors.fashion
     },
   ];
 
@@ -220,19 +221,6 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.subtitle}>مرحباً، {user?.name || 'زائر'}</Text>
         </View>
 
-        {/* Search Bar */}
-        <TouchableOpacity 
-          style={styles.searchBar}
-          onPress={() => navigation.navigate('Product')}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="search" size={20} color={colors.textTertiary} />
-          <Text style={styles.searchPlaceholder}>ابحث عن منتج أو مطعم...</Text>
-          <View style={styles.searchAction}>
-            <Ionicons name="scan" size={22} color={colors.primary} />
-          </View>
-        </TouchableOpacity>
-
         {/* Action Buttons */}
         <View style={styles.headerActions}>
           <TouchableOpacity 
@@ -246,6 +234,21 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
 
+      {/* Floating Search Bar */}
+      <View style={styles.floatingSearchContainer}>
+        <TouchableOpacity 
+          style={styles.floatingSearchBar}
+          onPress={() => navigation.navigate('Product')}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="search" size={20} color={colors.textTertiary} />
+          <Text style={styles.searchPlaceholder}>ابحث عن منتج أو مطعم...</Text>
+          <View style={styles.searchAction}>
+            <Ionicons name="scan" size={22} color={colors.primary} />
+          </View>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -257,7 +260,7 @@ const HomeScreen = ({ navigation }) => {
           />
         }
       >
-        {/* Services - Full Image Cards */}
+        {/* Services - Circular Profile Icon Style */}
         <View style={styles.servicesSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.servicesContainer}>
@@ -268,19 +271,19 @@ const HomeScreen = ({ navigation }) => {
                   onPress={() => handleServicePress(service)}
                   activeOpacity={0.85}
                 >
-                  <Image source={{ uri: service.image }} style={styles.serviceImage} />
-                  <LinearGradient 
-                    colors={service.gradient} 
-                    style={styles.serviceOverlay}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  />
-                  <View style={styles.serviceContent}>
+                  <View style={styles.serviceImageContainer}>
+                    <Image source={{ uri: service.image }} style={styles.serviceImage} />
+                    <LinearGradient 
+                      colors={[service.color + 'DD', service.color + 'AA']} 
+                      style={styles.serviceOverlay}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    />
                     <View style={styles.serviceIconContainer}>
-                      <Ionicons name={service.icon} size={28} color={colors.white} />
+                      <Ionicons name={service.icon} size={26} color={colors.white} />
                     </View>
-                    <Text style={styles.serviceName}>{service.name}</Text>
                   </View>
+                  <Text style={styles.serviceName}>{service.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -368,7 +371,7 @@ const HomeScreen = ({ navigation }) => {
           </ScrollView>
         </View>
 
-        {/* Categories with Products - Full Image Cards */}
+        {/* Categories with Products */}
         {['طعام', 'سوبرماركت', 'صيدلية'].map((categoryName) => (
           <View key={categoryName} style={styles.categorySection}>
             <View style={styles.sectionHeader}>
@@ -408,14 +411,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   headerContainer: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.background,
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   titleContainer: {
-    marginBottom: spacing.md,
+    flex: 1,
   },
   largeTitle: {
     fontSize: 36,
@@ -428,38 +431,19 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 2,
   },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.cardSecondary,
-    borderRadius: borderRadius.xl,
-    paddingHorizontal: spacing.md,
-    height: 48,
-    gap: spacing.sm,
-  },
-  searchPlaceholder: {
-    fontSize: 16,
-    color: colors.textTertiary,
-    flex: 1,
-  },
-  searchAction: {
-    paddingLeft: spacing.sm,
-    borderLeftWidth: 1,
-    borderLeftColor: colors.border,
-  },
   headerActions: {
     flexDirection: 'row',
     gap: spacing.sm,
-    paddingTop: spacing.md,
   },
   actionButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.cardSecondary,
+    backgroundColor: colors.card,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    ...shadows.sm,
   },
   notificationBadge: {
     position: 'absolute',
@@ -472,10 +456,36 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.card,
   },
+  // Floating Search Bar
+  floatingSearchContainer: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background,
+  },
+  floatingSearchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    paddingHorizontal: spacing.md,
+    height: 52,
+    gap: spacing.sm,
+    ...shadows.lg,
+  },
+  searchPlaceholder: {
+    fontSize: 16,
+    color: colors.textTertiary,
+    flex: 1,
+  },
+  searchAction: {
+    paddingLeft: spacing.sm,
+    borderLeftWidth: 1,
+    borderLeftColor: colors.border,
+  },
   scrollContent: {
     paddingBottom: 100,
   },
-  // Services - Full Image Cards
+  // Services - Circular Profile Icon Style
   servicesSection: {
     backgroundColor: colors.card,
     paddingVertical: spacing.md,
@@ -484,13 +494,18 @@ const styles = StyleSheet.create({
   servicesContainer: {
     flexDirection: 'row',
     paddingHorizontal: spacing.md,
-    gap: spacing.md,
+    gap: spacing.lg,
   },
   serviceCard: {
-    width: 100,
-    height: 110,
-    borderRadius: borderRadius.xl,
+    alignItems: 'center',
+    width: 76,
+  },
+  serviceImageContainer: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     overflow: 'hidden',
+    marginBottom: spacing.xs,
     ...shadows.md,
   },
   serviceImage: {
@@ -501,32 +516,25 @@ const styles = StyleSheet.create({
   serviceOverlay: {
     ...StyleSheet.absoluteFillObject,
   },
-  serviceContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.sm,
-  },
   serviceIconContainer: {
     width: 48,
     height: 48,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.xs,
+    position: 'absolute',
+    alignSelf: 'center',
+    top: 10,
     backdropFilter: 'blur(10px)',
   },
   serviceName: {
     fontSize: 12,
-    fontWeight: '700',
-    color: colors.white,
+    fontWeight: '600',
+    color: colors.text,
     textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
   },
-  // Offers - Full Background Image Cards
+  // Offers
   offersSection: {
     marginBottom: spacing.lg,
   },
@@ -612,7 +620,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(255,255,255,0.85)',
   },
-  // Restaurants - Full Image Cards
+  // Restaurants
   restaurantsSection: {
     marginBottom: spacing.lg,
   },
@@ -700,7 +708,7 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  // Category Products - Full Image Cards
+  // Category Products
   categorySection: {
     marginBottom: spacing.lg,
   },

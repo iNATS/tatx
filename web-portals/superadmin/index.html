@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تاتكس - لوحة التحكم الرئيسية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              cairo: ['Cairo', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                50: '#fce7f3',
+                100: '#fbcfe8',
+                200: '#f9a8d4',
+                300: '#f472b6',
+                400: '#ec4899',
+                500: '#e91e63',
+                600: '#d21e63',
+                700: '#ad1457',
+                800: '#881349',
+                900: '#6f1240',
+              },
+            },
+          },
+        },
+      }
+    </script>
+    <style>
+      * {
+        font-family: 'Cairo', sans-serif;
+      }
+      .sidebar-link:hover {
+        background: linear-gradient(90deg, rgba(233,30,99,0.1) 0%, transparent 100%);
+      }
+      .sidebar-link.active {
+        background: linear-gradient(90deg, rgba(233,30,99,0.15) 0%, transparent 100%);
+        border-right: 3px solid #e91e63;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
