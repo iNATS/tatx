@@ -1,24 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Platform } from 'react-native';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, typography, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { categories, restaurants } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 
 const HomeScreen = ({ navigation }) => {
   const { isRTL, user } = useApp();
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const insets = useSafeAreaInsets();
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const quickServices = [
+    { id: 'taxi', name: 'تاكسي', icon: 'taxi', color: colors.primary, screen: 'Taxi' },
+    { id: 'food', name: 'طعام', icon: 'fast-food', color: colors.success, screen: 'Product' },
+    { id: 'market', name: 'تسوق', icon: 'cart', color: colors.info, screen: 'Product' },
+    { id: 'gifts', name: 'هدايا', icon: 'gift', color: colors.warning, screen: 'Product' },
+    { id: 'pharmacy', name: 'صيدلية', icon: 'medkit', color: colors.error, screen: 'Product' },
+    { id: 'grocery', name: 'بقالة', icon: 'basket', color: colors.green, screen: 'Product' },
+  ];
+
+  const offers = [
+    { id: '1', title: 'خصم 30%', subtitle: 'على جميع المطاعم', image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400', color: '#FF6B6B' },
+    { id: '2', title: 'توصيل مجاني', subtitle: 'للطلبات فوق 100 ر.س', image: 'https://images.unsplash.com/photo-1556910103-1c02745a30bf?w=400', color: '#4ECDC4' },
+    { id: '3', title: 'عروض حصرية', subtitle: 'لأعضاء تاتكس', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400', color: '#14B8A6' },
+  ];
 
   const renderCategory = (category) => (
     <TouchableOpacity
       key={category.id}
       style={styles.categoryItem}
-      onPress={() => setSelectedCategory(category.id)}
+      onPress={() => {
+        setSelectedCategory(category.id);
+        navigation.navigate('Product', { category: category.name });
+      }}
+      activeOpacity={0.8}
     >
-      <View style={[styles.categoryIcon, { backgroundColor: category.color + '20' }]}>
-        <Ionicons name={category.icon} size={28} color={category.color} />
+      <View style={[styles.categoryIcon, { backgroundColor: category.color + '15' }]}>
+        <Ionicons name={category.icon} size={26} color={category.color} />
       </View>
       <Text style={styles.categoryName}>{category.name}</Text>
     </TouchableOpacity>
@@ -29,103 +48,124 @@ const HomeScreen = ({ navigation }) => {
       key={restaurant.id}
       style={styles.restaurantItem}
       onPress={() => navigation.navigate('RestaurantDetail', { restaurant })}
+      activeOpacity={0.8}
     >
       <Image source={{ uri: restaurant.logo }} style={styles.restaurantLogo} />
       <View style={styles.restaurantInfo}>
         <Text style={styles.restaurantName}>{restaurant.name}</Text>
-        <Text style={styles.restaurantTags}>{restaurant.tags.join(' • ')}</Text>
+        <View style={styles.restaurantTags}>
+          <Text style={styles.tagText}>{restaurant.tags.join(' • ')}</Text>
+        </View>
         <View style={styles.restaurantMeta}>
-          <Text style={styles.restaurantDelivery}>
-            التوصيل ر.س {restaurant.deliveryFee} | {restaurant.deliveryTime} دق
-          </Text>
+          <View style={styles.deliveryInfo}>
+            <Ionicons name="motorcycle" size={14} color={colors.textSecondary} />
+            <Text style={styles.restaurantDelivery}>
+              {restaurant.deliveryFee} ر.س • {restaurant.deliveryTime} دق
+            </Text>
+          </View>
           <View style={styles.ratingContainer}>
             <Ionicons name="star" size={14} color={colors.warning} />
             <Text style={styles.ratingText}>{restaurant.rating}</Text>
           </View>
         </View>
       </View>
-      <Ionicons name="chevron-forward" size={24} color={colors.gray} />
+      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+    </TouchableOpacity>
+  );
+
+  const renderOffer = (offer, index) => (
+    <TouchableOpacity 
+      key={offer.id} 
+      style={[styles.offerCard, { backgroundColor: offer.color }]}
+      activeOpacity={0.8}
+      onPress={() => navigation.navigate('Product')}
+    >
+      <View style={styles.offerContent}>
+        <Text style={styles.offerTitle}>{offer.title}</Text>
+        <Text style={styles.offerSubtitle}>{offer.subtitle}</Text>
+        <TouchableOpacity style={styles.offerButton}>
+          <Text style={styles.offerButtonText}>تسوق الآن</Text>
+          <Ionicons name="arrow-forward" size={16} color={colors.white} />
+        </TouchableOpacity>
+      </View>
+      <Image source={{ uri: offer.image }} style={styles.offerImage} />
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
       {/* Header with Safe Area */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.md) }]}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
         <TouchableOpacity onPress={() => navigation.navigate('Location')} style={styles.locationWrapper}>
           <View style={styles.locationContainer}>
             <View style={styles.locationIconWrapper}>
-              <Ionicons name="location" size={18} color={colors.white} />
+              <Ionicons name="location" size={16} color={colors.white} />
             </View>
             <View>
-              <Text style={styles.locationLabel}>التوصيل الى</Text>
+              <Text style={styles.locationLabel}>التوصيل إلى</Text>
               <Text style={styles.locationText} numberOfLines={1}>
                 شارع الملك عبد العزيز، الدمام
               </Text>
             </View>
-            <Ionicons name="chevron-down" size={20} color={colors.white} />
+            <Ionicons name="chevron-down" size={18} color={colors.white} />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Search')}
-          style={styles.searchButton}
-        >
-          <Ionicons name="search" size={22} color={colors.white} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Product')}
+            style={styles.headerBtn}
+          >
+            <Ionicons name="search" size={20} color={colors.white} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Chat')}
+            style={styles.headerBtn}
+          >
+            <Ionicons name="notifications" size={20} color={colors.white} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Banner */}
-        <View style={styles.banner}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600' }}
-            style={styles.bannerImage}
-          />
-          <View style={styles.bannerOverlay}>
-            <Text style={styles.bannerTitle}>مطاعم منوعة</Text>
-            <Text style={styles.bannerSubtitle}>و اكلات شهية</Text>
-          </View>
-          <View style={styles.bannerLogo}>
-            <Text style={styles.bannerLogoText}>TATX</Text>
+        {/* Quick Services */}
+        <View style={styles.quickServicesSection}>
+          <View style={styles.quickServicesGrid}>
+            {quickServices.map((service) => (
+              <TouchableOpacity
+                key={service.id}
+                style={styles.quickServiceItem}
+                onPress={() => navigation.navigate(service.screen)}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.quickServiceIcon, { backgroundColor: service.color + '15' }]}>
+                  <Ionicons name={service.icon} size={26} color={service.color} />
+                </View>
+                <Text style={styles.quickServiceName}>{service.name}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
-        {/* Quick Actions */}
-        <View style={styles.quickActions}>
-          <TouchableOpacity 
-            style={styles.quickAction}
-            onPress={() => navigation.navigate('Taxi')}
-          >
-            <View style={[styles.quickActionIcon, { backgroundColor: colors.primary + '20' }]}>
-              <Ionicons name="taxi" size={28} color={colors.primary} />
+        {/* Offers Banner */}
+        <View style={styles.offersSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>العروض الحصرية</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>عرض الكل</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.offersContainer}>
+              {offers.map(renderOffer)}
             </View>
-            <Text style={styles.quickActionText}>تاكسي</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickAction}>
-            <View style={[styles.quickActionIcon, { backgroundColor: colors.success + '20' }]}>
-              <Ionicons name="fast-food" size={28} color={colors.success} />
-            </View>
-            <Text style={styles.quickActionText}>طعام</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickAction}>
-            <View style={[styles.quickActionIcon, { backgroundColor: colors.info + '20' }]}>
-              <Ionicons name="cart" size={28} color={colors.info} />
-            </View>
-            <Text style={styles.quickActionText}>تسوق</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickAction}>
-            <View style={[styles.quickActionIcon, { backgroundColor: colors.warning + '20' }]}>
-              <Ionicons name="gift" size={28} color={colors.warning} />
-            </View>
-            <Text style={styles.quickActionText}>هدايا</Text>
-          </TouchableOpacity>
+          </ScrollView>
         </View>
 
         {/* Categories */}
-        <View style={styles.section}>
+        <View style={styles.categoriesSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>التصنيفات</Text>
             <TouchableOpacity>
@@ -140,19 +180,51 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Featured Restaurants */}
-        <View style={styles.section}>
+        <View style={styles.restaurantsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>المحلات المختارة</Text>
+            <Text style={styles.sectionTitle}>المطاعم المميزة</Text>
             <TouchableOpacity>
               <Text style={styles.seeAll}>عرض الكل</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.restaurantsContainer}>
-            {restaurants.map(renderRestaurant)}
+          <View style={[styles.restaurantsContainer, shadows.sm]}>
+            {restaurants.slice(0, 4).map(renderRestaurant)}
           </View>
         </View>
 
-        {/* Bottom padding for tab bar */}
+        {/* Popular Near You */}
+        <View style={styles.popularSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>الأكثر طلباً بالقرب منك</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>عرض الكل</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.popularContainer}>
+              {restaurants.slice(2, 5).map((restaurant, index) => (
+                <TouchableOpacity 
+                  key={index}
+                  style={styles.popularCard}
+                  onPress={() => navigation.navigate('RestaurantDetail', { restaurant })}
+                  activeOpacity={0.8}
+                >
+                  <Image source={{ uri: restaurant.logo }} style={styles.popularImage} />
+                  <View style={styles.popularInfo}>
+                    <Text style={styles.popularName}>{restaurant.name}</Text>
+                    <View style={styles.popularMeta}>
+                      <Ionicons name="star" size={12} color={colors.warning} />
+                      <Text style={styles.popularRating}>{restaurant.rating}</Text>
+                      <Text style={styles.popularTime}>• {restaurant.deliveryTime} دق</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Bottom spacing */}
         <View style={{ height: 20 }} />
       </ScrollView>
     </View>
@@ -166,8 +238,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
     backgroundColor: colors.primary,
@@ -186,100 +258,68 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: spacing.sm,
+    marginLeft: spacing.sm,
   },
   locationLabel: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
-    marginBottom: 2,
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.7)',
+    marginBottom: 1,
   },
   locationText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: colors.white,
-    maxWidth: 200,
+    maxWidth: 180,
   },
-  searchButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  headerActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  headerBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: spacing.sm,
   },
   scrollContent: {
     paddingBottom: spacing.xl,
   },
-  banner: {
-    height: 180,
-    margin: spacing.md,
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    position: 'relative',
-    ...shadows.md,
-  },
-  bannerImage: {
-    width: '100%',
-    height: '100%',
-  },
-  bannerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    padding: spacing.lg,
-  },
-  bannerTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: colors.white,
-    textAlign: 'right',
-  },
-  bannerSubtitle: {
-    fontSize: 20,
-    color: colors.white,
-    textAlign: 'right',
-    marginTop: spacing.xs,
-  },
-  bannerLogo: {
-    position: 'absolute',
-    top: spacing.md,
-    right: spacing.md,
+  // Quick Services
+  quickServicesSection: {
     backgroundColor: colors.white,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: borderRadius.full,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
   },
-  bannerLogoText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  quickActions: {
+  quickServicesGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.lg,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  quickAction: {
+  quickServiceItem: {
+    width: '31%',
     alignItems: 'center',
+    paddingVertical: spacing.sm,
   },
-  quickActionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  quickServiceIcon: {
+    width: 54,
+    height: 54,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.xs,
   },
-  quickActionText: {
-    fontSize: 13,
-    color: colors.text,
+  quickServiceName: {
+    fontSize: 12,
     fontWeight: '600',
+    color: colors.text,
+    textAlign: 'center',
   },
-  section: {
-    marginTop: spacing.md,
+  // Offers Section
+  offersSection: {
+    marginBottom: spacing.lg,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -289,28 +329,76 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '700',
     color: colors.text,
   },
   seeAll: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.primary,
     fontWeight: '600',
+  },
+  offersContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing.md,
+    gap: spacing.md,
+  },
+  offerCard: {
+    width: 280,
+    height: 140,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    ...shadows.md,
+  },
+  offerContent: {
+    flex: 1,
+  },
+  offerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.white,
+    marginBottom: 4,
+  },
+  offerSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: spacing.md,
+  },
+  offerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+  },
+  offerButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  offerImage: {
+    width: 100,
+    height: '100%',
+    borderRadius: borderRadius.lg,
+  },
+  // Categories Section
+  categoriesSection: {
+    marginBottom: spacing.lg,
   },
   categoriesContainer: {
     flexDirection: 'row',
     paddingHorizontal: spacing.sm,
+    gap: spacing.sm,
   },
   categoryItem: {
     alignItems: 'center',
     padding: spacing.sm,
     minWidth: 80,
-    marginRight: spacing.sm,
   },
   categoryIcon: {
-    width: 60,
-    height: 60,
+    width: 58,
+    height: 58,
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
@@ -320,13 +408,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.text,
     textAlign: 'center',
+    fontWeight: '500',
+  },
+  // Restaurants Section
+  restaurantsSection: {
+    marginBottom: spacing.lg,
   },
   restaurantsContainer: {
     backgroundColor: colors.white,
     marginHorizontal: spacing.md,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
-    ...shadows.md,
   },
   restaurantItem: {
     flexDirection: 'row',
@@ -347,19 +439,26 @@ const styles = StyleSheet.create({
   },
   restaurantName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: colors.text,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   restaurantTags: {
+    marginBottom: 4,
+  },
+  tagText: {
     fontSize: 12,
     color: colors.textSecondary,
-    marginBottom: 4,
   },
   restaurantMeta: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  deliveryInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   restaurantDelivery: {
     fontSize: 12,
@@ -374,6 +473,50 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     marginLeft: 2,
+  },
+  // Popular Section
+  popularSection: {
+    marginBottom: spacing.lg,
+  },
+  popularContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing.md,
+    gap: spacing.md,
+  },
+  popularCard: {
+    width: 160,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.sm,
+  },
+  popularImage: {
+    width: '100%',
+    height: 100,
+    backgroundColor: colors.grayLight,
+  },
+  popularInfo: {
+    padding: spacing.sm,
+  },
+  popularName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  popularMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  popularRating: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  popularTime: {
+    fontSize: 11,
+    color: colors.textSecondary,
   },
 });
 

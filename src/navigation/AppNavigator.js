@@ -1,9 +1,11 @@
 import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 
 // Screens
 import SplashScreen from '../screens/SplashScreen';
@@ -26,50 +28,86 @@ import TaxiScreen from '../screens/TaxiScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Custom Floating Tab Bar
+const FloatingTabBar = ({ state, descriptors, navigation }) => {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View style={[styles.tabBarContainer, { paddingBottom: Math.max(insets.bottom, spacing.sm) }]}>
+      <View style={styles.tabBar}>
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const label = options.tabBarLabel || route.name;
+          const isFocused = state.index === index;
+          
+          const iconName = isFocused
+            ? route.name === 'Home' ? 'home' 
+              : route.name === 'Taxi' ? 'taxi'
+              : route.name === 'Orders' ? 'list'
+              : route.name === 'Offers' ? 'pricetag'
+              : 'person'
+            : route.name === 'Home' ? 'home-outline'
+              : route.name === 'Taxi' ? 'taxi-outline'
+              : route.name === 'Orders' ? 'list-outline'
+              : route.name === 'Offers' ? 'pricetag-outline'
+              : 'person-outline';
+
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          return (
+            <View key={route.key} style={styles.tabItem}>
+              <TouchableOpacity
+                onPress={onPress}
+                style={[
+                  styles.tabButton,
+                  isFocused && styles.tabButtonFocused,
+                ]}
+                activeOpacity={0.8}
+              >
+                <View style={styles.tabContent}>
+                  <Ionicons 
+                    name={iconName} 
+                    size={24} 
+                    color={isFocused ? colors.white : colors.textSecondary} 
+                  />
+                  <Text 
+                    style={[
+                      styles.tabLabel,
+                      isFocused && styles.tabLabelFocused,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {label}
+                  </Text>
+                </View>
+                {isFocused && <View style={styles.tabIndicator} />}
+              </TouchableOpacity>
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
+};
+
 // Bottom Tab Navigator
 const MainTabs = () => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      tabBar={(props) => <FloatingTabBar {...props} />}
+      screenOptions={{
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === 'Home') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Taxi') {
-            iconName = focused ? 'taxi' : 'taxi-outline';
-          } else if (route.name === 'Orders') {
-            iconName = focused ? 'list' : 'list-outline';
-          } else if (route.name === 'Offers') {
-            iconName = focused ? 'pricetag' : 'pricetag-outline';
-          } else if (route.name === 'Account') {
-            iconName = focused ? 'person' : 'person-outline';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.gray,
-        tabBarStyle: {
-          height: 65,
-          paddingBottom: 8,
-          paddingTop: 8,
-          backgroundColor: colors.white,
-          borderTopWidth: 0,
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-          marginTop: 4,
-        },
-        tabBarActiveBackgroundColor: colors.primary + '08',
-      })}
+      }}
     >
       <Tab.Screen
         name="Home"
@@ -137,3 +175,62 @@ const AppNavigator = () => {
 };
 
 export default AppNavigator;
+
+const styles = StyleSheet.create({
+  tabBarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'transparent',
+    elevation: 0,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: colors.white,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    borderRadius: borderRadius.xl * 1.5,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xs,
+    ...shadows.lg,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  tabButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    borderRadius: borderRadius.xl,
+    minWidth: 60,
+  },
+  tabButtonFocused: {
+    backgroundColor: colors.primary,
+  },
+  tabContent: {
+    alignItems: 'center',
+  },
+  tabLabel: {
+    fontSize: 10,
+    color: colors.textSecondary,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  tabLabelFocused: {
+    color: colors.white,
+    fontWeight: '700',
+  },
+  tabIndicator: {
+    position: 'absolute',
+    bottom: -2,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.full,
+    opacity: 0.3,
+  },
+});

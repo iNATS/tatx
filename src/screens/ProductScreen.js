@@ -11,8 +11,23 @@ const ProductScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [selectedFilter, setSelectedFilter] = useState('الكل');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('popular');
 
-  const filters = ['الكل', 'اطعمة', 'البان', 'عنايه شخصية'];
+  const filters = [
+    { id: 'الكل', icon: 'apps', label: 'الكل' },
+    { id: 'اطعمة', icon: 'fast-food', label: 'طعام' },
+    { id: 'البان', icon: 'wine', label: 'ألبان' },
+    { id: 'عنايه شخصية', icon: 'sparkles', label: 'عناية' },
+    { id: 'مشروبات', icon: 'water', label: 'مشروبات' },
+    { id: 'حلويات', icon: 'ice-cream', label: 'حلويات' },
+  ];
+
+  const sortOptions = [
+    { id: 'popular', label: 'الأكثر شعبية' },
+    { id: 'price_low', label: 'السعر: الأقل' },
+    { id: 'price_high', label: 'السعر: الأعلى' },
+    { id: 'newest', label: 'الأحدث' },
+  ];
 
   const filteredProducts = products.filter((product) => {
     const matchesFilter = selectedFilter === 'الكل' || product.category === selectedFilter;
@@ -26,7 +41,7 @@ const ProductScreen = ({ navigation }) => {
     <View style={styles.container}>
       {/* Header with Safe Area */}
       <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <View style={styles.headerLeft}>
+        <View style={styles.headerContent}>
           <Text style={styles.title}>أسواق النخبة</Text>
           <Text style={styles.subtitle}>تسوق من أفضل المتاجر</Text>
         </View>
@@ -44,61 +59,95 @@ const ProductScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color={colors.textSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="ابحث عن منتج..."
-            placeholderTextColor={colors.textSecondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
-          )}
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Search Bar */}
+        <View style={styles.searchSection}>
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color={colors.textSecondary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="ابحث عن منتج..."
+              placeholderTextColor={colors.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
 
-      {/* Filters */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        style={styles.filtersContainer}
-        contentContainerStyle={styles.filtersContent}
-      >
-        {filters.map((filter) => (
-          <TouchableOpacity
-            key={filter}
-            style={[
-              styles.filter, 
-              selectedFilter === filter && styles.filterActive,
-              selectedFilter === filter && { backgroundColor: colors.primary }
-            ]}
-            onPress={() => setSelectedFilter(filter)}
-            activeOpacity={0.7}
+        {/* Filters Section - Redesigned */}
+        <View style={styles.filtersSection}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filtersContent}
           >
-            <Text
-              style={[
-                styles.filterText, 
-                selectedFilter === filter && styles.filterTextActive
-              ]}
-            >
-              {filter}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+            {filters.map((filter) => (
+              <TouchableOpacity
+                key={filter.id}
+                style={[
+                  styles.filterChip,
+                  selectedFilter === filter.id && styles.filterChipActive,
+                  selectedFilter === filter.id && { backgroundColor: colors.primary },
+                ]}
+                onPress={() => setSelectedFilter(filter.id)}
+                activeOpacity={0.8}
+              >
+                <Ionicons 
+                  name={filter.icon} 
+                  size={18} 
+                  color={selectedFilter === filter.id ? colors.white : colors.textSecondary} 
+                />
+                <Text
+                  style={[
+                    styles.filterText,
+                    selectedFilter === filter.id && styles.filterTextActive,
+                  ]}
+                >
+                  {filter.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
-      {/* Products Grid */}
-      <ScrollView 
-        showsVerticalScrollIndicator={false} 
-        style={styles.productsScroll}
-        contentContainerStyle={styles.productsContent}
-      >
+          {/* Sort Options */}
+          <View style={styles.sortRow}>
+            <Text style={styles.sortLabel}>ترتيب حسب:</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.sortOptions}>
+                {sortOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={[
+                      styles.sortChip,
+                      sortBy === option.id && styles.sortChipActive,
+                    ]}
+                    onPress={() => setSortBy(option.id)}
+                    activeOpacity={0.8}
+                  >
+                    <Text
+                      style={[
+                        styles.sortText,
+                        sortBy === option.id && styles.sortTextActive,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+
+        {/* Products Grid */}
         <View style={styles.productsGrid}>
           {filteredProducts.map((product) => (
             <TouchableOpacity 
@@ -114,11 +163,19 @@ const ProductScreen = ({ navigation }) => {
                     <Text style={styles.discountText}>{product.discount}%</Text>
                   </View>
                 )}
+                <TouchableOpacity style={styles.wishlistBtn}>
+                  <Ionicons name="heart-outline" size={18} color={colors.white} />
+                </TouchableOpacity>
               </View>
               <View style={styles.productInfo}>
                 <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
                 <View style={styles.productFooter}>
-                  <Text style={styles.productPrice}>ر.س {product.price}</Text>
+                  <View>
+                    <Text style={styles.productPrice}>{product.price} ر.س</Text>
+                    {product.oldPrice && (
+                      <Text style={styles.productOldPrice}>{product.oldPrice} ر.س</Text>
+                    )}
+                  </View>
                   <TouchableOpacity
                     style={styles.addButton}
                     onPress={() => {
@@ -132,36 +189,36 @@ const ProductScreen = ({ navigation }) => {
                     }}
                     activeOpacity={0.8}
                   >
-                    <Ionicons name="add" size={20} color={colors.white} />
+                    <Ionicons name="add" size={18} color={colors.white} />
                   </TouchableOpacity>
                 </View>
               </View>
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Bottom spacing for cart summary */}
+        <View style={{ height: cartCount > 0 ? 100 : 20 }} />
       </ScrollView>
 
-      {/* Cart Summary */}
+      {/* Cart Summary - Floating */}
       {cartCount > 0 && (
         <TouchableOpacity
           style={[styles.cartSummary, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}
           onPress={() => navigation.navigate('Cart')}
           activeOpacity={0.9}
         >
-          <View style={styles.cartSummaryLeft}>
-            <View style={styles.cartSummaryIcon}>
-              <Ionicons name="cart" size={20} color={colors.white} />
-              <Text style={styles.cartSummaryCount}>{cartCount}</Text>
+          <View style={styles.cartSummaryRight}>
+            <View style={styles.cartIconWrapper}>
+              <Ionicons name="cart" size={18} color={colors.white} />
+              <Text style={styles.cartCount}>{cartCount}</Text>
             </View>
             <Text style={styles.cartSummaryText}>
               {cartCount} {cartCount === 1 ? 'منتج' : 'منتجات'}
             </Text>
           </View>
-          <View style={styles.cartSummaryRight}>
-            <Text style={styles.cartSummaryLabel}>المجموع</Text>
-            <Text style={styles.cartSummaryTotal}>ر.س {cartTotal}</Text>
-          </View>
-          <View style={styles.cartSummaryArrow}>
+          <View style={styles.cartSummaryLeft}>
+            <Text style={styles.cartSummaryTotal}>{cartTotal} ر.س</Text>
             <Ionicons name="arrow-forward" size={20} color={colors.white} />
           </View>
         </TouchableOpacity>
@@ -181,9 +238,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
-    backgroundColor: colors.white,
   },
-  headerLeft: {
+  headerContent: {
     flex: 1,
   },
   title: {
@@ -223,8 +279,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.white,
   },
-  searchContainer: {
-    padding: spacing.md,
+  scrollContent: {
+    paddingBottom: spacing.xl,
+  },
+  // Search Section
+  searchSection: {
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
   },
   searchBar: {
     flexDirection: 'row',
@@ -241,26 +302,30 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
-  filtersContainer: {
+  // Filters Section - Redesigned
+  filtersSection: {
     marginBottom: spacing.md,
   },
   filtersContent: {
     paddingHorizontal: spacing.md,
     gap: spacing.sm,
   },
-  filter: {
-    paddingHorizontal: spacing.lg,
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.white,
+    gap: spacing.xs,
     ...shadows.sm,
   },
-  filterActive: {
+  filterChipActive: {
     backgroundColor: colors.primary,
     ...shadows.md,
   },
   filterText: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.textSecondary,
     fontWeight: '600',
   },
@@ -268,16 +333,49 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontWeight: '700',
   },
-  productsScroll: {
-    flex: 1,
+  // Sort Row
+  sortRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.md,
+    gap: spacing.sm,
   },
-  productsContent: {
-    padding: spacing.sm,
-    paddingBottom: 100,
+  sortLabel: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontWeight: '600',
   },
+  sortOptions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  sortChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.white,
+    ...shadows.sm,
+  },
+  sortChipActive: {
+    backgroundColor: colors.primary + '15',
+    borderColor: colors.primary,
+    borderWidth: 1,
+  },
+  sortText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  sortTextActive: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  // Products Grid
   productsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    paddingHorizontal: spacing.sm,
     gap: spacing.sm,
   },
   productCard: {
@@ -309,6 +407,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.white,
   },
+  wishlistBtn: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   productInfo: {
     padding: spacing.md,
   },
@@ -330,6 +439,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primary,
   },
+  productOldPrice: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    textDecorationLine: 'line-through',
+  },
   addButton: {
     width: 36,
     height: 36,
@@ -339,24 +453,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...shadows.sm,
   },
+  // Cart Summary - Floating
   cartSummary: {
     position: 'absolute',
     bottom: 0,
-    left: 0,
-    right: 0,
+    left: spacing.md,
+    right: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.primary,
     padding: spacing.md,
+    borderRadius: borderRadius.xl,
     ...shadows.lg,
   },
-  cartSummaryLeft: {
+  cartSummaryRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
   },
-  cartSummaryIcon: {
+  cartIconWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -364,36 +480,26 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
   },
-  cartSummaryCount: {
-    fontSize: 12,
+  cartCount: {
+    fontSize: 11,
     fontWeight: '700',
     color: colors.white,
     marginLeft: 2,
   },
   cartSummaryText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: colors.white,
   },
-  cartSummaryRight: {
+  cartSummaryLeft: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  cartSummaryLabel: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
+    gap: spacing.sm,
   },
   cartSummaryTotal: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: 'bold',
     color: colors.white,
-  },
-  cartSummaryArrow: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 

@@ -23,19 +23,25 @@ const OrdersScreen = ({ navigation }) => {
   const renderOrder = (order) => (
     <TouchableOpacity
       key={order.id}
-      style={[styles.orderCard, shadows.md]}
+      style={[styles.orderCard, shadows.sm]}
       onPress={() => navigation.navigate('OrderDetail', { order })}
       activeOpacity={0.7}
     >
       <View style={styles.orderHeader}>
         <View style={styles.orderRestaurant}>
           <Image source={{ uri: order.restaurantLogo }} style={styles.orderLogo} />
-          <View>
+          <View style={styles.restaurantInfo}>
             <Text style={styles.orderRestaurantName}>{order.restaurantName}</Text>
-            <Text style={styles.orderDate}>{order.date} | {order.time}</Text>
+            <View style={styles.orderMeta}>
+              <Ionicons name="calendar-outline" size={12} color={colors.textSecondary} />
+              <Text style={styles.orderDate}>{order.date}</Text>
+              <Text style={styles.orderDivider}>•</Text>
+              <Ionicons name="time-outline" size={12} color={colors.textSecondary} />
+              <Text style={styles.orderDate}>{order.time}</Text>
+            </View>
           </View>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) + '20' }]}>
+        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) + '15' }]}>
           <Text style={[styles.statusText, { color: getStatusColor(order.status) }]}>
             {order.statusAr}
           </Text>
@@ -48,18 +54,18 @@ const OrdersScreen = ({ navigation }) => {
             <Image source={{ uri: item.image }} style={styles.orderItemImage} />
             <View style={styles.orderItemInfo}>
               <Text style={styles.orderItemName}>{item.name}</Text>
-              <Text style={styles.orderItemQuantity}>الكمية : {item.quantity}</Text>
+              <Text style={styles.orderItemQuantity}>الكمية: {item.quantity}</Text>
             </View>
           </View>
         ))}
       </View>
 
       <View style={styles.orderFooter}>
-        <View style={styles.totalContainer}>
+        <View style={styles.totalInfo}>
+          <Text style={styles.totalLabel}>المجموع</Text>
           <Text style={styles.orderTotal}>{order.total} ر.س</Text>
-          <Text style={styles.orderTotalLabel}>المجموع</Text>
         </View>
-        <TouchableOpacity style={styles.reorderButton}>
+        <TouchableOpacity style={styles.reorderButton} activeOpacity={0.8}>
           <Ionicons name="refresh" size={18} color={colors.primary} />
           <Text style={styles.reorderButtonText}>إعادة الطلب</Text>
         </TouchableOpacity>
@@ -70,38 +76,52 @@ const OrdersScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header with Safe Area */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.md) }]}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
         <Text style={styles.title}>الطلبات</Text>
-        <TouchableOpacity style={styles.filterButton}>
+        <TouchableOpacity style={styles.filterBtn} activeOpacity={0.7}>
           <Ionicons name="filter" size={22} color={colors.white} />
         </TouchableOpacity>
       </View>
 
       {/* Tabs */}
-      <View style={styles.tabs}>
-        <TouchableOpacity style={[styles.tab, styles.tabActive]}>
-          <Text style={styles.tabTextActive}>الكل</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tab}>
-          <Text style={styles.tabText}>قيد التحضير</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tab}>
-          <Text style={styles.tabText}>تم التوصيل</Text>
-        </TouchableOpacity>
+      <View style={styles.tabsContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.tabs}>
+            {['الكل', 'قيد التحضير', 'تم التوصيل', 'ملغاة'].map((tab, index) => (
+              <TouchableOpacity
+                key={tab}
+                style={[styles.tab, index === 0 && styles.tabActive]}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.tabText, index === 0 && styles.tabTextActive]}>
+                  {tab}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
 
-      {/* Empty State or Orders List */}
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.ordersList}>
+      {/* Orders List */}
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.ordersContent}
+      >
         {orders.length > 0 ? (
           orders.map(renderOrder)
         ) : (
           <View style={styles.emptyState}>
-            <Ionicons name="bag-outline" size={64} color={colors.gray} />
+            <View style={styles.emptyIcon}>
+              <Ionicons name="bag-outline" size={48} color={colors.gray} />
+            </View>
             <Text style={styles.emptyTitle}>لا توجد طلبات</Text>
             <Text style={styles.emptySubtitle}>ابدأ بالتسوق الآن</Text>
+            <TouchableOpacity style={styles.shopButton}>
+              <Text style={styles.shopButtonText}>تسوق الآن</Text>
+            </TouchableOpacity>
           </View>
         )}
-        {/* Bottom padding for tab bar */}
+        {/* Bottom spacing */}
         <View style={{ height: 20 }} />
       </ScrollView>
     </View>
@@ -122,11 +142,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '700',
     color: colors.white,
   },
-  filterButton: {
+  filterBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -134,36 +154,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  tabsContainer: {
+    backgroundColor: colors.white,
+    ...shadows.sm,
+  },
   tabs: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     gap: spacing.sm,
-    ...shadows.sm,
   },
   tab: {
-    flex: 1,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    alignItems: 'center',
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.full,
     backgroundColor: colors.grayLight,
   },
   tabActive: {
     backgroundColor: colors.primary,
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.textSecondary,
     fontWeight: '600',
   },
   tabTextActive: {
-    fontSize: 14,
-    fontWeight: '700',
     color: colors.white,
+    fontWeight: '700',
   },
-  ordersList: {
-    flex: 1,
+  ordersContent: {
     padding: spacing.md,
   },
   emptyState: {
@@ -171,16 +190,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: spacing.xxl * 2,
   },
+  emptyIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.grayLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: colors.text,
-    marginTop: spacing.lg,
+    marginBottom: spacing.xs,
   },
   emptySubtitle: {
     fontSize: 14,
     color: colors.textSecondary,
-    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
+  },
+  shopButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.xl,
+  },
+  shopButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.white,
   },
   orderCard: {
     backgroundColor: colors.white,
@@ -200,22 +239,33 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   orderLogo: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
+    width: 56,
+    height: 56,
+    borderRadius: 14,
     backgroundColor: colors.grayLight,
+  },
+  restaurantInfo: {
+    marginLeft: spacing.md,
+    flex: 1,
   },
   orderRestaurantName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: colors.text,
-    marginLeft: spacing.sm,
+    marginBottom: 4,
+  },
+  orderMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   orderDate: {
     fontSize: 12,
     color: colors.textSecondary,
-    marginLeft: spacing.sm,
-    marginTop: 2,
+  },
+  orderDivider: {
+    fontSize: 12,
+    color: colors.textSecondary,
   },
   statusBadge: {
     paddingHorizontal: spacing.md,
@@ -238,7 +288,7 @@ const styles = StyleSheet.create({
   orderItemImage: {
     width: 50,
     height: 50,
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: colors.grayLight,
   },
   orderItemInfo: {
@@ -249,12 +299,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     textAlign: 'right',
+    marginBottom: 2,
   },
   orderItemQuantity: {
     fontSize: 12,
     color: colors.textSecondary,
     textAlign: 'right',
-    marginTop: 2,
   },
   orderFooter: {
     flexDirection: 'row',
@@ -264,17 +314,18 @@ const styles = StyleSheet.create({
     borderTopColor: colors.grayLight,
     paddingTop: spacing.md,
   },
-  totalContainer: {
+  totalInfo: {
     flexDirection: 'column',
+  },
+  totalLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginBottom: 2,
   },
   orderTotal: {
     fontSize: 18,
     fontWeight: 'bold',
     color: colors.text,
-  },
-  orderTotalLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
   },
   reorderButton: {
     flexDirection: 'row',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,19 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  Modal,
   FlatList,
+  Dimensions,
   Platform,
-  Image,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, typography } from '../constants/theme';
+import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
 const TaxiScreen = ({ navigation }) => {
-  const { isRTL, user } = useApp();
+  const { isRTL } = useApp();
   const insets = useSafeAreaInsets();
   const [pickupLocation, setPickupLocation] = useState('موقعك الحالي');
   const [destination, setDestination] = useState('');
@@ -26,58 +27,68 @@ const TaxiScreen = ({ navigation }) => {
   const [isFindingDriver, setIsFindingDriver] = useState(false);
   const [driverFound, setDriverFound] = useState(false);
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [mapRegion, setMapRegion] = useState({
+    latitude: 26.4207,
+    longitude: 50.0888,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
 
   const rideTypes = [
     {
       id: 'economy',
-      name: 'تاكسي اقتصادي',
+      name: 'اقتصادي',
       icon: 'car-outline',
       price: 15,
-      time: '5 دقائق',
+      time: '٥ دق',
       capacity: 4,
       color: colors.green,
-      description: 'خيار اقتصادي للرحلات اليومية',
     },
     {
       id: 'comfort',
-      name: 'تاكسي مريح',
+      name: 'مريح',
       icon: 'directions-car',
       price: 25,
-      time: '3 دقائق',
+      time: '٣ دق',
       capacity: 4,
       color: colors.primary,
-      description: 'راحة أكثر بأسعار معقولة',
       popular: true,
     },
     {
       id: 'premium',
-      name: 'تاكسي فاخر',
-      icon: 'emoji-events',
+      name: 'فاخر',
+      icon: 'diamond-outline',
       price: 40,
-      time: '7 دقائق',
+      time: '٧ دق',
       capacity: 4,
       color: colors.accent,
-      description: 'فخامة وخدمة مميزة',
     },
     {
       id: 'van',
-      name: 'فان عائلي',
-      icon: 'bus-outline',
+      name: 'عائلي',
+      icon: 'people-outline',
       price: 35,
-      time: '10 دقائق',
+      time: '١٠ دق',
       capacity: 7,
       color: colors.info,
-      description: 'مثالي للعائلات والمجموعات',
+    },
+    {
+      id: 'luxury',
+      name: 'لوكشري',
+      icon: 'star-outline',
+      price: 60,
+      time: '٨ دق',
+      capacity: 4,
+      color: colors.warning,
     },
   ];
 
   const destinationSuggestions = [
-    { id: '1', name: 'مطار الملك فهد الدولي', address: 'الدمام - طريق المطار', icon: 'airplane' },
-    { id: '2', name: 'مول الراشد', address: 'الدمام - طريق الملك عبد العزيز', icon: 'shopping-bag' },
-    { id: '3', name: 'برج المياه', address: 'الدمام - الكورنيش', icon: 'water' },
-    { id: '4', name: 'جامعة الإمام عبد الرحمن', address: 'الدمام - حي الجامعة', icon: 'school' },
-    { id: '5', name: 'مستشفى الملك فهد', address: 'الدمام - طريق الأمير محمد بن فهد', icon: 'hospital' },
+    { id: '1', name: 'مطار الملك فهد الدولي', address: 'طريق المطار', icon: 'airplane' },
+    { id: '2', name: 'مول الراشد', address: 'طريق الملك عبد العزيز', icon: 'shopping-bag' },
+    { id: '3', name: 'برج المياه', address: 'الكورنيش', icon: 'water' },
+    { id: '4', name: 'جامعة الإمام', address: 'حي الجامعة', icon: 'school' },
+    { id: '5', name: 'مستشفى الملك فهد', address: 'طريق الأمير محمد', icon: 'hospital' },
   ];
 
   const driverInfo = {
@@ -87,8 +98,6 @@ const TaxiScreen = ({ navigation }) => {
     car: 'تويوتا كامري 2024',
     color: 'أبيض',
     plate: 'أ ب ج 1234',
-    phone: '+966 5X XXX XXXX',
-    avatar: null,
   };
 
   const handleFindDriver = () => {
@@ -106,49 +115,33 @@ const TaxiScreen = ({ navigation }) => {
     setSelectedRide(null);
   };
 
-  const renderRideType = (ride) => {
-    const isSelected = selectedRide?.id === ride.id;
+  const renderRideType = ({ item }) => {
+    const isSelected = selectedRide?.id === item.id;
     return (
       <TouchableOpacity
-        key={ride.id}
         style={[
-          styles.rideTypeItem,
-          isSelected && styles.rideTypeItemSelected,
-          isSelected && { borderColor: ride.color },
+          styles.rideCard,
+          isSelected && styles.rideCardSelected,
+          isSelected && { borderColor: item.color },
         ]}
-        onPress={() => setSelectedRide(ride)}
+        onPress={() => setSelectedRide(item)}
         activeOpacity={0.7}
       >
-        {ride.popular && (
-          <View style={styles.popularBadge}>
-            <Text style={styles.popularText}>الأكثر طلباً</Text>
+        {item.popular && (
+          <View style={[styles.popularBadge, { backgroundColor: item.color }]}>
+            <Text style={styles.popularText}>مميز</Text>
           </View>
         )}
-        <View style={styles.rideTypeContent}>
-          <View style={[styles.rideTypeIcon, { backgroundColor: ride.color + '15' }]}>
-            <Ionicons name={ride.icon} size={28} color={ride.color} />
-          </View>
-          <View style={styles.rideTypeInfo}>
-            <Text style={styles.rideTypeName}>{ride.name}</Text>
-            <Text style={styles.rideTypeDescription}>{ride.description}</Text>
-            <View style={styles.rideTypeMeta}>
-              <View style={styles.metaItem}>
-                <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
-                <Text style={styles.metaText}>{ride.time}</Text>
-              </View>
-              <View style={styles.metaItem}>
-                <Ionicons name="people-outline" size={14} color={colors.textSecondary} />
-                <Text style={styles.metaText}>{ride.capacity} ركاب</Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.rideTypePrice}>
-            <Text style={styles.rideTypePriceValue}>{ride.price}</Text>
-            <Text style={styles.rideTypePriceLabel}>ر.س</Text>
-          </View>
+        <View style={[styles.rideIconContainer, { backgroundColor: item.color + '15' }]}>
+          <Ionicons name={item.icon} size={24} color={item.color} />
         </View>
+        <Text style={styles.rideName} numberOfLines={1}>{item.name}</Text>
+        <Text style={styles.rideTime}>{item.time}</Text>
+        <Text style={[styles.ridePrice, { color: item.color }]}>{item.price} ر.س</Text>
         {isSelected && (
-          <View style={[styles.selectedIndicator, { backgroundColor: ride.color }]} />
+          <View style={[styles.selectedCheck, { backgroundColor: item.color }]}>
+            <Ionicons name="checkmark" size={14} color={colors.white} />
+          </View>
         )}
       </TouchableOpacity>
     );
@@ -164,7 +157,7 @@ const TaxiScreen = ({ navigation }) => {
       activeOpacity={0.7}
     >
       <View style={[styles.suggestionIcon, { backgroundColor: colors.primary + '15' }]}>
-        <Ionicons name={item.icon} size={22} color={colors.primary} />
+        <Ionicons name={item.icon} size={20} color={colors.primary} />
       </View>
       <View style={styles.suggestionInfo}>
         <Text style={styles.suggestionName}>{item.name}</Text>
@@ -177,96 +170,96 @@ const TaxiScreen = ({ navigation }) => {
   if (driverFound) {
     return (
       <View style={styles.container}>
-        {/* Map Area */}
-        <View style={styles.mapArea}>
+        {/* Fullscreen Map */}
+        <View style={styles.fullscreenMap}>
           <View style={styles.mapPlaceholder}>
-            <View style={styles.mapIconContainer}>
-              <Ionicons name="location" size={40} color={colors.primary} />
-            </View>
-            <View style={styles.routeLine} />
-            <View style={styles.mapIconContainer}>
-              <Ionicons name="car" size={40} color={colors.success} />
+            <View style={styles.routeContainer}>
+              <View style={styles.locationMarker}>
+                <View style={[styles.locationDot, { backgroundColor: colors.success }]} />
+                <View style={styles.locationPulse} />
+              </View>
+              <View style={styles.routeLine} />
+              <View style={styles.carMarker}>
+                <View style={[styles.carIcon, { backgroundColor: colors.primary }]}>
+                  <Ionicons name="taxi" size={20} color={colors.white} />
+                </View>
+                <View style={styles.etaBadge}>
+                  <Text style={styles.etaText}>{selectedRide?.time}</Text>
+                </View>
+              </View>
             </View>
           </View>
+
+          {/* Close Button */}
           <TouchableOpacity 
-            style={styles.closeButton}
+            style={[styles.closeButton, { top: Math.max(insets.top + 10, 50) }]}
             onPress={handleCancelRide}
           >
             <Ionicons name="close" size={24} color={colors.white} />
           </TouchableOpacity>
         </View>
 
-        {/* Driver Info Card */}
-        <View style={[styles.driverCard, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
-          <View style={styles.driverCardHandle} />
+        {/* Driver Info Bottom Sheet */}
+        <View style={[styles.driverBottomSheet, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+          <View style={styles.sheetHandle} />
           
-          <View style={styles.driverHeader}>
+          <View style={styles.driverInfoHeader}>
             <View>
-              <Text style={styles.driverCardTitle}>في الطريق إليك</Text>
-              <Text style={styles.driverCardSubtitle}>سيصل خلال {selectedRide?.time}</Text>
+              <Text style={styles.driverStatus}>في الطريق إليك</Text>
+              <Text style={styles.driverEta}>يصل خلال {selectedRide?.time}</Text>
             </View>
             <View style={styles.driverActions}>
-              <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.success }]}>
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.success }]}>
                 <Ionicons name="call" size={20} color={colors.white} />
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]}>
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: colors.primary }]}>
                 <Ionicons name="chatbubble" size={20} color={colors.white} />
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.driverContent}>
+          <View style={styles.driverDetails}>
+            <View style={styles.driverAvatar}>
+              <Ionicons name="person" size={32} color={colors.white} />
+            </View>
             <View style={styles.driverInfo}>
-              <View style={styles.driverAvatar}>
-                <Ionicons name="person" size={36} color={colors.white} />
-              </View>
-              <View style={styles.driverDetails}>
-                <Text style={styles.driverName}>{driverInfo.name}</Text>
-                <View style={styles.driverRating}>
-                  <Ionicons name="star" size={16} color={colors.warning} />
-                  <Text style={styles.driverRatingText}>{driverInfo.rating}</Text>
-                  <Text style={styles.driverTrips}> • {driverInfo.trips} رحلة</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.vehicleCard}>
-              <View style={styles.vehicleInfo}>
-                <View style={[styles.vehicleIcon, { backgroundColor: colors.primary + '15' }]}>
-                  <Ionicons name="car" size={24} color={colors.primary} />
-                </View>
-                <View style={styles.vehicleDetails}>
-                  <Text style={styles.vehicleText}>{driverInfo.car}</Text>
-                  <Text style={styles.vehicleColor}>{driverInfo.color}</Text>
-                </View>
-                <View style={styles.plateBadge}>
-                  <Text style={styles.plateText}>{driverInfo.plate}</Text>
-                </View>
+              <Text style={styles.driverName}>{driverInfo.name}</Text>
+              <View style={styles.driverRating}>
+                <Ionicons name="star" size={14} color={colors.warning} />
+                <Text style={styles.driverRatingText}>{driverInfo.rating}</Text>
+                <Text style={styles.driverTrips}> • {driverInfo.trips} رحلة</Text>
               </View>
             </View>
           </View>
 
-          <View style={styles.tripRoute}>
-            <View style={styles.routePoint}>
-              <View style={[styles.routeDot, styles.routeDotGreen]} />
-              <View style={styles.routeTextContainer}>
-                <Text style={styles.routeLabel}>من</Text>
-                <Text style={styles.routeText}>{pickupLocation}</Text>
-              </View>
+          <View style={styles.vehicleInfo}>
+            <View style={styles.vehicleIcon}>
+              <Ionicons name="car" size={24} color={colors.primary} />
             </View>
-            <View style={styles.routeLineVertical} />
-            <View style={styles.routePoint}>
-              <View style={[styles.routeDot, styles.routeDotPrimary]} />
-              <View style={styles.routeTextContainer}>
-                <Text style={styles.routeLabel}>إلى</Text>
-                <Text style={styles.routeText}>{destination}</Text>
-              </View>
+            <View style={styles.vehicleDetails}>
+              <Text style={styles.vehicleText}>{driverInfo.car}</Text>
+              <Text style={styles.vehicleColor}>{driverInfo.color}</Text>
+            </View>
+            <View style={styles.plateBadge}>
+              <Text style={styles.plateText}>{driverInfo.plate}</Text>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancelRide}>
+          <View style={styles.tripInfo}>
+            <View style={styles.tripPoint}>
+              <View style={[styles.tripDot, { backgroundColor: colors.success }]} />
+              <View style={styles.tripLine} />
+              <Text style={styles.tripText} numberOfLines={1}>{pickupLocation}</Text>
+            </View>
+            <View style={styles.tripPoint}>
+              <View style={[styles.tripDot, { backgroundColor: colors.primary }]} />
+              <Text style={styles.tripText} numberOfLines={1}>{destination}</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.cancelRideBtn} onPress={handleCancelRide}>
             <Ionicons name="close-circle-outline" size={20} color={colors.error} />
-            <Text style={styles.cancelButtonText}>إلغاء الرحلة</Text>
+            <Text style={styles.cancelRideText}>إلغاء الرحلة</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -276,156 +269,99 @@ const TaxiScreen = ({ navigation }) => {
   // Main Booking View
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>حجز تاكسي</Text>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="help-circle-outline" size={24} color={colors.text} />
+      {/* Fullscreen Map Background */}
+      <View style={styles.fullscreenMap}>
+        <View style={styles.mapPlaceholder}>
+          <View style={styles.mapCenterMarker}>
+            <Ionicons name="location" size={40} color={colors.primary} />
+          </View>
+        </View>
+        
+        {/* Current Location Button */}
+        <TouchableOpacity 
+          style={[styles.locationFab, { top: Math.max(insets.top + 10, 50) }]}
+          onPress={() => {}}
+        >
+          <Ionicons name="navigate" size={22} color={colors.white} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Map Preview */}
-        <View style={styles.mapPreview}>
-          <View style={styles.mapPreviewContent}>
-            <Ionicons name="map-outline" size={48} color={colors.primary} />
-            <Text style={styles.mapPreviewText}>اختر وجهتك لبدء الرحلة</Text>
-          </View>
-          <TouchableOpacity style={styles.currentLocationButton}>
-            <Ionicons name="navigate" size={20} color={colors.white} />
-            <Text style={styles.currentLocationButtonText}>موقعي الحالي</Text>
+      {/* Overlay Content */}
+      <View style={styles.overlayContent}>
+        {/* Header */}
+        <View style={[styles.header, { paddingTop: Math.max(insets.top + 10, spacing.md) }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>حجز تاكسي</Text>
+          <View style={styles.headerBtn} />
         </View>
 
-        {/* Location Inputs */}
-        <View style={styles.locationsCard}>
+        {/* Location Inputs Card */}
+        <View style={styles.locationCard}>
           <View style={styles.locationRow}>
             <View style={[styles.locationDot, styles.locationDotGreen]} />
-            <View style={styles.locationInputContainer}>
-              <TextInput
-                style={styles.locationInput}
-                value={pickupLocation}
-                onChangeText={setPickupLocation}
-                placeholder="موقعpickup"
-                placeholderTextColor={colors.textSecondary}
-              />
-            </View>
-            <TouchableOpacity style={styles.swapButton}>
-              <Ionicons name="swap-vertical" size={20} color={colors.primary} />
+            <TextInput
+              style={styles.locationInput}
+              value={pickupLocation}
+              onChangeText={setPickupLocation}
+              placeholder="موقعpickup"
+              placeholderTextColor={colors.textSecondary}
+            />
+            <TouchableOpacity style={styles.swapBtn}>
+              <Ionicons name="swap-vertical" size={18} color={colors.primary} />
             </TouchableOpacity>
           </View>
-
           <View style={styles.locationDivider} />
-
           <View style={styles.locationRow}>
             <View style={[styles.locationDot, styles.locationDotPrimary]} />
-            <View style={styles.locationInputContainer}>
-              <TextInput
-                style={styles.locationInput}
-                value={destination}
-                onChangeText={setDestination}
-                onFocus={() => setShowDestinationSuggestions(true)}
-                placeholder="أدخل الوجهة"
-                placeholderTextColor={colors.textSecondary}
-              />
-              {destination ? (
-                <TouchableOpacity onPress={() => setDestination('')}>
-                  <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
-                </TouchableOpacity>
-              ) : null}
-            </View>
-          </View>
-        </View>
-
-        {/* Destination Suggestions */}
-        {showDestinationSuggestions && destination.length > 0 && (
-          <View style={styles.suggestionsCard}>
-            <FlatList
-              data={destinationSuggestions.filter(item => 
-                item.name.toLowerCase().includes(destination.toLowerCase())
-              )}
-              renderItem={renderDestinationSuggestion}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
-          </View>
-        )}
-
-        {/* Ride Types */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>اختر نوع التاكسي</Text>
-            <TouchableOpacity>
-              <Text style={styles.sectionLink}>عرض الكل</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.rideTypesContainer}>
-            {rideTypes.map(renderRideType)}
-          </View>
-        </View>
-
-        {/* Payment Method */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>طريقة الدفع</Text>
-            <TouchableOpacity onPress={() => setShowPaymentModal(true)}>
-              <Text style={styles.sectionLink}>تغيير</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity style={styles.paymentCard} activeOpacity={0.7}>
-            <View style={[styles.paymentIcon, { backgroundColor: colors.success + '15' }]}>
-              <Ionicons name="wallet" size={24} color={colors.success} />
-            </View>
-            <View style={styles.paymentInfo}>
-              <Text style={styles.paymentName}>المحفظة</Text>
-              <Text style={styles.paymentBalance}>الرصيد: ر.س 150.00</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Promo Code */}
-        <View style={styles.promoCard}>
-          <View style={styles.promoInputContainer}>
-            <Ionicons name="pricetag-outline" size={22} color={colors.textSecondary} />
             <TextInput
-              style={styles.promoInput}
-              placeholder="أدخل كود الخصم"
+              style={styles.locationInput}
+              value={destination}
+              onChangeText={setDestination}
+              onFocus={() => setShowDestinationSuggestions(true)}
+              placeholder="أدخل الوجهة"
               placeholderTextColor={colors.textSecondary}
             />
           </View>
-          <TouchableOpacity style={styles.applyButton}>
-            <Text style={styles.applyButtonText}>تطبيق</Text>
-          </TouchableOpacity>
+
+          {/* Destination Suggestions */}
+          {showDestinationSuggestions && destination.length > 0 && (
+            <View style={styles.suggestionsList}>
+              {destinationSuggestions
+                .filter(item => item.name.includes(destination))
+                .map(renderDestinationSuggestion)}
+            </View>
+          )}
+        </View>
+
+        {/* Ride Types - Horizontal Scroll */}
+        <View style={styles.rideTypesSection}>
+          <Text style={styles.sectionTitle}>اختر النوع</Text>
+          <FlatList
+            data={rideTypes}
+            renderItem={renderRideType}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.rideTypesList}
+          />
         </View>
 
         {/* Confirm Button */}
-        <View style={[styles.confirmArea, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+        <View style={[styles.confirmSection, { paddingBottom: Math.max(insets.bottom + 20, spacing.xl) }]}>
           {selectedRide && destination && (
-            <View style={styles.fareSummary}>
-              <View>
-                <Text style={styles.fareLabel}>إجمالي الأجرة</Text>
-                <Text style={styles.fareValue}>{selectedRide.price} ر.س</Text>
-              </View>
-              <View style={styles.fareDetails}>
-                <Text style={styles.fareTime}>{selectedRide.time}</Text>
-                <Text style={styles.fareDistance}>~5.2 كم</Text>
-              </View>
+            <View style={styles.fareInfo}>
+              <Text style={styles.fareLabel}>{selectedRide.name}</Text>
+              <Text style={styles.farePrice}>{selectedRide.price} ر.س</Text>
             </View>
           )}
           <TouchableOpacity
             style={[
-              styles.confirmButton,
-              (!selectedRide || !destination) && styles.confirmButtonDisabled,
+              styles.confirmBtn,
+              (!selectedRide || !destination) && styles.confirmBtnDisabled,
               { 
                 backgroundColor: selectedRide && destination ? colors.primary : colors.gray,
-                opacity: selectedRide && destination ? 1 : 0.6 
               },
             ]}
             onPress={handleFindDriver}
@@ -433,19 +369,19 @@ const TaxiScreen = ({ navigation }) => {
             activeOpacity={0.8}
           >
             {isFindingDriver ? (
-              <View style={styles.findingDriver}>
+              <View style={styles.findingRow}>
                 <ActivityIndicator color={colors.white} />
-                <Text style={styles.findingDriverText}>جاري البحث عن سائق...</Text>
+                <Text style={styles.findingText}>جاري البحث...</Text>
               </View>
             ) : (
-              <View style={styles.confirmContent}>
+              <>
                 <Ionicons name="taxi" size={22} color={colors.white} />
-                <Text style={styles.confirmButtonText}>اطلب الآن</Text>
-              </View>
+                <Text style={styles.confirmText}>اطلب الآن</Text>
+              </>
             )}
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -455,390 +391,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.sm,
-    backgroundColor: colors.white,
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.grayLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  scrollContent: {
-    paddingBottom: spacing.xl,
-  },
-  // Map Preview
-  mapPreview: {
-    height: 180,
-    margin: spacing.md,
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    backgroundColor: colors.grayLight,
-    ...shadows.md,
-  },
-  mapPreviewContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mapPreviewText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: spacing.sm,
-  },
-  currentLocationButton: {
-    position: 'absolute',
-    bottom: spacing.md,
-    right: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    ...shadows.md,
-  },
-  currentLocationButtonText: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: '600',
-    marginLeft: spacing.xs,
-  },
-  // Locations Card
-  locationsCard: {
-    backgroundColor: colors.white,
-    marginHorizontal: spacing.md,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    ...shadows.md,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  locationDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  locationDotGreen: {
-    backgroundColor: colors.success,
-  },
-  locationDotPrimary: {
-    backgroundColor: colors.primary,
-  },
-  locationInputContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: spacing.sm,
-  },
-  locationInput: {
-    flex: 1,
-    fontSize: 15,
-    color: colors.text,
-  },
-  swapButton: {
-    padding: spacing.xs,
-  },
-  locationDivider: {
-    height: 1,
-    backgroundColor: colors.grayLight,
-    marginVertical: spacing.xs,
-  },
-  // Suggestions
-  suggestionsCard: {
-    backgroundColor: colors.white,
-    marginHorizontal: spacing.md,
-    borderRadius: borderRadius.xl,
-    padding: spacing.sm,
-    ...shadows.md,
-  },
-  suggestionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
-  },
-  suggestionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  suggestionInfo: {
-    flex: 1,
-    marginLeft: spacing.sm,
-  },
-  suggestionName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  suggestionAddress: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  // Section
-  section: {
-    marginTop: spacing.lg,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  sectionLink: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  // Ride Types
-  rideTypesContainer: {
-    backgroundColor: colors.white,
-    marginHorizontal: spacing.md,
-    borderRadius: borderRadius.xl,
-    padding: spacing.sm,
-    ...shadows.md,
-  },
-  rideTypeItem: {
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    marginBottom: spacing.sm,
-    borderWidth: 2,
-    borderColor: 'transparent',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  rideTypeItemSelected: {
-    backgroundColor: colors.primary + '08',
-  },
-  rideTypeContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  rideTypeIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rideTypeInfo: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  rideTypeName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  rideTypeDescription: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  rideTypeMeta: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  metaText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginLeft: 2,
-  },
-  rideTypePrice: {
-    alignItems: 'flex-end',
-  },
-  rideTypePriceValue: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  rideTypePriceLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  popularBadge: {
-    position: 'absolute',
-    top: spacing.sm,
-    left: spacing.sm,
-    backgroundColor: colors.warning,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.full,
-  },
-  popularText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  selectedIndicator: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-  },
-  // Payment
-  paymentCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    marginHorizontal: spacing.md,
-    padding: spacing.md,
-    borderRadius: borderRadius.xl,
-    ...shadows.md,
-  },
-  paymentIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  paymentInfo: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  paymentName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  paymentBalance: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  // Promo
-  promoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.lg,
-    paddingHorizontal: spacing.md,
-    gap: spacing.sm,
-  },
-  promoInputContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.sm,
-    ...shadows.sm,
-  },
-  promoInput: {
-    flex: 1,
-    fontSize: 15,
-    color: colors.text,
-    marginLeft: spacing.sm,
-  },
-  applyButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
-  },
-  applyButtonText: {
-    color: colors.white,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  // Confirm Area
-  confirmArea: {
-    marginTop: spacing.lg,
-    paddingHorizontal: spacing.md,
-  },
-  fareSummary: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    padding: spacing.md,
-    borderRadius: borderRadius.xl,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-  },
-  fareLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  fareValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  fareDetails: {
-    alignItems: 'flex-end',
-  },
-  fareTime: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  fareDistance: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  confirmButton: {
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
-    alignItems: 'center',
-  },
-  confirmButtonDisabled: {
-    opacity: 0.6,
-  },
-  confirmContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  confirmButtonText: {
-    color: colors.white,
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  findingDriver: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  findingDriverText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  // Driver Found Styles
-  mapArea: {
-    flex: 1,
+  fullscreenMap: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.grayLight,
   },
   mapPlaceholder: {
@@ -846,24 +400,78 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  mapIconContainer: {
+  mapCenterMarker: {
     width: 60,
     height: 60,
     borderRadius: 30,
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadows.md,
+    ...shadows.lg,
+  },
+  routeContainer: {
+    alignItems: 'center',
+  },
+  locationMarker: {
+    alignItems: 'center',
+  },
+  locationDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+  },
+  locationPulse: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.success + '30',
   },
   routeLine: {
-    width: 2,
-    height: 60,
+    width: 3,
+    height: 80,
     backgroundColor: colors.primary,
     borderStyle: 'dashed',
+    marginVertical: spacing.sm,
+  },
+  carMarker: {
+    alignItems: 'center',
+  },
+  carIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.md,
+  },
+  etaBadge: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+  },
+  etaText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  locationFab: {
+    position: 'absolute',
+    right: spacing.md,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.md,
   },
   closeButton: {
     position: 'absolute',
-    top: 50,
     right: spacing.md,
     width: 44,
     height: 44,
@@ -872,14 +480,232 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  driverCard: {
+  overlayContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+  },
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.sm,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  locationCard: {
+    backgroundColor: colors.white,
+    marginHorizontal: spacing.md,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    ...shadows.lg,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+  },
+  locationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  locationDotGreen: {
+    backgroundColor: colors.success,
+  },
+  locationDotPrimary: {
+    backgroundColor: colors.primary,
+  },
+  locationInput: {
+    flex: 1,
+    fontSize: 15,
+    color: colors.text,
+    marginHorizontal: spacing.sm,
+  },
+  swapBtn: {
+    padding: spacing.xs,
+  },
+  locationDivider: {
+    height: 1,
+    backgroundColor: colors.grayLight,
+    marginVertical: spacing.xs,
+  },
+  suggestionsList: {
+    marginTop: spacing.sm,
+    maxHeight: 200,
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+  },
+  suggestionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  suggestionInfo: {
+    flex: 1,
+    marginLeft: spacing.sm,
+  },
+  suggestionName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  suggestionAddress: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  rideTypesSection: {
+    backgroundColor: 'transparent',
+    paddingVertical: spacing.md,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.white,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  rideTypesList: {
+    paddingHorizontal: spacing.md,
+    gap: spacing.sm,
+  },
+  rideCard: {
+    width: 90,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    padding: spacing.sm,
+    alignItems: 'center',
+    ...shadows.md,
+    position: 'relative',
+  },
+  rideCardSelected: {
+    borderWidth: 2,
+  },
+  popularBadge: {
+    position: 'absolute',
+    top: -6,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+  },
+  popularText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  rideIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  rideName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
+    textAlign: 'center',
+  },
+  rideTime: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  ridePrice: {
+    fontSize: 14,
+    fontWeight: '700',
+    marginTop: spacing.xs,
+  },
+  selectedCheck: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  confirmSection: {
+    paddingHorizontal: spacing.md,
+  },
+  fareInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    padding: spacing.md,
+    borderRadius: borderRadius.xl,
+    marginBottom: spacing.md,
+    ...shadows.md,
+  },
+  fareLabel: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  farePrice: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.text,
+  },
+  confirmBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.xl,
+    gap: spacing.sm,
+    ...shadows.lg,
+  },
+  confirmBtnDisabled: {
+    opacity: 0.6,
+  },
+  confirmText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  findingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  findingText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  // Driver Bottom Sheet
+  driverBottomSheet: {
     backgroundColor: colors.white,
     borderTopLeftRadius: borderRadius.xl * 1.5,
     borderTopRightRadius: borderRadius.xl * 1.5,
     padding: spacing.lg,
     ...shadows.lg,
   },
-  driverCardHandle: {
+  sheetHandle: {
     width: 40,
     height: 4,
     backgroundColor: colors.gray,
@@ -887,55 +713,49 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: spacing.md,
   },
-  driverCardTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  driverCardSubtitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  driverHeader: {
+  driverInfoHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.lg,
   },
-  driverActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
+  driverStatus: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
   },
-  actionButton: {
+  driverEta: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  actionBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: spacing.sm,
   },
-  driverContent: {
-    marginBottom: spacing.lg,
-  },
-  driverInfo: {
+  driverDetails: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   driverAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  driverDetails: {
+  driverInfo: {
     marginLeft: spacing.md,
     flex: 1,
   },
   driverName: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
     color: colors.text,
   },
@@ -954,19 +774,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
   },
-  vehicleCard: {
-    backgroundColor: colors.grayLight,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-  },
   vehicleInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: colors.grayLight,
+    padding: spacing.md,
+    borderRadius: borderRadius.xl,
+    marginBottom: spacing.lg,
   },
   vehicleIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -992,60 +812,43 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   plateText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.text,
   },
-  tripRoute: {
-    paddingVertical: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.grayLight,
-  },
-  routePoint: {
+  tripInfo: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    marginBottom: spacing.lg,
   },
-  routeDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginTop: 4,
-  },
-  routeDotGreen: {
-    backgroundColor: colors.success,
-  },
-  routeDotPrimary: {
-    backgroundColor: colors.primary,
-  },
-  routeTextContainer: {
+  tripPoint: {
     flex: 1,
-    marginLeft: spacing.md,
-    marginBottom: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  routeLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
+  tripDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
-  routeText: {
-    fontSize: 14,
-    color: colors.text,
-    marginTop: 2,
-  },
-  routeLineVertical: {
-    width: 2,
-    height: 20,
+  tripLine: {
+    flex: 1,
+    height: 2,
     backgroundColor: colors.grayLight,
-    marginLeft: 5,
-    marginVertical: -spacing.sm,
+    marginHorizontal: spacing.sm,
   },
-  cancelButton: {
+  tripText: {
+    fontSize: 13,
+    color: colors.text,
+    flex: 1,
+  },
+  cancelRideBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: spacing.md,
     gap: spacing.xs,
   },
-  cancelButtonText: {
+  cancelRideText: {
     fontSize: 15,
     color: colors.error,
     fontWeight: '600',
