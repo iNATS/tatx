@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { orders } from '../data/staticData';
+import FilterTabs from '../components/FilterTabs';
 
 const OrdersScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const [selectedFilter, setSelectedFilter] = useState('الكل');
   const getStatusColor = (status) => {
     switch (status) {
       case 'delivered':
@@ -83,24 +85,17 @@ const OrdersScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.tabs}>
-            {['الكل', 'قيد التحضير', 'تم التوصيل', 'ملغاة'].map((tab, index) => (
-              <TouchableOpacity
-                key={tab}
-                style={[styles.tab, index === 0 && styles.tabActive]}
-                activeOpacity={0.8}
-              >
-                <Text style={[styles.tabText, index === 0 && styles.tabTextActive]}>
-                  {tab}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+      {/* Filter Tabs */}
+      <FilterTabs
+        filters={[
+          { id: 'الكل', label: 'الكل', icon: 'apps' },
+          { id: 'preparing', label: 'قيد التحضير', icon: 'time' },
+          { id: 'delivered', label: 'تم التوصيل', icon: 'checkmark-done' },
+          { id: 'cancelled', label: 'ملغاة', icon: 'close-circle' },
+        ]}
+        selectedFilter={selectedFilter}
+        onSelectFilter={setSelectedFilter}
+      />
 
       {/* Orders List */}
       <ScrollView 
@@ -151,34 +146,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  tabsContainer: {
-    backgroundColor: colors.white,
-    ...shadows.sm,
-  },
-  tabs: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
-  },
-  tab: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.grayLight,
-  },
-  tabActive: {
-    backgroundColor: colors.primary,
-  },
-  tabText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  tabTextActive: {
-    color: colors.white,
-    fontWeight: '700',
   },
   ordersContent: {
     padding: spacing.md,

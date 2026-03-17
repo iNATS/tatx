@@ -1,0 +1,105 @@
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+
+/**
+ * Reusable Filter Tabs Component
+ * Simple, clean design consistent with app theme
+ */
+const FilterTabs = ({ 
+  filters, 
+  selectedFilter, 
+  onSelectFilter, 
+  showIcons = true,
+  compact = false 
+}) => {
+  return (
+    <View style={styles.container}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {filters.map((filter, index) => {
+          const isSelected = selectedFilter === filter.id || selectedFilter === filter;
+          const label = typeof filter === 'string' ? filter : filter.label;
+          const icon = typeof filter === 'object' ? filter.icon : null;
+          
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.tab,
+                isSelected && styles.tabActive,
+                compact && styles.tabCompact,
+              ]}
+              onPress={() => onSelectFilter(filter.id || filter)}
+              activeOpacity={0.7}
+            >
+              {showIcons && icon && (
+                <Ionicons 
+                  name={icon} 
+                  size={compact ? 16 : 18} 
+                  color={isSelected ? colors.white : colors.textSecondary} 
+                />
+              )}
+              <Text 
+                style={[
+                  styles.tabText, 
+                  isSelected && styles.tabTextActive,
+                  compact && styles.tabTextCompact,
+                ]}
+                numberOfLines={1}
+              >
+                {label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.white,
+    paddingVertical: spacing.sm,
+    ...shadows.sm,
+  },
+  scrollContent: {
+    paddingHorizontal: spacing.md,
+    gap: spacing.sm,
+  },
+  tab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.grayLight,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    gap: spacing.xs,
+  },
+  tabActive: {
+    backgroundColor: colors.primary,
+  },
+  tabCompact: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  tabText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  tabTextActive: {
+    color: colors.white,
+    fontWeight: '700',
+  },
+  tabTextCompact: {
+    fontSize: 12,
+  },
+});
+
+export default FilterTabs;
