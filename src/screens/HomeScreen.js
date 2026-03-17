@@ -1,227 +1,271 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { categories, restaurants } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 const HomeScreen = ({ navigation }) => {
   const { isRTL, user } = useApp();
   const insets = useSafeAreaInsets();
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  // Quick services with screens
   const quickServices = [
     { id: 'taxi', name: 'تاكسي', icon: 'taxi', color: colors.primary, screen: 'Taxi' },
-    { id: 'food', name: 'طعام', icon: 'fast-food', color: colors.success, screen: 'Product' },
-    { id: 'market', name: 'تسوق', icon: 'cart', color: colors.info, screen: 'Product' },
-    { id: 'gifts', name: 'هدايا', icon: 'gift', color: colors.warning, screen: 'Product' },
-    { id: 'pharmacy', name: 'صيدلية', icon: 'medkit', color: colors.error, screen: 'Product' },
-    { id: 'grocery', name: 'بقالة', icon: 'basket', color: colors.green, screen: 'Product' },
+    { id: 'food', name: 'طعام', icon: 'fast-food', color: colors.success, screen: 'Category', params: { name: 'طعام' } },
+    { id: 'market', name: 'سوبرماركت', icon: 'cart', color: colors.info, screen: 'Category', params: { name: 'سوبرماركت' } },
+    { id: 'pharmacy', name: 'صيدلية', icon: 'medkit', color: colors.error, screen: 'Category', params: { name: 'صيدلية' } },
+    { id: 'grocery', name: 'بقالة', icon: 'basket', color: colors.green, screen: 'Category', params: { name: 'بقالة' } },
+    { id: 'gifts', name: 'هدايا', icon: 'gift', color: colors.warning, screen: 'Category', params: { name: 'هدايا' } },
+    { id: 'electronics', name: 'إلكترونيات', icon: 'phone-portrait', color: colors.secondary, screen: 'Category', params: { name: 'إلكترونيات' } },
+    { id: 'fashion', name: 'أزياء', icon: 'shirt', color: colors.accent, screen: 'Category', params: { name: 'أزياء' } },
+    { id: 'home', name: 'المنزل', icon: 'home', color: colors.info, screen: 'Category', params: { name: 'المنزل' } },
   ];
 
-  const offers = [
-    { id: '1', title: 'خصم 30%', subtitle: 'على جميع المطاعم', image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400', color: '#FF6B6B' },
-    { id: '2', title: 'توصيل مجاني', subtitle: 'للطلبات فوق 100 ر.س', image: 'https://images.unsplash.com/photo-1556910103-1c02745a30bf?w=400', color: '#4ECDC4' },
-    { id: '3', title: 'عروض حصرية', subtitle: 'لأعضاء تاتكس', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400', color: '#14B8A6' },
+  // Hero banners
+  const heroBanners = [
+    { 
+      id: '1', 
+      title: 'تاتكس ماركت', 
+      subtitle: 'تسوق بخصم يصل إلى 50%', 
+      image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600',
+      color: colors.primary,
+      screen: 'Product'
+    },
+    { 
+      id: '2', 
+      title: 'توصيل مجاني', 
+      subtitle: 'للطلبات فوق 100 ر.س', 
+      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600',
+      color: colors.success,
+      screen: 'Product'
+    },
+    { 
+      id: '3', 
+      title: 'عروض حصرية', 
+      subtitle: 'لأعضاء تاتكس فقط', 
+      image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=600',
+      color: colors.accent,
+      screen: 'Product'
+    },
   ];
 
-  const renderCategory = (category) => (
-    <TouchableOpacity
-      key={category.id}
-      style={styles.categoryItem}
-      onPress={() => {
-        setSelectedCategory(category.id);
-        navigation.navigate('Product', { category: category.name });
-      }}
-      activeOpacity={0.8}
-    >
-      <View style={[styles.categoryIcon, { backgroundColor: category.color + '15' }]}>
-        <Ionicons name={category.icon} size={26} color={category.color} />
-      </View>
-      <Text style={styles.categoryName}>{category.name}</Text>
-    </TouchableOpacity>
-  );
+  // Featured categories
+  const featuredCategories = categories.slice(0, 6);
 
-  const renderRestaurant = (restaurant) => (
-    <TouchableOpacity
-      key={restaurant.id}
-      style={styles.restaurantItem}
-      onPress={() => navigation.navigate('RestaurantDetail', { restaurant })}
-      activeOpacity={0.8}
-    >
-      <Image source={{ uri: restaurant.logo }} style={styles.restaurantLogo} />
-      <View style={styles.restaurantInfo}>
-        <Text style={styles.restaurantName}>{restaurant.name}</Text>
-        <View style={styles.restaurantTags}>
-          <Text style={styles.tagText}>{restaurant.tags.join(' • ')}</Text>
-        </View>
-        <View style={styles.restaurantMeta}>
-          <View style={styles.deliveryInfo}>
-            <Ionicons name="motorcycle" size={14} color={colors.textSecondary} />
-            <Text style={styles.restaurantDelivery}>
-              {restaurant.deliveryFee} ر.س • {restaurant.deliveryTime} دق
-            </Text>
-          </View>
-          <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color={colors.warning} />
-            <Text style={styles.ratingText}>{restaurant.rating}</Text>
-          </View>
-        </View>
-      </View>
-      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-    </TouchableOpacity>
-  );
+  const handleCategoryPress = (category) => {
+    navigation.navigate('Category', { name: category.name, icon: category.icon, color: category.color });
+  };
 
-  const renderOffer = (offer, index) => (
-    <TouchableOpacity 
-      key={offer.id} 
-      style={[styles.offerCard, { backgroundColor: offer.color }]}
-      activeOpacity={0.8}
-      onPress={() => navigation.navigate('Product')}
-    >
-      <View style={styles.offerContent}>
-        <Text style={styles.offerTitle}>{offer.title}</Text>
-        <Text style={styles.offerSubtitle}>{offer.subtitle}</Text>
-        <TouchableOpacity style={styles.offerButton}>
-          <Text style={styles.offerButtonText}>تسوق الآن</Text>
-          <Ionicons name="arrow-forward" size={16} color={colors.white} />
-        </TouchableOpacity>
-      </View>
-      <Image source={{ uri: offer.image }} style={styles.offerImage} />
-    </TouchableOpacity>
-  );
+  const handleQuickService = (service) => {
+    if (service.screen === 'Taxi') {
+      navigation.navigate('Taxi');
+    } else if (service.screen === 'Category') {
+      navigation.navigate('Category', service.params);
+    } else if (service.screen === 'Product') {
+      navigation.navigate('Product');
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Header with Safe Area */}
+      {/* Modern Header */}
       <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <TouchableOpacity onPress={() => navigation.navigate('Location')} style={styles.locationWrapper}>
-          <View style={styles.locationContainer}>
-            <View style={styles.locationIconWrapper}>
-              <Ionicons name="location" size={16} color={colors.white} />
+        <View style={styles.headerTop}>
+          <TouchableOpacity onPress={() => navigation.navigate('Location')} style={styles.locationBtn}>
+            <View style={styles.locationIcon}>
+              <Ionicons name="location" size={18} color={colors.white} />
             </View>
-            <View>
+            <View style={styles.locationTextContainer}>
               <Text style={styles.locationLabel}>التوصيل إلى</Text>
-              <Text style={styles.locationText} numberOfLines={1}>
-                شارع الملك عبد العزيز، الدمام
-              </Text>
+              <Text style={styles.locationText} numberOfLines={1}>الدمام، شارع الملك عبد العزيز</Text>
             </View>
             <Ionicons name="chevron-down" size={18} color={colors.white} />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.headerActions}>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('Product')}
-            style={styles.headerBtn}
-          >
-            <Ionicons name="search" size={20} color={colors.white} />
           </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('Chat')}
-            style={styles.headerBtn}
-          >
-            <Ionicons name="notifications" size={20} color={colors.white} />
+        </View>
+        
+        <View style={styles.headerActions}>
+          <TouchableOpacity onPress={() => navigation.navigate('Product')} style={styles.actionBtn}>
+            <Ionicons name="search" size={22} color={colors.white} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Chat')} style={styles.actionBtn}>
+            <Ionicons name="notifications" size={22} color={colors.white} />
+            <View style={styles.notificationBadge} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Quick Services */}
-        <View style={styles.quickServicesSection}>
-          <View style={styles.quickServicesGrid}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Hero Banner Carousel */}
+        <View style={styles.heroSection}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            pagingEnabled
+            snapToInterval={SCREEN_WIDTH - spacing.md * 2}
+            decelerationRate="fast"
+          >
+            {heroBanners.map((banner) => (
+              <TouchableOpacity
+                key={banner.id}
+                style={[styles.heroBanner, { backgroundColor: banner.color }]}
+                onPress={() => navigation.navigate(banner.screen)}
+              >
+                <View style={styles.heroContent}>
+                  <Text style={styles.heroTitle}>{banner.title}</Text>
+                  <Text style={styles.heroSubtitle}>{banner.subtitle}</Text>
+                  <TouchableOpacity style={styles.heroButton}>
+                    <Text style={styles.heroButtonText}>تسوق الآن</Text>
+                    <Ionicons name="arrow-forward" size={18} color={colors.white} />
+                  </TouchableOpacity>
+                </View>
+                <Image source={{ uri: banner.image }} style={styles.heroImage} />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <View style={styles.heroIndicators}>
+            {heroBanners.map((_, index) => (
+              <View key={index} style={[styles.indicator, index === 0 && styles.indicatorActive]} />
+            ))}
+          </View>
+        </View>
+
+        {/* Quick Services Grid */}
+        <View style={styles.servicesSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>خدمات تاتكس</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>عرض الكل</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.servicesGrid}>
             {quickServices.map((service) => (
               <TouchableOpacity
                 key={service.id}
-                style={styles.quickServiceItem}
-                onPress={() => navigation.navigate(service.screen)}
+                style={styles.serviceItem}
+                onPress={() => handleQuickService(service)}
                 activeOpacity={0.8}
               >
-                <View style={[styles.quickServiceIcon, { backgroundColor: service.color + '15' }]}>
-                  <Ionicons name={service.icon} size={26} color={service.color} />
+                <View style={[styles.serviceIcon, { backgroundColor: service.color + '15' }]}>
+                  <Ionicons name={service.icon} size={28} color={service.color} />
                 </View>
-                <Text style={styles.quickServiceName}>{service.name}</Text>
+                <Text style={styles.serviceName}>{service.name}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {/* Offers Banner */}
-        <View style={styles.offersSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>العروض الحصرية</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>عرض الكل</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.offersContainer}>
-              {offers.map(renderOffer)}
-            </View>
-          </ScrollView>
-        </View>
-
-        {/* Categories */}
+        {/* Featured Categories */}
         <View style={styles.categoriesSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>التصنيفات</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Category', { name: 'الكل' })}>
               <Text style={styles.seeAll}>عرض الكل</Text>
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.categoriesContainer}>
-              {categories.map(renderCategory)}
+              {featuredCategories.map((category) => (
+                <TouchableOpacity
+                  key={category.id}
+                  style={styles.categoryItem}
+                  onPress={() => handleCategoryPress(category)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.categoryIcon, { backgroundColor: category.color + '15' }]}>
+                    <Ionicons name={category.icon} size={28} color={category.color} />
+                  </View>
+                  <Text style={styles.categoryName}>{category.name}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </ScrollView>
         </View>
 
-        {/* Featured Restaurants */}
-        <View style={styles.restaurantsSection}>
+        {/* Special Offers Section */}
+        <View style={styles.offersSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>المطاعم المميزة</Text>
+            <Text style={styles.sectionTitle}>عروض خاصة</Text>
             <TouchableOpacity>
               <Text style={styles.seeAll}>عرض الكل</Text>
             </TouchableOpacity>
           </View>
-          <View style={[styles.restaurantsContainer, shadows.sm]}>
-            {restaurants.slice(0, 4).map(renderRestaurant)}
+          <View style={styles.offersGrid}>
+            <TouchableOpacity style={[styles.offerCard, styles.offerCardLarge, { backgroundColor: colors.primary }]}>
+              <View style={styles.offerContent}>
+                <Text style={styles.offerPercent}>50%</Text>
+                <Text style={styles.offerText}>خصم على المطاعم</Text>
+                <Text style={styles.offerSubtext}>لفترة محدودة</Text>
+              </View>
+              <Ionicons name="fast-food" size={60} color="rgba(255,255,255,0.2)" />
+            </TouchableOpacity>
+            <View style={styles.offerCardsRight}>
+              <TouchableOpacity style={[styles.offerCard, styles.offerCardSmall, { backgroundColor: colors.success }]}>
+                <View style={styles.offerContentSmall}>
+                  <Text style={styles.offerTextSmall}>توصيل مجاني</Text>
+                  <Text style={styles.offerSubtextSmall}>الطلبات فوق 100 ر.س</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.offerCard, styles.offerCardSmall, { backgroundColor: colors.warning }]}>
+                <View style={styles.offerContentSmall}>
+                  <Text style={styles.offerTextSmall}>عرض اليوم</Text>
+                  <Text style={styles.offerSubtextSmall}>خصم 30%</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
-        {/* Popular Near You */}
-        <View style={styles.popularSection}>
+        {/* Popular Restaurants */}
+        <View style={styles.restaurantsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>الأكثر طلباً بالقرب منك</Text>
+            <Text style={styles.sectionTitle}>المطاعم الشهيرة</Text>
             <TouchableOpacity>
               <Text style={styles.seeAll}>عرض الكل</Text>
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.popularContainer}>
-              {restaurants.slice(2, 5).map((restaurant, index) => (
-                <TouchableOpacity 
+            <View style={styles.restaurantCards}>
+              {restaurants.slice(0, 5).map((restaurant, index) => (
+                <TouchableOpacity
                   key={index}
-                  style={styles.popularCard}
+                  style={styles.restaurantCard}
                   onPress={() => navigation.navigate('RestaurantDetail', { restaurant })}
-                  activeOpacity={0.8}
                 >
-                  <Image source={{ uri: restaurant.logo }} style={styles.popularImage} />
-                  <View style={styles.popularInfo}>
-                    <Text style={styles.popularName}>{restaurant.name}</Text>
-                    <View style={styles.popularMeta}>
-                      <Ionicons name="star" size={12} color={colors.warning} />
-                      <Text style={styles.popularRating}>{restaurant.rating}</Text>
-                      <Text style={styles.popularTime}>• {restaurant.deliveryTime} دق</Text>
+                  <Image source={{ uri: restaurant.logo }} style={styles.restaurantCardImage} />
+                  <View style={styles.restaurantCardInfo}>
+                    <Text style={styles.restaurantCardName}>{restaurant.name}</Text>
+                    <View style={styles.restaurantCardMeta}>
+                      <Ionicons name="star" size={14} color={colors.warning} />
+                      <Text style={styles.restaurantCardRating}>{restaurant.rating}</Text>
+                      <Text style={styles.restaurantCardDot}>•</Text>
+                      <Text style={styles.restaurantCardTime}>{restaurant.deliveryTime} دق</Text>
                     </View>
                   </View>
                 </TouchableOpacity>
               ))}
             </View>
           </ScrollView>
+        </View>
+
+        {/* Download App Banner */}
+        <View style={styles.downloadBanner}>
+          <View style={styles.downloadContent}>
+            <View style={styles.downloadIcon}>
+              <Ionicons name="download" size={32} color={colors.white} />
+            </View>
+            <View style={styles.downloadText}>
+              <Text style={styles.downloadTitle}>حمّل تطبيق تاتكس</Text>
+              <Text style={styles.downloadSubtitle}>واحصل على خصم 20% على أول طلب</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.downloadBtn}>
+            <Text style={styles.downloadBtnText}>تحميل</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Bottom spacing */}
@@ -237,21 +281,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
     backgroundColor: colors.primary,
+    paddingBottom: spacing.md,
   },
-  locationWrapper: {
-    flex: 1,
+  headerTop: {
+    paddingHorizontal: spacing.md,
   },
-  locationContainer: {
+  locationBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: borderRadius.xl,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
-  locationIconWrapper: {
+  locationIcon: {
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -260,73 +304,124 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: spacing.sm,
   },
+  locationTextContainer: {
+    marginLeft: spacing.sm,
+    flex: 1,
+  },
   locationLabel: {
     fontSize: 10,
     color: 'rgba(255,255,255,0.7)',
-    marginBottom: 1,
   },
   locationText: {
     fontSize: 13,
     fontWeight: '600',
     color: colors.white,
-    maxWidth: 180,
   },
   headerActions: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.md,
     gap: spacing.sm,
   },
-  headerBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+  actionBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.error,
   },
   scrollContent: {
     paddingBottom: 100,
   },
-  // Quick Services
-  quickServicesSection: {
+  // Hero Section
+  heroSection: {
+    marginVertical: spacing.md,
+  },
+  heroBanner: {
+    width: SCREEN_WIDTH - spacing.md * 2,
+    height: 180,
+    marginHorizontal: spacing.md,
+    borderRadius: borderRadius.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.lg,
+    ...shadows.md,
+  },
+  heroContent: {
+    flex: 1,
+  },
+  heroTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: colors.white,
+    marginBottom: spacing.xs,
+  },
+  heroSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: spacing.md,
+  },
+  heroButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    gap: spacing.xs,
+  },
+  heroButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  heroImage: {
+    width: 140,
+    height: '100%',
+    borderRadius: borderRadius.lg,
+  },
+  heroIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: spacing.sm,
+    gap: spacing.xs,
+  },
+  indicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.gray,
+  },
+  indicatorActive: {
+    width: 20,
+    backgroundColor: colors.primary,
+  },
+  // Services Section
+  servicesSection: {
     backgroundColor: colors.white,
     padding: spacing.md,
     marginBottom: spacing.md,
     ...shadows.sm,
   },
-  quickServicesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  quickServiceItem: {
-    width: '31%',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  quickServiceIcon: {
-    width: 54,
-    height: 54,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  quickServiceName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text,
-    textAlign: 'center',
-  },
-  // Offers Section
-  offersSection: {
-    marginBottom: spacing.lg,
-  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   sectionTitle: {
     fontSize: 18,
@@ -338,49 +433,30 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '600',
   },
-  offersContainer: {
+  servicesGrid: {
     flexDirection: 'row',
-    paddingHorizontal: spacing.md,
-    gap: spacing.md,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  offerCard: {
-    width: 280,
-    height: 140,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    flexDirection: 'row',
+  serviceItem: {
+    width: '23%',
     alignItems: 'center',
-    ...shadows.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  offerContent: {
-    flex: 1,
-  },
-  offerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.white,
-    marginBottom: 4,
-  },
-  offerSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
-    marginBottom: spacing.md,
-  },
-  offerButton: {
-    flexDirection: 'row',
+  serviceIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: spacing.xs,
+    marginBottom: spacing.xs,
   },
-  offerButtonText: {
-    fontSize: 13,
+  serviceName: {
+    fontSize: 11,
     fontWeight: '600',
-    color: colors.white,
-  },
-  offerImage: {
-    width: 100,
-    height: '100%',
-    borderRadius: borderRadius.lg,
+    color: colors.text,
+    textAlign: 'center',
   },
   // Categories Section
   categoriesSection: {
@@ -388,17 +464,17 @@ const styles = StyleSheet.create({
   },
   categoriesContainer: {
     flexDirection: 'row',
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.md,
     gap: spacing.sm,
   },
   categoryItem: {
     alignItems: 'center',
     padding: spacing.sm,
-    minWidth: 80,
+    minWidth: 85,
   },
   categoryIcon: {
-    width: 58,
-    height: 58,
+    width: 60,
+    height: 60,
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
@@ -410,113 +486,160 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
   },
+  // Offers Section
+  offersSection: {
+    marginBottom: spacing.lg,
+  },
+  offersGrid: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing.md,
+    gap: spacing.sm,
+  },
+  offerCard: {
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    ...shadows.md,
+  },
+  offerCardLarge: {
+    flex: 1.5,
+    height: 140,
+  },
+  offerCardSmall: {
+    flex: 1,
+    height: 66,
+    marginBottom: spacing.sm,
+  },
+  offerCardsRight: {
+    flex: 1,
+  },
+  offerContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  offerPercent: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: colors.white,
+  },
+  offerText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  offerSubtext: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 2,
+  },
+  offerContentSmall: {
+    justifyContent: 'center',
+  },
+  offerTextSmall: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  offerSubtextSmall: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 2,
+  },
   // Restaurants Section
   restaurantsSection: {
     marginBottom: spacing.lg,
   },
-  restaurantsContainer: {
-    backgroundColor: colors.white,
-    marginHorizontal: spacing.md,
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-  },
-  restaurantItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.grayLight,
-  },
-  restaurantLogo: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    backgroundColor: colors.grayLight,
-  },
-  restaurantInfo: {
-    flex: 1,
-    marginHorizontal: spacing.md,
-  },
-  restaurantName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  restaurantTags: {
-    marginBottom: 4,
-  },
-  tagText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  restaurantMeta: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  deliveryInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  restaurantDelivery: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text,
-    marginLeft: 2,
-  },
-  // Popular Section
-  popularSection: {
-    marginBottom: spacing.lg,
-  },
-  popularContainer: {
+  restaurantCards: {
     flexDirection: 'row',
     paddingHorizontal: spacing.md,
     gap: spacing.md,
   },
-  popularCard: {
-    width: 160,
+  restaurantCard: {
+    width: 170,
     backgroundColor: colors.white,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     ...shadows.sm,
   },
-  popularImage: {
+  restaurantCardImage: {
     width: '100%',
-    height: 100,
+    height: 110,
     backgroundColor: colors.grayLight,
   },
-  popularInfo: {
+  restaurantCardInfo: {
     padding: spacing.sm,
   },
-  popularName: {
+  restaurantCardName: {
     fontSize: 14,
     fontWeight: '600',
     color: colors.text,
     marginBottom: 4,
   },
-  popularMeta: {
+  restaurantCardMeta: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  popularRating: {
+  restaurantCardRating: {
     fontSize: 12,
     fontWeight: '600',
     color: colors.text,
   },
-  popularTime: {
+  restaurantCardDot: {
+    fontSize: 10,
+    color: colors.textSecondary,
+  },
+  restaurantCardTime: {
     fontSize: 11,
     color: colors.textSecondary,
+  },
+  // Download Banner
+  downloadBanner: {
+    backgroundColor: colors.secondary,
+    marginHorizontal: spacing.md,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    ...shadows.md,
+  },
+  downloadContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  downloadIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  downloadText: {
+    flex: 1,
+  },
+  downloadTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.white,
+    marginBottom: 2,
+  },
+  downloadSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  downloadBtn: {
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.xl,
+  },
+  downloadBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.secondary,
   },
 });
 

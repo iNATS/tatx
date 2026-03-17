@@ -20,6 +20,13 @@ const AccountScreen = ({ navigation }) => {
       ],
     },
     {
+      title: 'خدمات المتاجر',
+      items: [
+        { id: 'vendor', label: 'سجّل متجرك', icon: 'storefront', color: colors.success, screen: 'VendorSignup', badge: 'جديد' },
+        { id: 'orders', label: 'طلباتي', icon: 'bag', color: colors.primary, screen: 'Orders' },
+      ],
+    },
+    {
       title: 'المساعدة',
       items: [
         { id: 'help', label: 'المساعدة', icon: 'help-circle', color: colors.accent, screen: 'Chat' },
@@ -81,7 +88,7 @@ const AccountScreen = ({ navigation }) => {
         <TouchableOpacity 
           style={styles.storeBanner}
           activeOpacity={0.8}
-          onPress={() => {}}
+          onPress={() => navigation.navigate('VendorSignup')}
         >
           <View style={styles.bannerContent}>
             <View style={styles.bannerIcon}>
@@ -130,11 +137,16 @@ const AccountScreen = ({ navigation }) => {
                     <Ionicons name={item.icon} size={22} color={item.color} />
                   </View>
                   <Text style={styles.menuLabel}>{item.label}</Text>
-                  {item.id === 'logout' ? (
+                  {item.badge && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{item.badge}</Text>
+                    </View>
+                  )}
+                  {!item.badge && (item.id === 'logout' ? (
                     <Ionicons name="arrow-forward" size={18} color={colors.error} />
                   ) : (
                     <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-                  )}
+                  ))}
                 </TouchableOpacity>
               ))}
             </View>
@@ -324,6 +336,18 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.text,
     marginRight: spacing.md,
+  },
+  badge: {
+    backgroundColor: colors.error,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+    marginLeft: spacing.sm,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.white,
   },
   // Version
   versionContainer: {

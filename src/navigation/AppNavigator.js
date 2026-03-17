@@ -24,6 +24,8 @@ import WalletScreen from '../screens/WalletScreen';
 import ChatScreen from '../screens/ChatScreen';
 import LocationScreen from '../screens/LocationScreen';
 import TaxiScreen from '../screens/TaxiScreen';
+import CategoryScreen from '../screens/CategoryScreen';
+import VendorSignupScreen from '../screens/VendorSignupScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -169,6 +171,8 @@ const AppNavigator = () => {
         <Stack.Screen name="Search" component={ProductScreen} />
         <Stack.Screen name="RestaurantDetail" component={HomeScreen} />
         <Stack.Screen name="Help" component={ChatScreen} />
+        <Stack.Screen name="Category" component={CategoryScreen} />
+        <Stack.Screen name="VendorSignup" component={VendorSignupScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
