@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import ModalSheet from './ModalSheet';
 
 /**
- * Item Detail Modal Component
- * Shows full item information with add to cart functionality
+ * Apple HIG Compliant Item Detail Modal
+ * 
+ * Features:
+ * - Sheet presentation with drag-to-dismiss
+ * - Large hero image
+ * - Clear typography hierarchy
+ * - Quantity selector
+ * - Customization options
+ * - Prominent add to cart button
  */
 const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
   const insets = useSafeAreaInsets();
@@ -49,201 +58,180 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
   };
 
   return (
-    <Modal
+    <ModalSheet
       visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
+      onClose={onClose}
+      height="95%"
+      showHandle={true}
+      showCloseButton={true}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modalContent}>
-          {/* Handle */}
-          <View style={styles.handleContainer}>
-            <View style={styles.handle} />
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Hero Image */}
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: item.image }} style={styles.itemImage} />
+          {item.discount && (
+            <View style={styles.discountBadge}>
+              <Text style={styles.discountText}>{item.discount}% خصم</Text>
+            </View>
+          )}
+          <TouchableOpacity style={styles.wishlistButton} activeOpacity={0.8}>
+            <Ionicons name="heart-outline" size={24} color={colors.white} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Item Info */}
+        <View style={styles.itemInfo}>
+          <Text style={styles.itemName}>{item.name}</Text>
+          
+          {item.description && (
+            <Text style={styles.itemDescription}>{item.description}</Text>
+          )}
+
+          {/* Rating & Time */}
+          <View style={styles.itemMeta}>
+            {item.rating && (
+              <View style={styles.metaItem}>
+                <Ionicons name="star" size={18} color={colors.warning} />
+                <Text style={styles.metaText}>{item.rating}</Text>
+              </View>
+            )}
+            {item.time && (
+              <View style={styles.metaItem}>
+                <Ionicons name="time-outline" size={18} color={colors.textSecondary} />
+                <Text style={styles.metaText}>{item.time}</Text>
+              </View>
+            )}
+            {item.deliveryFee && (
+              <View style={styles.metaItem}>
+                <Ionicons name="bicycle-outline" size={18} color={colors.textSecondary} />
+                <Text style={styles.metaText}>{item.deliveryFee} ر.س</Text>
+              </View>
+            )}
           </View>
 
-          {/* Close Button */}
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color={colors.text} />
-          </TouchableOpacity>
+          {/* Price */}
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>{item.price} ر.س</Text>
+            {item.oldPrice && (
+              <Text style={styles.oldPrice}>{item.oldPrice} ر.س</Text>
+            )}
+          </View>
+        </View>
 
-          <ScrollView 
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
-          >
-            {/* Item Image */}
-            <View style={styles.imageContainer}>
-              <Image source={{ uri: item.image }} style={styles.itemImage} />
-              {item.discount && (
-                <View style={styles.discountBadge}>
-                  <Text style={styles.discountText}>{item.discount}% خصم</Text>
-                </View>
-              )}
-            </View>
-
-            {/* Item Info */}
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              
-              {item.description && (
-                <Text style={styles.itemDescription}>{item.description}</Text>
-              )}
-
-              {/* Rating and Time */}
-              <View style={styles.itemMeta}>
-                {item.rating && (
-                  <View style={styles.metaItem}>
-                    <Ionicons name="star" size={16} color={colors.warning} />
-                    <Text style={styles.metaText}>{item.rating}</Text>
-                  </View>
-                )}
-                {item.time && (
-                  <View style={styles.metaItem}>
-                    <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
-                    <Text style={styles.metaText}>{item.time}</Text>
-                  </View>
-                )}
-              </View>
-
-              {/* Price */}
-              <View style={styles.priceContainer}>
-                <Text style={styles.price}>{item.price} ر.س</Text>
-                {item.oldPrice && (
-                  <Text style={styles.oldPrice}>{item.oldPrice} ر.س</Text>
-                )}
-              </View>
-            </View>
-
-            {/* Quantity Selector */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>الكمية</Text>
-              <View style={styles.quantityContainer}>
-                <TouchableOpacity 
-                  style={styles.quantityButton} 
-                  onPress={handleDecrement}
-                  disabled={quantity <= 1}
-                >
-                  <Ionicons 
-                    name="remove" 
-                    size={20} 
-                    color={quantity <= 1 ? colors.gray : colors.white} 
-                  />
-                </TouchableOpacity>
-                <View style={styles.quantityValue}>
-                  <Text style={styles.quantityText}>{quantity}</Text>
-                </View>
-                <TouchableOpacity 
-                  style={styles.quantityButton} 
-                  onPress={handleIncrement}
-                >
-                  <Ionicons name="add" size={20} color={colors.white} />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Notes/Customization */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>ملاحظات (اختياري)</Text>
-              <View style={styles.notesContainer}>
-                {itemNotes.map((note) => (
-                  <TouchableOpacity
-                    key={note.id}
-                    style={[
-                      styles.noteItem,
-                      selectedNotes.includes(note.id) && styles.noteItemSelected,
-                    ]}
-                    onPress={() => toggleNote(note.id)}
-                  >
-                    <Ionicons 
-                      name={selectedNotes.includes(note.id) ? 'checkbox' : 'square-outline'} 
-                      size={20} 
-                      color={selectedNotes.includes(note.id) ? colors.primary : colors.textSecondary} 
-                    />
-                    <Text style={[
-                      styles.noteText,
-                      selectedNotes.includes(note.id) && styles.noteTextSelected,
-                    ]}>
-                      {note.text}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Bottom spacing */}
-            <View style={{ height: 100 }} />
-          </ScrollView>
-
-          {/* Add to Cart Button */}
-          <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
-            <View style={styles.totalContainer}>
-              <Text style={styles.totalLabel}>المجموع</Text>
-              <Text style={styles.totalPrice}>{totalPrice} ر.س</Text>
+        {/* Quantity Selector */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>الكمية</Text>
+            <Text style={styles.sectionSubtitle}>اختر الكمية المطلوبة</Text>
+          </View>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity 
+              style={[styles.quantityButton, quantity <= 1 && styles.quantityButtonDisabled]} 
+              onPress={handleDecrement}
+              disabled={quantity <= 1}
+              activeOpacity={0.7}
+            >
+              <Ionicons 
+                name="remove" 
+                size={24} 
+                color={quantity <= 1 ? colors.textTertiary : colors.white} 
+              />
+            </TouchableOpacity>
+            <View style={styles.quantityValue}>
+              <Text style={styles.quantityText}>{quantity}</Text>
             </View>
             <TouchableOpacity 
-              style={styles.addToCartButton}
-              onPress={handleAddToCart}
-              activeOpacity={0.8}
+              style={styles.quantityButton} 
+              onPress={handleIncrement}
+              activeOpacity={0.7}
             >
-              <Ionicons name="cart" size={22} color={colors.white} />
-              <Text style={styles.addToCartText}>أضف للسلة</Text>
-              <Text style={styles.addToCartQuantity}>x{quantity}</Text>
+              <Ionicons name="add" size={24} color={colors.white} />
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Notes/Customization */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>تخصيص الطلب</Text>
+            <Text style={styles.sectionSubtitle}>اختر الإضافات أو الملاحظات</Text>
+          </View>
+          <View style={styles.notesContainer}>
+            {itemNotes.map((note) => (
+              <TouchableOpacity
+                key={note.id}
+                style={[
+                  styles.noteItem,
+                  selectedNotes.includes(note.id) && styles.noteItemSelected,
+                ]}
+                onPress={() => toggleNote(note.id)}
+                activeOpacity={0.7}
+              >
+                <View style={[
+                  styles.checkbox,
+                  selectedNotes.includes(note.id) && styles.checkboxSelected,
+                ]}>
+                  {selectedNotes.includes(note.id) && (
+                    <Ionicons name="checkmark" size={16} color={colors.white} />
+                  )}
+                </View>
+                <Text style={[
+                  styles.noteText,
+                  selectedNotes.includes(note.id) && styles.noteTextSelected,
+                ]}>
+                  {note.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Bottom spacing for button */}
+        <View style={{ height: 100 }} />
+      </ScrollView>
+
+      {/* Add to Cart Button */}
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalLabel}>المجموع</Text>
+          <Text style={styles.totalPrice}>{totalPrice} ر.س</Text>
+        </View>
+        <TouchableOpacity 
+          style={styles.addToCartButton}
+          onPress={handleAddToCart}
+          activeOpacity={0.8}
+        >
+          <LinearGradient colors={colors.primaryGradient} style={styles.addToCartGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <Ionicons name="cart" size={22} color={colors.white} />
+            <Text style={styles.addToCartText}>أضف للسلة</Text>
+            <View style={styles.quantityBadge}>
+              <Text style={styles.quantityBadgeText}>x{quantity}</Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
-    </Modal>
+    </ModalSheet>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: colors.overlay,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.xl * 1.5,
-    borderTopRightRadius: borderRadius.xl * 1.5,
-    maxHeight: '90%',
-    position: 'relative',
-    ...shadows.xl,
-  },
-  handleContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    backgroundColor: colors.gray,
-    borderRadius: 2,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: spacing.md,
-    left: spacing.md,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...shadows.md,
-  },
   scrollContent: {
-    paddingHorizontal: spacing.md,
+    paddingBottom: 20,
   },
   imageContainer: {
     position: 'relative',
+    marginHorizontal: spacing.md,
     marginBottom: spacing.md,
   },
   itemImage: {
     width: '100%',
-    height: 250,
+    height: 280,
     borderRadius: borderRadius.xl,
     backgroundColor: colors.grayLight,
+    ...shadows.md,
   },
   discountBadge: {
     position: 'absolute',
@@ -251,28 +239,42 @@ const styles = StyleSheet.create({
     left: spacing.md,
     backgroundColor: colors.error,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
+    ...shadows.md,
   },
   discountText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     color: colors.white,
   },
+  wishlistButton: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backdropFilter: 'blur(10px)',
+  },
   itemInfo: {
+    paddingHorizontal: spacing.md,
     marginBottom: spacing.lg,
   },
   itemName: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '800',
     color: colors.text,
     marginBottom: spacing.sm,
     textAlign: 'right',
   },
   itemDescription: {
-    fontSize: 14,
+    fontSize: 15,
     color: colors.textSecondary,
-    lineHeight: 22,
+    lineHeight: 24,
     textAlign: 'right',
     marginBottom: spacing.md,
   },
@@ -288,33 +290,42 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 14,
-    color: colors.text,
     fontWeight: '600',
+    color: colors.text,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   price: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '800',
     color: colors.primary,
   },
   oldPrice: {
-    fontSize: 16,
-    color: colors.textSecondary,
+    fontSize: 18,
+    color: colors.textTertiary,
     textDecorationLine: 'line-through',
   },
   section: {
+    paddingHorizontal: spacing.md,
     marginBottom: spacing.lg,
   },
+  sectionHeader: {
+    marginBottom: spacing.md,
+  },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: spacing.md,
     textAlign: 'right',
+  },
+  sectionSubtitle: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    textAlign: 'right',
+    marginTop: 2,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -323,23 +334,27 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   quantityButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.md,
+  },
+  quantityButtonDisabled: {
+    backgroundColor: colors.grayLight,
   },
   quantityValue: {
-    width: 50,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.grayLight,
+    width: 60,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.cardSecondary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   quantityText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: colors.text,
   },
@@ -349,28 +364,47 @@ const styles = StyleSheet.create({
   noteItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.grayLight,
+    backgroundColor: colors.cardSecondary,
     padding: spacing.md,
     borderRadius: borderRadius.lg,
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   noteItemSelected: {
     backgroundColor: colors.primary + '10',
   },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: colors.gray,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
   noteText: {
-    fontSize: 14,
+    flex: 1,
+    fontSize: 15,
     color: colors.textSecondary,
+    textAlign: 'right',
   },
   noteTextSelected: {
     color: colors.primary,
     fontWeight: '600',
   },
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderTopWidth: 1,
-    borderTopColor: colors.grayLight,
+    borderTopColor: colors.borderLight,
     paddingTop: spacing.md,
   },
   totalContainer: {
@@ -381,33 +415,39 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
     marginBottom: 2,
+    textAlign: 'right',
   },
   totalPrice: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '800',
     color: colors.text,
+    textAlign: 'right',
   },
   addToCartButton: {
     flex: 1.5,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.lg,
+  },
+  addToCartGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primary,
     paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
     gap: spacing.sm,
-    ...shadows.md,
   },
   addToCartText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '700',
     color: colors.white,
   },
-  addToCartQuantity: {
+  quantityBadge: {
     backgroundColor: 'rgba(255,255,255,0.2)',
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.full,
+  },
+  quantityBadgeText: {
     fontSize: 12,
     fontWeight: '700',
     color: colors.white,
