@@ -12,12 +12,16 @@ export const colors = {
   // Status Colors
   success: '#10B981',
   successLight: '#D1FAE5',
+  successGradient: ['#10B981', '#34D399'],
   error: '#EF4444',
   errorLight: '#FEE2E2',
+  errorGradient: ['#EF4444', '#F87171'],
   warning: '#F59E0B',
   warningLight: '#FEF3C7',
+  warningGradient: ['#F59E0B', '#FBBF24'],
   info: '#3B82F6',
   infoLight: '#DBEAFE',
+  infoGradient: ['#3B82F6', '#60A5FA'],
   
   // Neutral Colors
   black: '#000000',
@@ -46,6 +50,16 @@ export const colors = {
   greenLight: '#D1FAE5',
   overlay: 'rgba(0, 0, 0, 0.5)',
   shadow: 'rgba(0, 0, 0, 0.1)',
+  
+  // Brand Colors for Services
+  taxi: '#E91E63',
+  food: '#10B981',
+  market: '#3B82F6',
+  pharmacy: '#EF4444',
+  grocery: '#10B981',
+  gifts: '#F59E0B',
+  electronics: '#FF4081',
+  fashion: '#FF5722',
 };
 
 export const spacing = {

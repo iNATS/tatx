@@ -8,17 +8,15 @@ import {
   ScrollView,
   ActivityIndicator,
   Dimensions,
-  Modal,
-  FlatList,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Trip states
 const TRIP_STATES = {
   IDLE: 'idle',
   PICKUP_LOCATION: 'pickup_location',
@@ -36,7 +34,6 @@ const TaxiScreen = ({ navigation }) => {
   const { isRTL } = useApp();
   const insets = useSafeAreaInsets();
   
-  // State management
   const [tripState, setTripState] = useState(TRIP_STATES.IDLE);
   const [pickupLocation, setPickupLocation] = useState('');
   const [destination, setDestination] = useState('');
@@ -47,12 +44,11 @@ const TaxiScreen = ({ navigation }) => {
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
   const [tripSummary, setTripSummary] = useState(null);
 
-  // Mock data
   const rideTypes = [
-    { id: 'economy', name: 'تاكسي', icon: 'car-outline', price: 15, time: '٥ دقائق', capacity: 4, color: colors.green },
-    { id: 'comfort', name: 'مريح', icon: 'directions-car', price: 25, time: '٣ دقائق', capacity: 4, color: colors.primary, popular: true },
-    { id: 'premium', name: 'فاخر', icon: 'diamond-outline', price: 40, time: '٧ دقائق', capacity: 4, color: colors.accent },
-    { id: 'van', name: 'عائلي', icon: 'people-outline', price: 35, time: '١٠ دقائق', capacity: 7, color: colors.info },
+    { id: 'economy', name: 'تاكسي', icon: 'car-outline', price: 15, time: '٥ دق', capacity: 4, color: colors.green, gradient: colors.successGradient },
+    { id: 'comfort', name: 'مريح', icon: 'directions-car', price: 25, time: '٣ دق', capacity: 4, color: colors.primary, popular: true, gradient: colors.primaryGradient },
+    { id: 'premium', name: 'فاخر', icon: 'diamond-outline', price: 40, time: '٧ دق', capacity: 4, color: colors.accent, gradient: ['#FF5722', '#FF8A65'] },
+    { id: 'van', name: 'عائلي', icon: 'people-outline', price: 35, time: '١٠ دق', capacity: 7, color: colors.info, gradient: colors.infoGradient },
   ];
 
   const locationSuggestions = [
@@ -84,7 +80,6 @@ const TaxiScreen = ({ navigation }) => {
     distance: '2.5 كم',
   };
 
-  // Effects
   useEffect(() => {
     if (tripState === TRIP_STATES.FINDING_DRIVER) {
       const timer = setTimeout(() => {
@@ -128,37 +123,10 @@ const TaxiScreen = ({ navigation }) => {
     }
   }, [tripState]);
 
-  // Handlers
-  const handleSelectPickup = (location) => {
-    setPickupLocation(location.name);
-    setShowPickupSuggestions(false);
-    setTripState(TRIP_STATES.DESTINATION);
-  };
-
-  const handleSelectDestination = (location) => {
-    setDestination(location.name);
-    setShowDestinationSuggestions(false);
-    setTripState(TRIP_STATES.SELECTING_RIDE);
-  };
-
   const handleFindDriver = () => {
     if (selectedRide && destination) {
       setTripState(TRIP_STATES.FINDING_DRIVER);
     }
-  };
-
-  const handleDriverArriving = () => {
-    setTripState(TRIP_STATES.DRIVER_ARRIVING);
-    setTripProgress(0);
-  };
-
-  const handleStartTrip = () => {
-    setTripState(TRIP_STATES.TRIP_IN_PROGRESS);
-    setTripProgress(0);
-  };
-
-  const handleCompleteTrip = () => {
-    setTripState(TRIP_STATES.TRIP_COMPLETED);
   };
 
   const handleReset = () => {
@@ -171,20 +139,22 @@ const TaxiScreen = ({ navigation }) => {
     setTripSummary(null);
   };
 
-  // Render functions for each state
   const renderIdle = () => (
     <View style={styles.emptyState}>
-      <View style={styles.emptyIcon}>
-        <Ionicons name="taxi" size={64} color={colors.primary} />
-      </View>
+      <LinearGradient colors={[colors.primary, colors.secondary]} style={styles.emptyIconGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+        <Ionicons name="taxi" size={56} color={colors.white} />
+      </LinearGradient>
       <Text style={styles.emptyTitle}>احجز رحلتك التالية</Text>
       <Text style={styles.emptySubtitle}>اختر موقعpickup والوجهة للبدء</Text>
       <TouchableOpacity 
         style={styles.startButton}
         onPress={() => setTripState(TRIP_STATES.PICKUP_LOCATION)}
+        activeOpacity={0.8}
       >
-        <Text style={styles.startButtonText}>ابدأ الحجز</Text>
-        <Ionicons name="arrow-forward" size={20} color={colors.white} />
+        <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.startButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+          <Text style={styles.startButtonText}>ابدأ الحجز</Text>
+          <Ionicons name="arrow-forward" size={20} color={colors.white} />
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
@@ -222,9 +192,10 @@ const TaxiScreen = ({ navigation }) => {
             key={item.id}
             style={styles.suggestionItem}
             onPress={() => tripState === TRIP_STATES.PICKUP_LOCATION 
-              ? handleSelectPickup(item) 
-              : handleSelectDestination(item)
+              ? setPickupLocation(item.name)
+              : setDestination(item.name)
             }
+            activeOpacity={0.7}
           >
             <View style={[styles.suggestionIcon, { backgroundColor: colors.primary + '15' }]}>
               <Ionicons name={item.icon} size={22} color={colors.primary} />
@@ -233,6 +204,7 @@ const TaxiScreen = ({ navigation }) => {
               <Text style={styles.suggestionName}>{item.name}</Text>
               <Text style={styles.suggestionAddress}>{item.address}</Text>
             </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -241,19 +213,19 @@ const TaxiScreen = ({ navigation }) => {
 
   const renderRideSelection = () => (
     <View style={styles.rideContainer}>
-      {/* Map Preview */}
       <View style={styles.mapPreview}>
-        <View style={styles.routePreview}>
-          <View style={[styles.routeDot, { backgroundColor: colors.success }]} />
-          <View style={styles.routeLine} />
-          <View style={[styles.routeDot, { backgroundColor: colors.primary }]} />
-        </View>
-        <Text style={styles.routeText}>
-          {pickupLocation || 'موقعpickup'} → {destination}
-        </Text>
+        <LinearGradient colors={[colors.infoLight, colors.primaryLight]} style={styles.mapGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+          <View style={styles.routePreview}>
+            <View style={[styles.routeDot, { backgroundColor: colors.success }]} />
+            <View style={styles.routeLine} />
+            <View style={[styles.routeDot, { backgroundColor: colors.primary }]} />
+          </View>
+          <Text style={styles.routeText}>
+            {pickupLocation || 'موقعpickup'} → {destination}
+          </Text>
+        </LinearGradient>
       </View>
 
-      {/* Ride Types */}
       <View style={styles.rideList}>
         <Text style={styles.sectionTitle}>اختر نوع التاكسي</Text>
         {rideTypes.map((ride) => (
@@ -265,6 +237,7 @@ const TaxiScreen = ({ navigation }) => {
               selectedRide?.id === ride.id && { borderColor: ride.color },
             ]}
             onPress={() => setSelectedRide(ride)}
+            activeOpacity={0.8}
           >
             {ride.popular && (
               <View style={[styles.popularBadge, { backgroundColor: ride.color }]}>
@@ -288,7 +261,6 @@ const TaxiScreen = ({ navigation }) => {
         ))}
       </View>
 
-      {/* Confirm Button */}
       <View style={styles.confirmContainer}>
         <TouchableOpacity
           style={[
@@ -297,9 +269,12 @@ const TaxiScreen = ({ navigation }) => {
           ]}
           onPress={handleFindDriver}
           disabled={!selectedRide}
+          activeOpacity={0.8}
         >
-          <Text style={styles.confirmButtonText}>تأكيد الحجز</Text>
-          <Text style={styles.confirmSubtext}>{selectedRide?.price || 0} ر.س</Text>
+          <LinearGradient colors={selectedRide ? colors.primaryGradient : [colors.gray, colors.gray]} style={styles.confirmGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <Text style={styles.confirmButtonText}>تأكيد الحجز</Text>
+            <Text style={styles.confirmSubtext}>{selectedRide?.price || 0} ر.س</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </View>
@@ -311,9 +286,9 @@ const TaxiScreen = ({ navigation }) => {
         <View style={styles.pulseRing} />
         <View style={styles.pulseRing} />
         <View style={styles.pulseRing} />
-        <View style={styles.carIconCenter}>
+        <LinearGradient colors={colors.primaryGradient} style={styles.carIconCenter} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
           <Ionicons name="taxi" size={40} color={colors.white} />
-        </View>
+        </LinearGradient>
       </View>
       <Text style={styles.findingTitle}>جاري البحث عن سائق...</Text>
       <Text style={styles.findingSubtitle}>نبحث عن أفضل السائقين بالقرب منك</Text>
@@ -328,19 +303,17 @@ const TaxiScreen = ({ navigation }) => {
 
   const renderDriverFound = () => (
     <View style={styles.driverContainer}>
-      {/* Map Area */}
-      <View style={styles.driverMap}>
+      <LinearGradient colors={colors.infoGradient} style={styles.driverMap} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
         <View style={styles.driverCarMarker}>
-          <View style={[styles.carMarker, { backgroundColor: colors.primary }]}>
+          <LinearGradient colors={colors.primaryGradient} style={styles.carMarker} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
             <Ionicons name="taxi" size={20} color={colors.white} />
-          </View>
+          </LinearGradient>
           <View style={styles.etaBadge}>
             <Text style={styles.etaText}>{driver?.eta} دق</Text>
           </View>
         </View>
-      </View>
+      </LinearGradient>
 
-      {/* Driver Info */}
       <View style={styles.driverInfoCard}>
         <View style={styles.driverHeader}>
           <View>
@@ -348,19 +321,19 @@ const TaxiScreen = ({ navigation }) => {
             <Text style={styles.driverEta}>سيصل خلال {driver?.eta} دقائق</Text>
           </View>
           <View style={styles.driverActions}>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.success }]}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.success }]} activeOpacity={0.8}>
               <Ionicons name="call" size={20} color={colors.white} />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]} activeOpacity={0.8}>
               <Ionicons name="chatbubble" size={20} color={colors.white} />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.driverDetails}>
-          <View style={styles.driverAvatar}>
+          <LinearGradient colors={colors.primaryGradient} style={styles.driverAvatar} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
             <Ionicons name="person" size={36} color={colors.white} />
-          </View>
+          </LinearGradient>
           <View style={styles.driverInfo}>
             <Text style={styles.driverName}>{driver?.name}</Text>
             <View style={styles.driverRating}>
@@ -384,8 +357,10 @@ const TaxiScreen = ({ navigation }) => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.arrivingButton} onPress={handleDriverArriving}>
-          <Text style={styles.arrivingButtonText}>محاكاة وصول السائق</Text>
+        <TouchableOpacity style={styles.arrivingButton} onPress={() => setTripState(TRIP_STATES.DRIVER_ARRIVING)} activeOpacity={0.8}>
+          <LinearGradient colors={colors.successGradient} style={styles.arrivingButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <Text style={styles.arrivingButtonText}>محاكاة وصول السائق</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </View>
@@ -396,14 +371,16 @@ const TaxiScreen = ({ navigation }) => {
       <View style={styles.progressContainer}>
         <Text style={styles.progressTitle}>السائق في الطريق</Text>
         <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${tripProgress}%` }]} />
+          <LinearGradient colors={colors.primaryGradient} style={[styles.progressFill, { width: `${tripProgress}%` }]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
         </View>
         <Text style={styles.progressText}>{tripProgress}%</Text>
       </View>
       
       {tripProgress >= 100 && (
-        <TouchableOpacity style={styles.startTripButton} onPress={handleStartTrip}>
-          <Text style={styles.startTripButtonText}>بدء الرحلة</Text>
+        <TouchableOpacity style={styles.startTripButton} onPress={() => setTripState(TRIP_STATES.TRIP_IN_PROGRESS)} activeOpacity={0.8}>
+          <LinearGradient colors={colors.primaryGradient} style={styles.startTripButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <Text style={styles.startTripButtonText}>بدء الرحلة</Text>
+          </LinearGradient>
         </TouchableOpacity>
       )}
     </View>
@@ -411,9 +388,7 @@ const TaxiScreen = ({ navigation }) => {
 
   const renderDriverArrived = () => (
     <View style={styles.arrivedContainer}>
-      <View style={styles.arrivedIcon}>
-        <Ionicons name="checkmark-circle" size={80} color={colors.success} />
-      </View>
+      <Ionicons name="checkmark-circle" size={80} color={colors.success} />
       <Text style={styles.arrivedTitle}>وصل السائق!</Text>
       <Text style={styles.arrivedSubtitle}>السائق في انتظارك عند موقعpickup</Text>
       
@@ -431,8 +406,10 @@ const TaxiScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.startTripButton} onPress={handleStartTrip}>
-        <Text style={styles.startTripButtonText}>بدء الرحلة</Text>
+      <TouchableOpacity style={styles.startTripButton} onPress={() => setTripState(TRIP_STATES.TRIP_IN_PROGRESS)} activeOpacity={0.8}>
+        <LinearGradient colors={colors.primaryGradient} style={styles.startTripButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+          <Text style={styles.startTripButtonText}>بدء الرحلة</Text>
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
@@ -442,7 +419,7 @@ const TaxiScreen = ({ navigation }) => {
       <View style={styles.tripProgress}>
         <Text style={styles.tripProgressTitle}>الرحلة جارية</Text>
         <View style={styles.tripProgressBar}>
-          <View style={[styles.tripProgressFill, { width: `${tripProgress}%` }]} />
+          <LinearGradient colors={colors.successGradient} style={[styles.tripProgressFill, { width: `${tripProgress}%` }]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
         </View>
         <Text style={styles.tripProgressText}>{tripProgress}%</Text>
       </View>
@@ -466,8 +443,10 @@ const TaxiScreen = ({ navigation }) => {
       </View>
 
       {tripProgress >= 100 && (
-        <TouchableOpacity style={styles.completeButton} onPress={handleCompleteTrip}>
-          <Text style={styles.completeButtonText}>إنهاء الرحلة</Text>
+        <TouchableOpacity style={styles.completeButton} onPress={() => setTripState(TRIP_STATES.TRIP_COMPLETED)} activeOpacity={0.8}>
+          <LinearGradient colors={colors.successGradient} style={styles.completeButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+            <Text style={styles.completeButtonText}>إنهاء الرحلة</Text>
+          </LinearGradient>
         </TouchableOpacity>
       )}
     </View>
@@ -515,16 +494,16 @@ const TaxiScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.newRideButton} onPress={handleReset}>
-        <Text style={styles.newRideButtonText}>حجز رحلة جديدة</Text>
+      <TouchableOpacity style={styles.newRideButton} onPress={handleReset} activeOpacity={0.8}>
+        <LinearGradient colors={colors.primaryGradient} style={styles.newRideButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+          <Text style={styles.newRideButtonText}>حجز رحلة جديدة</Text>
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
 
-  // Main render
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
@@ -535,7 +514,6 @@ const TaxiScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Content based on state */}
       <ScrollView 
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
@@ -567,6 +545,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.sm,
     backgroundColor: colors.white,
+    ...shadows.sm,
   },
   headerBtn: {
     width: 40,
@@ -587,21 +566,21 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
   },
-  // Empty State
+  // Idle State
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.xl,
   },
-  emptyIcon: {
+  emptyIconGradient: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: colors.primary + '15',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
+    ...shadows.lg,
   },
   emptyTitle: {
     fontSize: 22,
@@ -616,14 +595,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   startButton: {
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.lg,
+  },
+  startButtonGradient: {
     flexDirection: 'row',
-    backgroundColor: colors.primary,
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
-    alignItems: 'center',
     gap: spacing.sm,
-    ...shadows.md,
   },
   startButtonText: {
     fontSize: 17,
@@ -654,7 +635,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     height: 50,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    ...shadows.md,
   },
   searchInput: {
     flex: 1,
@@ -667,7 +648,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.grayLight,
+    borderBottomColor: colors.borderLight,
   },
   suggestionIcon: {
     width: 44,
@@ -682,7 +663,7 @@ const styles = StyleSheet.create({
   },
   suggestionName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.text,
   },
   suggestionAddress: {
@@ -695,10 +676,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mapPreview: {
-    backgroundColor: colors.grayLight,
-    padding: spacing.lg,
-    alignItems: 'center',
+    height: 150,
+    margin: spacing.md,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.md,
+  },
+  mapGradient: {
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   routePreview: {
     alignItems: 'center',
@@ -775,7 +762,7 @@ const styles = StyleSheet.create({
   },
   ridePrice: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
   popularBadge: {
     position: 'absolute',
@@ -794,17 +781,19 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   confirmButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.lg,
+  },
+  confirmButtonDisabled: {
+    opacity: 0.6,
+  },
+  confirmGradient: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    ...shadows.md,
-  },
-  confirmButtonDisabled: {
-    backgroundColor: colors.gray,
+    paddingVertical: spacing.md,
   },
   confirmButtonText: {
     fontSize: 17,
@@ -813,7 +802,7 @@ const styles = StyleSheet.create({
   },
   confirmSubtext: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     color: colors.white,
   },
   // Finding Driver
@@ -842,9 +831,9 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.lg,
   },
   findingTitle: {
     fontSize: 20,
@@ -873,7 +862,6 @@ const styles = StyleSheet.create({
   },
   driverMap: {
     flex: 1,
-    backgroundColor: colors.grayLight,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -886,21 +874,22 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadows.md,
+    ...shadows.lg,
   },
   etaBadge: {
     position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.white,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.full,
+    ...shadows.sm,
   },
   etaText: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.white,
+    color: colors.text,
   },
   driverInfoCard: {
     backgroundColor: colors.white,
@@ -935,6 +924,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.md,
   },
   driverDetails: {
     flexDirection: 'row',
@@ -945,9 +935,9 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.md,
   },
   driverInfo: {
     marginLeft: spacing.md,
@@ -974,7 +964,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   vehicleCard: {
-    backgroundColor: colors.grayLight,
+    backgroundColor: colors.cardSecondary,
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -989,7 +979,7 @@ const styles = StyleSheet.create({
   },
   vehicleText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.text,
   },
   vehicleColor: {
@@ -1010,9 +1000,12 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   arrivingButton: {
-    backgroundColor: colors.success,
-    paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.md,
+  },
+  arrivingButtonGradient: {
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
   arrivingButtonText: {
@@ -1023,9 +1016,9 @@ const styles = StyleSheet.create({
   // Driver Arriving
   arrivingContainer: {
     flex: 1,
+    padding: spacing.xl,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.xl,
   },
   progressContainer: {
     width: '100%',
@@ -1046,22 +1039,23 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.primary,
     borderRadius: 4,
   },
   progressText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: colors.text,
     marginTop: spacing.md,
   },
   startTripButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
+    overflow: 'hidden',
     marginTop: spacing.xl,
-    ...shadows.md,
+    ...shadows.lg,
+  },
+  startTripButtonGradient: {
+    paddingVertical: spacing.md,
+    alignItems: 'center',
   },
   startTripButtonText: {
     fontSize: 17,
@@ -1074,9 +1068,6 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  arrivedIcon: {
-    marginBottom: spacing.lg,
   },
   arrivedTitle: {
     fontSize: 24,
@@ -1148,12 +1139,11 @@ const styles = StyleSheet.create({
   },
   tripProgressFill: {
     height: '100%',
-    backgroundColor: colors.success,
     borderRadius: 4,
   },
   tripProgressText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: colors.text,
     marginTop: spacing.md,
   },
@@ -1181,11 +1171,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   completeButton: {
-    backgroundColor: colors.success,
-    paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.lg,
+  },
+  completeButtonGradient: {
+    paddingVertical: spacing.md,
     alignItems: 'center',
-    ...shadows.md,
   },
   completeButtonText: {
     fontSize: 17,
@@ -1262,13 +1254,14 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   newRideButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
+    overflow: 'hidden',
     width: '100%',
+    ...shadows.lg,
+  },
+  newRideButtonGradient: {
+    paddingVertical: spacing.md,
     alignItems: 'center',
-    ...shadows.md,
   },
   newRideButtonText: {
     fontSize: 17,
