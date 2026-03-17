@@ -66,7 +66,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.white,
     paddingVertical: spacing.sm,
-    ...shadows.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   scrollContent: {
     paddingHorizontal: spacing.md,
@@ -75,14 +76,18 @@ const styles = StyleSheet.create({
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.grayLight,
+    backgroundColor: colors.cardSecondary,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
     gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   tabActive: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
+    ...shadows.md,
   },
   tabCompact: {
     paddingHorizontal: spacing.sm,

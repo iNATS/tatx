@@ -199,7 +199,7 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: colors.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -208,6 +208,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: borderRadius.xl * 1.5,
     maxHeight: '90%',
     position: 'relative',
+    ...shadows.xl,
   },
   handleContainer: {
     alignItems: 'center',
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadows.sm,
+    ...shadows.md,
   },
   scrollContent: {
     paddingHorizontal: spacing.md,

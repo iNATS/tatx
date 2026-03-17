@@ -5,7 +5,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { categories, restaurants } from '../data/staticData';
 import { useApp } from '../context/AppContext';
-import FilterTabs from '../components/FilterTabs';
 import ItemDetailModal from '../components/ItemDetailModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -13,7 +12,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HomeScreen = ({ navigation }) => {
   const { isRTL, user, addToCart } = useApp();
   const insets = useSafeAreaInsets();
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showItemModal, setShowItemModal] = useState(false);
 
@@ -29,7 +27,7 @@ const HomeScreen = ({ navigation }) => {
     { id: 'fashion', name: 'أزياء', icon: 'shirt', color: colors.accent, screen: 'Category', params: { name: 'أزياء' } },
   ];
 
-  // Paid Offers from Vendors (Background Cards)
+  // Paid Offers from Vendors
   const paidOffers = [
     { 
       id: '1', 
@@ -37,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
       title: 'خصم 40%', 
       subtitle: 'على جميع الوجبات', 
       image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600',
-      bgColor: '#FF6B6B',
+      bgColor: ['#FF6B6B', '#EE5A5A'],
       valid: 'ينتهي خلال 3 أيام'
     },
     { 
@@ -46,7 +44,7 @@ const HomeScreen = ({ navigation }) => {
       title: 'توصيل مجاني', 
       subtitle: 'للطلبات فوق 150 ر.س', 
       image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600',
-      bgColor: '#4ECDC4',
+      bgColor: ['#4ECDC4', '#44B8B0'],
       valid: 'ينتهي اليوم'
     },
     { 
@@ -55,16 +53,16 @@ const HomeScreen = ({ navigation }) => {
       title: 'وجبة عائلية', 
       subtitle: 'بخصم 35%', 
       image: 'https://images.unsplash.com/photo-1626777552726-456c5ca36c25?w=600',
-      bgColor: '#14B8A6',
+      bgColor: ['#14B8A6', '#0FA594'],
       valid: 'ينتهي غداً'
     },
     { 
       id: '4', 
       vendor: 'مخبز البركة',
-      title: 'اشتري 1 واحصل على 1 مجاني', 
+      title: 'اشتري 1 واحصل على 1', 
       subtitle: 'على جميع المعجنات', 
       image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600',
-      bgColor: '#F59E0B',
+      bgColor: ['#F59E0B', '#E58E0A'],
       valid: 'ينتهي خلال أسبوع'
     },
   ];
@@ -110,14 +108,19 @@ const HomeScreen = ({ navigation }) => {
       key={index}
       style={styles.productCard}
       onPress={() => handleProductPress(product)}
-      activeOpacity={0.8}
+      activeOpacity={0.85}
     >
-      <Image source={{ uri: product.image }} style={styles.productImage} />
+      <View style={styles.productImageContainer}>
+        <Image source={{ uri: product.image }} style={styles.productImage} />
+        <TouchableOpacity style={styles.wishlistBtn} activeOpacity={0.8}>
+          <Ionicons name="heart-outline" size={16} color={colors.white} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.productInfo}>
         <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
         <View style={styles.productMeta}>
           <View style={styles.rating}>
-            <Ionicons name="star" size={14} color={colors.warning} />
+            <Ionicons name="star" size={12} color={colors.warning} />
             <Text style={styles.ratingText}>{product.rating}</Text>
           </View>
           <Text style={styles.productTime}>{product.time}</Text>
@@ -129,17 +132,25 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+      {/* Modern Header with Gradient */}
       <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
         <View style={styles.headerContent}>
-          <Text style={styles.greeting}>مرحباً، {user?.name || 'زائر'}</Text>
+          <Text style={styles.greeting}>مرحباً، {user?.name || 'زائر'} 👋</Text>
           <Text style={styles.subGreeting}>ماذا تريد أن تطلب اليوم؟</Text>
         </View>
         <View style={styles.headerActions}>
-          <TouchableOpacity onPress={() => navigation.navigate('Product')} style={styles.actionBtn}>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Product')} 
+            style={styles.actionBtn}
+            activeOpacity={0.8}
+          >
             <Ionicons name="search" size={22} color={colors.white} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Chat')} style={styles.actionBtn}>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Chat')} 
+            style={styles.actionBtn}
+            activeOpacity={0.8}
+          >
             <Ionicons name="notifications" size={22} color={colors.white} />
             <View style={styles.notificationBadge} />
           </TouchableOpacity>
@@ -147,20 +158,25 @@ const HomeScreen = ({ navigation }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* TATX Services - One Row Slider */}
+        {/* TATX Services - Modern Cards */}
         <View style={styles.servicesSection}>
-          <Text style={styles.sectionTitle}>خدمات تاتكس</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>خدمات تاتكس</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>عرض الكل</Text>
+            </TouchableOpacity>
+          </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.servicesContainer}>
               {tatxServices.map((service) => (
                 <TouchableOpacity
                   key={service.id}
-                  style={styles.serviceItem}
+                  style={[styles.serviceCard, { backgroundColor: service.color + '08' }]}
                   onPress={() => handleServicePress(service)}
                   activeOpacity={0.8}
                 >
-                  <View style={[styles.serviceIcon, { backgroundColor: service.color + '15' }]}>
-                    <Ionicons name={service.icon} size={26} color={service.color} />
+                  <View style={[styles.serviceIcon, { backgroundColor: service.color }]}>
+                    <Ionicons name={service.icon} size={24} color={colors.white} />
                   </View>
                   <Text style={styles.serviceName}>{service.name}</Text>
                 </TouchableOpacity>
@@ -169,7 +185,7 @@ const HomeScreen = ({ navigation }) => {
           </ScrollView>
         </View>
 
-        {/* Paid Offers from Vendors - Background Cards Slider */}
+        {/* Paid Offers - Gradient Cards */}
         <View style={styles.offersSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>عروض حصرية من المتاجر</Text>
@@ -182,11 +198,13 @@ const HomeScreen = ({ navigation }) => {
               {paidOffers.map((offer) => (
                 <TouchableOpacity
                   key={offer.id}
-                  style={[styles.offerCard, { backgroundColor: offer.bgColor }]}
-                  activeOpacity={0.8}
+                  style={[styles.offerCard, { backgroundColor: offer.bgColor[0] }]}
+                  activeOpacity={0.85}
                 >
                   <View style={styles.offerContent}>
-                    <Text style={styles.offerVendor}>{offer.vendor}</Text>
+                    <View style={styles.offerBadge}>
+                      <Text style={styles.offerBadgeText}>{offer.vendor}</Text>
+                    </View>
                     <Text style={styles.offerTitle}>{offer.title}</Text>
                     <Text style={styles.offerSubtitle}>{offer.subtitle}</Text>
                     <View style={styles.offerValid}>
@@ -201,7 +219,7 @@ const HomeScreen = ({ navigation }) => {
           </ScrollView>
         </View>
 
-        {/* Famous Restaurants Slider */}
+        {/* Famous Restaurants - Enhanced Cards */}
         <View style={styles.restaurantsSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>أشهر المطاعم</Text>
@@ -215,14 +233,21 @@ const HomeScreen = ({ navigation }) => {
                 <TouchableOpacity
                   key={index}
                   style={styles.restaurantCard}
-                  activeOpacity={0.8}
+                  activeOpacity={0.85}
                 >
-                  <Image source={{ uri: restaurant.logo }} style={styles.restaurantCardImage} />
+                  <View style={styles.restaurantImageContainer}>
+                    <Image source={{ uri: restaurant.logo }} style={styles.restaurantCardImage} />
+                    <View style={styles.restaurantFavorite}>
+                      <Ionicons name="heart-outline" size={16} color={colors.white} />
+                    </View>
+                  </View>
                   <View style={styles.restaurantCardInfo}>
                     <Text style={styles.restaurantCardName}>{restaurant.name}</Text>
                     <View style={styles.restaurantCardMeta}>
-                      <Ionicons name="star" size={14} color={colors.warning} />
-                      <Text style={styles.restaurantCardRating}>{restaurant.rating}</Text>
+                      <View style={styles.ratingBadge}>
+                        <Ionicons name="star" size={12} color={colors.warning} />
+                        <Text style={styles.restaurantCardRating}>{restaurant.rating}</Text>
+                      </View>
                       <Text style={styles.restaurantCardDot}>•</Text>
                       <Text style={styles.restaurantCardTime}>{restaurant.deliveryTime} دق</Text>
                       <Text style={styles.restaurantCardDot}>•</Text>
@@ -249,7 +274,7 @@ const HomeScreen = ({ navigation }) => {
                 <TouchableOpacity
                   key={index}
                   style={styles.nearCard}
-                  activeOpacity={0.8}
+                  activeOpacity={0.85}
                 >
                   <Image source={{ uri: restaurant.logo }} style={styles.nearCardImage} />
                   <View style={styles.nearCardInfo}>
@@ -269,7 +294,7 @@ const HomeScreen = ({ navigation }) => {
           </ScrollView>
         </View>
 
-        {/* Categories with Products Slider */}
+        {/* Categories with Products */}
         {['طعام', 'سوبرماركت', 'صيدلية'].map((categoryName) => (
           <View key={categoryName} style={styles.categorySection}>
             <View style={styles.sectionHeader}>
@@ -320,12 +345,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greeting: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 22,
+    fontWeight: '800',
     color: colors.text,
   },
   subGreeting: {
-    fontSize: 13,
+    fontSize: 14,
     color: colors.textSecondary,
     marginTop: 2,
   },
@@ -334,31 +359,33 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   actionBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    ...shadows.md,
   },
   notificationBadge: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 12,
+    right: 12,
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: colors.error,
+    borderWidth: 2,
+    borderColor: colors.white,
   },
   scrollContent: {
     paddingBottom: 100,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     color: colors.text,
-    marginBottom: spacing.md,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -370,9 +397,9 @@ const styles = StyleSheet.create({
   seeAll: {
     fontSize: 13,
     color: colors.primary,
-    fontWeight: '600',
+    fontWeight: '700',
   },
-  // Services Section
+  // Services Section - Modern Cards
   servicesSection: {
     backgroundColor: colors.white,
     padding: spacing.md,
@@ -384,26 +411,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     gap: spacing.md,
   },
-  serviceItem: {
+  serviceCard: {
     alignItems: 'center',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.xl,
+    minWidth: 85,
   },
   serviceIcon: {
-    width: 58,
-    height: 58,
-    borderRadius: 18,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
+    ...shadows.md,
   },
   serviceName: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.text,
     textAlign: 'center',
   },
-  // Offers Section
+  // Offers Section - Gradient Cards
   offersSection: {
     marginBottom: spacing.lg,
   },
@@ -419,24 +449,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing.md,
-    ...shadows.md,
+    ...shadows.lg,
   },
   offerContent: {
     flex: 1,
   },
-  offerVendor: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
-    marginBottom: 4,
+  offerBadge: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+    alignSelf: 'flex-start',
+    marginBottom: spacing.sm,
+  },
+  offerBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.white,
   },
   offerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: colors.white,
     marginBottom: 4,
   },
   offerSubtitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: 'rgba(255,255,255,0.9)',
     marginBottom: spacing.sm,
   },
@@ -468,12 +506,26 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
-    ...shadows.sm,
+    ...shadows.md,
+  },
+  restaurantImageContainer: {
+    position: 'relative',
   },
   restaurantCardImage: {
     width: '100%',
     height: 120,
     backgroundColor: colors.grayLight,
+  },
+  restaurantFavorite: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   restaurantCardInfo: {
     padding: spacing.sm,
@@ -490,14 +542,23 @@ const styles = StyleSheet.create({
     gap: 4,
     flexWrap: 'wrap',
   },
+  ratingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.warning + '15',
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+    gap: 2,
+  },
   restaurantCardRating: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     color: colors.text,
   },
   restaurantCardDot: {
-    fontSize: 10,
-    color: colors.textSecondary,
+    fontSize: 8,
+    color: colors.textTertiary,
   },
   restaurantCardTime: {
     fontSize: 11,
@@ -521,7 +582,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
-    ...shadows.sm,
+    ...shadows.md,
   },
   nearCardImage: {
     width: '100%',
@@ -533,7 +594,7 @@ const styles = StyleSheet.create({
   },
   nearCardName: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.text,
     marginBottom: 4,
   },
@@ -567,19 +628,34 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
-    ...shadows.sm,
+    ...shadows.md,
+  },
+  productImageContainer: {
+    position: 'relative',
   },
   productImage: {
     width: '100%',
     height: 130,
+    borderRadius: borderRadius.xl,
     backgroundColor: colors.grayLight,
+  },
+  wishlistBtn: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   productInfo: {
     padding: spacing.sm,
   },
   productName: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.text,
     marginBottom: 4,
   },
@@ -595,17 +671,17 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   ratingText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     color: colors.text,
   },
   productTime: {
-    fontSize: 11,
-    color: colors.textSecondary,
+    fontSize: 10,
+    color: colors.textTertiary,
   },
   productPrice: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: colors.primary,
   },
 });
