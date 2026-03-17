@@ -8,26 +8,26 @@ import {
   ScrollView,
   ActivityIndicator,
   Dimensions,
+  Modal,
 } from 'react-native';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const TRIP_STATES = {
   IDLE: 'idle',
-  PICKUP_LOCATION: 'pickup_location',
+  PICKUP: 'pickup',
   DESTINATION: 'destination',
-  SELECTING_RIDE: 'selecting_ride',
-  FINDING_DRIVER: 'finding_driver',
+  RIDE_SELECT: 'ride_select',
+  FINDING: 'finding',
   DRIVER_FOUND: 'driver_found',
-  DRIVER_ARRIVING: 'driver_arriving',
-  DRIVER_ARRIVED: 'driver_arrived',
-  TRIP_IN_PROGRESS: 'trip_in_progress',
-  TRIP_COMPLETED: 'trip_completed',
+  ARRIVING: 'arriving',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed',
 };
 
 const TaxiScreen = ({ navigation }) => {
@@ -35,85 +35,86 @@ const TaxiScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   
   const [tripState, setTripState] = useState(TRIP_STATES.IDLE);
-  const [pickupLocation, setPickupLocation] = useState('');
+  const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
   const [selectedRide, setSelectedRide] = useState(null);
   const [driver, setDriver] = useState(null);
-  const [tripProgress, setTripProgress] = useState(0);
-  const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
-  const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
-  const [tripSummary, setTripSummary] = useState(null);
+  const [progress, setProgress] = useState(0);
 
   const rideTypes = [
-    { id: 'economy', name: 'تاكسي', icon: 'car-outline', price: 15, time: '٥ دق', capacity: 4, color: colors.green, gradient: colors.successGradient },
-    { id: 'comfort', name: 'مريح', icon: 'directions-car', price: 25, time: '٣ دق', capacity: 4, color: colors.primary, popular: true, gradient: colors.primaryGradient },
-    { id: 'premium', name: 'فاخر', icon: 'diamond-outline', price: 40, time: '٧ دق', capacity: 4, color: colors.accent, gradient: ['#FF5722', '#FF8A65'] },
-    { id: 'van', name: 'عائلي', icon: 'people-outline', price: 35, time: '١٠ دق', capacity: 7, color: colors.info, gradient: colors.infoGradient },
+    { 
+      id: 'uberx', 
+      name: 'تاكسي', 
+      icon: 'car-outline', 
+      price: 15, 
+      time: '٣ دقائق', 
+      capacity: 4,
+      description: 'رحلات يومية ميسورة التكلفة',
+      color: '#000000'
+    },
+    { 
+      id: 'comfort', 
+      name: 'مريح', 
+      icon: 'directions-car', 
+      price: 25, 
+      time: '٥ دقائق', 
+      capacity: 4,
+      description: 'سيارات أحدث مع مساحة إضافية',
+      color: '#22c55e'
+    },
+    { 
+      id: 'premium', 
+      name: 'فاخر', 
+      icon: 'diamond-outline', 
+      price: 40, 
+      time: '٧ دقائق', 
+      capacity: 4,
+      description: 'مركبات فاخرة من الدرجة الأولى',
+      color: '#eab308'
+    },
+    { 
+      id: 'van', 
+      name: 'عائلي', 
+      icon: 'people-outline', 
+      price: 35, 
+      time: '١٠ دقائق', 
+      capacity: 7,
+      description: 'مثالي للمجموعات والعائلات',
+      color: '#3b82f6'
+    },
   ];
 
-  const locationSuggestions = [
+  const locations = [
     { id: '1', name: 'موقعك الحالي', address: 'تم التحديد تلقائياً', icon: 'location' },
     { id: '2', name: 'المنزل', address: 'شارع الملك عبد العزيز', icon: 'home' },
     { id: '3', name: 'العمل', address: 'طريق الظهران', icon: 'business' },
     { id: '4', name: 'مول الراشد', address: 'طريق الملك عبد العزيز', icon: 'shopping-bag' },
-    { id: '5', name: 'مطار الملك فهد', address: 'طريق المطار', icon: 'airplane' },
-  ];
-
-  const destinationSuggestions = [
-    { id: '1', name: 'مطار الملك فهد الدولي', address: 'طريق المطار - 25 كم', icon: 'airplane' },
-    { id: '2', name: 'مول الراشد', address: 'طريق الملك عبد العزيز - 8 كم', icon: 'shopping-bag' },
-    { id: '3', name: 'برج المياه', address: 'الكورنيش - 5 كم', icon: 'water' },
-    { id: '4', name: 'جامعة الإمام', address: 'حي الجامعة - 12 كم', icon: 'school' },
-    { id: '5', name: 'مستشفى الملك فهد', address: 'طريق الأمير محمد - 6 كم', icon: 'hospital' },
   ];
 
   const mockDriver = {
     name: 'أحمد محمد',
     rating: 4.9,
     trips: 2450,
-    car: 'تويوتا كامري',
-    year: '2024',
+    car: 'تويوتا كامري 2024',
     color: 'أبيض',
     plate: 'أ ب ج 1234',
-    phone: '+966 50 123 4567',
     eta: 3,
-    distance: '2.5 كم',
   };
 
   useEffect(() => {
-    if (tripState === TRIP_STATES.FINDING_DRIVER) {
+    if (tripState === TRIP_STATES.FINDING) {
       const timer = setTimeout(() => {
         setDriver(mockDriver);
         setTripState(TRIP_STATES.DRIVER_FOUND);
-      }, 3000);
+      }, 2500);
       return () => clearTimeout(timer);
     }
 
-    if (tripState === TRIP_STATES.DRIVER_ARRIVING) {
+    if (tripState === TRIP_STATES.ARRIVING) {
       const interval = setInterval(() => {
-        setTripProgress(prev => {
+        setProgress(prev => {
           if (prev >= 100) {
             clearInterval(interval);
-            setTripState(TRIP_STATES.DRIVER_ARRIVED);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 500);
-      return () => clearInterval(interval);
-    }
-
-    if (tripState === TRIP_STATES.TRIP_IN_PROGRESS) {
-      const interval = setInterval(() => {
-        setTripProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setTripState(TRIP_STATES.TRIP_COMPLETED);
-            setTripSummary({
-              distance: '8.5 كم',
-              duration: '18 دقيقة',
-              total: selectedRide?.price || 25,
-            });
             return 100;
           }
           return prev + 5;
@@ -123,412 +124,263 @@ const TaxiScreen = ({ navigation }) => {
     }
   }, [tripState]);
 
+  const handleLocationSelect = (location) => {
+    if (tripState === TRIP_STATES.IDLE) {
+      setPickup(location.name);
+      setTripState(TRIP_STATES.DESTINATION);
+    } else {
+      setDestination(location.name);
+      setTripState(TRIP_STATES.RIDE_SELECT);
+    }
+  };
+
   const handleFindDriver = () => {
     if (selectedRide && destination) {
-      setTripState(TRIP_STATES.FINDING_DRIVER);
+      setTripState(TRIP_STATES.FINDING);
     }
   };
 
   const handleReset = () => {
     setTripState(TRIP_STATES.IDLE);
-    setPickupLocation('');
+    setPickup('');
     setDestination('');
     setSelectedRide(null);
     setDriver(null);
-    setTripProgress(0);
-    setTripSummary(null);
+    setProgress(0);
   };
 
-  const renderIdle = () => (
-    <View style={styles.emptyState}>
-      <LinearGradient colors={[colors.primary, colors.secondary]} style={styles.emptyIconGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-        <Ionicons name="taxi" size={56} color={colors.white} />
-      </LinearGradient>
-      <Text style={styles.emptyTitle}>احجز رحلتك التالية</Text>
-      <Text style={styles.emptySubtitle}>اختر موقعpickup والوجهة للبدء</Text>
-      <TouchableOpacity 
-        style={styles.startButton}
-        onPress={() => setTripState(TRIP_STATES.PICKUP_LOCATION)}
-        activeOpacity={0.8}
-      >
-        <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.startButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-          <Text style={styles.startButtonText}>ابدأ الحجز</Text>
-          <Ionicons name="arrow-forward" size={20} color={colors.white} />
-        </LinearGradient>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderLocationSelection = () => (
+  // Uber-style Location Input
+  const renderLocationInput = () => (
     <View style={styles.locationContainer}>
       <View style={styles.locationHeader}>
-        <TouchableOpacity onPress={() => setTripState(TRIP_STATES.IDLE)}>
+        <TouchableOpacity onPress={() => tripState === TRIP_STATES.IDLE ? null : setTripState(TRIP_STATES.IDLE)}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.locationTitle}>
-          {tripState === TRIP_STATES.PICKUP_LOCATION ? 'موقعpickup' : 'الوجهة'}
+          {tripState === TRIP_STATES.IDLE ? 'موقعpickup' : 'الوجهة'}
         </Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color={colors.textSecondary} />
+      <View style={styles.locationInputWrapper}>
+        <View style={styles.locationDot} />
         <TextInput
-          style={styles.searchInput}
-          placeholder={tripState === TRIP_STATES.PICKUP_LOCATION ? 'أدخل موقعpickup' : 'أدخل الوجهة'}
-          placeholderTextColor={colors.textSecondary}
-          value={tripState === TRIP_STATES.PICKUP_LOCATION ? pickupLocation : destination}
-          onChangeText={tripState === TRIP_STATES.PICKUP_LOCATION ? setPickupLocation : setDestination}
-          onFocus={() => tripState === TRIP_STATES.PICKUP_LOCATION 
-            ? setShowPickupSuggestions(true) 
-            : setShowDestinationSuggestions(true)
-          }
+          style={styles.locationInput}
+          placeholder={tripState === TRIP_STATES.IDLE ? 'أدخل موقعpickup' : 'أدخل الوجهة'}
+          placeholderTextColor={colors.textTertiary}
+          value={tripState === TRIP_STATES.IDLE ? pickup : destination}
+          onChangeText={tripState === TRIP_STATES.IDLE ? setPickup : setDestination}
         />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {(tripState === TRIP_STATES.PICKUP_LOCATION ? locationSuggestions : destinationSuggestions).map((item) => (
+        {locations.map((location) => (
           <TouchableOpacity
-            key={item.id}
-            style={styles.suggestionItem}
-            onPress={() => tripState === TRIP_STATES.PICKUP_LOCATION 
-              ? setPickupLocation(item.name)
-              : setDestination(item.name)
-            }
+            key={location.id}
+            style={styles.locationSuggestion}
+            onPress={() => handleLocationSelect(location)}
             activeOpacity={0.7}
           >
-            <View style={[styles.suggestionIcon, { backgroundColor: colors.primary + '15' }]}>
-              <Ionicons name={item.icon} size={22} color={colors.primary} />
+            <View style={styles.suggestionIcon}>
+              <Ionicons name={location.icon} size={20} color={colors.text} />
             </View>
             <View style={styles.suggestionInfo}>
-              <Text style={styles.suggestionName}>{item.name}</Text>
-              <Text style={styles.suggestionAddress}>{item.address}</Text>
+              <Text style={styles.suggestionName}>{location.name}</Text>
+              <Text style={styles.suggestionAddress}>{location.address}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
   );
 
+  // Uber-style Ride Selection
   const renderRideSelection = () => (
     <View style={styles.rideContainer}>
-      <View style={styles.mapPreview}>
-        <LinearGradient colors={[colors.infoLight, colors.primaryLight]} style={styles.mapGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-          <View style={styles.routePreview}>
-            <View style={[styles.routeDot, { backgroundColor: colors.success }]} />
-            <View style={styles.routeLine} />
-            <View style={[styles.routeDot, { backgroundColor: colors.primary }]} />
+      {/* Map Placeholder */}
+      <View style={styles.mapPlaceholder}>
+        <LinearGradient colors={['#1a1a1a', '#2d2d2d']} style={styles.mapGradient}>
+          <View style={styles.mapCenter}>
+            <Ionicons name="location" size={32} color={colors.primary} />
           </View>
-          <Text style={styles.routeText}>
-            {pickupLocation || 'موقعpickup'} → {destination}
-          </Text>
         </LinearGradient>
       </View>
 
-      <View style={styles.rideList}>
-        <Text style={styles.sectionTitle}>اختر نوع التاكسي</Text>
-        {rideTypes.map((ride) => (
+      {/* Bottom Sheet */}
+      <View style={styles.rideSheet}>
+        <View style={styles.sheetHandle} />
+        
+        <Text style={styles.rideSheetTitle}>اختر الرحلة</Text>
+        
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {rideTypes.map((ride) => (
+            <TouchableOpacity
+              key={ride.id}
+              style={[
+                styles.rideOption,
+                selectedRide?.id === ride.id && styles.rideOptionSelected,
+              ]}
+              onPress={() => setSelectedRide(ride)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.rideOptionLeft}>
+                <View style={styles.rideOptionIcon}>
+                  <Ionicons name={ride.icon} size={32} color={ride.color} />
+                </View>
+                <View style={styles.rideOptionInfo}>
+                  <View style={styles.rideOptionHeader}>
+                    <Text style={styles.rideOptionName}>{ride.name}</Text>
+                    <View style={styles.rideOptionMeta}>
+                      <Ionicons name="person-outline" size={14} color={colors.textTertiary} />
+                      <Text style={styles.rideOptionCapacity}>{ride.capacity}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.rideOptionTime}>{ride.time}</Text>
+                  <Text style={styles.rideOptionDescription}>{ride.description}</Text>
+                </View>
+              </View>
+              <Text style={styles.rideOptionPrice}>{ride.price} ر.س</Text>
+              {selectedRide?.id === ride.id && (
+                <View style={styles.rideOptionCheck}>
+                  <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        <View style={styles.rideFooter}>
+          <View style={styles.paymentMethod}>
+            <Ionicons name="wallet" size={20} color={colors.text} />
+            <Text style={styles.paymentText}>نقدي</Text>
+          </View>
           <TouchableOpacity
-            key={ride.id}
-            style={[
-              styles.rideItem,
-              selectedRide?.id === ride.id && styles.rideItemSelected,
-              selectedRide?.id === ride.id && { borderColor: ride.color },
-            ]}
-            onPress={() => setSelectedRide(ride)}
+            style={[styles.confirmButton, !selectedRide && styles.confirmButtonDisabled]}
+            onPress={handleFindDriver}
+            disabled={!selectedRide}
             activeOpacity={0.8}
           >
-            {ride.popular && (
-              <View style={[styles.popularBadge, { backgroundColor: ride.color }]}>
-                <Text style={styles.popularText}>مميز</Text>
-              </View>
-            )}
-            <View style={[styles.rideIcon, { backgroundColor: ride.color + '15' }]}>
-              <Ionicons name={ride.icon} size={26} color={ride.color} />
-            </View>
-            <View style={styles.rideInfo}>
-              <Text style={styles.rideName}>{ride.name}</Text>
-              <View style={styles.rideMeta}>
-                <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
-                <Text style={styles.rideTime}>{ride.time}</Text>
-                <Ionicons name="people-outline" size={14} color={colors.textSecondary} />
-                <Text style={styles.rideCapacity}>{ride.capacity} ركاب</Text>
-              </View>
-            </View>
-            <Text style={[styles.ridePrice, { color: ride.color }]}>{ride.price} ر.س</Text>
+            <Text style={styles.confirmButtonText}>
+              {selectedRide ? `تأكيد ${selectedRide.name}` : 'اختر رحلة'}
+            </Text>
           </TouchableOpacity>
-        ))}
+        </View>
       </View>
+    </View>
+  );
 
-      <View style={styles.confirmContainer}>
+  // Uber-style Finding Driver
+  const renderFindingDriver = () => (
+    <View style={styles.findingContainer}>
+      <View style={styles.mapPlaceholder}>
+        <LinearGradient colors={['#1a1a1a', '#2d2d2d']} style={styles.mapGradient}>
+          <View style={styles.findingAnimation}>
+            <View style={styles.pulseRing} />
+            <View style={styles.pulseRing} />
+            <View style={styles.pulseRing} />
+            <View style={styles.carIconCenter}>
+              <Ionicons name="car" size={32} color={colors.white} />
+            </View>
+          </View>
+        </LinearGradient>
+      </View>
+      
+      <View style={styles.findingSheet}>
+        <View style={styles.sheetHandle} />
+        <Text style={styles.findingTitle}>جاري البحث عن سائق...</Text>
+        <Text style={styles.findingSubtitle}>نبحث عن أفضل السائقين بالقرب منك</Text>
+        
         <TouchableOpacity
-          style={[
-            styles.confirmButton,
-            !selectedRide && styles.confirmButtonDisabled,
-          ]}
-          onPress={handleFindDriver}
-          disabled={!selectedRide}
-          activeOpacity={0.8}
+          style={styles.cancelButton}
+          onPress={() => setTripState(TRIP_STATES.RIDE_SELECT)}
         >
-          <LinearGradient colors={selectedRide ? colors.primaryGradient : [colors.gray, colors.gray]} style={styles.confirmGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            <Text style={styles.confirmButtonText}>تأكيد الحجز</Text>
-            <Text style={styles.confirmSubtext}>{selectedRide?.price || 0} ر.س</Text>
-          </LinearGradient>
+          <Text style={styles.cancelButtonText}>إلغاء</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
-  const renderFindingDriver = () => (
-    <View style={styles.findingContainer}>
-      <View style={styles.findingAnimation}>
-        <View style={styles.pulseRing} />
-        <View style={styles.pulseRing} />
-        <View style={styles.pulseRing} />
-        <LinearGradient colors={colors.primaryGradient} style={styles.carIconCenter} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-          <Ionicons name="taxi" size={40} color={colors.white} />
-        </LinearGradient>
-      </View>
-      <Text style={styles.findingTitle}>جاري البحث عن سائق...</Text>
-      <Text style={styles.findingSubtitle}>نبحث عن أفضل السائقين بالقرب منك</Text>
-      <TouchableOpacity 
-        style={styles.cancelButton}
-        onPress={() => setTripState(TRIP_STATES.SELECTING_RIDE)}
-      >
-        <Text style={styles.cancelButtonText}>إلغاء البحث</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
+  // Uber-style Driver Found
   const renderDriverFound = () => (
     <View style={styles.driverContainer}>
-      <LinearGradient colors={colors.infoGradient} style={styles.driverMap} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-        <View style={styles.driverCarMarker}>
-          <LinearGradient colors={colors.primaryGradient} style={styles.carMarker} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-            <Ionicons name="taxi" size={20} color={colors.white} />
-          </LinearGradient>
-          <View style={styles.etaBadge}>
-            <Text style={styles.etaText}>{driver?.eta} دق</Text>
+      <View style={styles.mapPlaceholder}>
+        <LinearGradient colors={['#1a1a1a', '#2d2d2d']} style={styles.mapGradient}>
+          <View style={styles.driverMarker}>
+            <View style={styles.driverMarkerIcon}>
+              <Ionicons name="car" size={24} color={colors.white} />
+            </View>
+            <View style={styles.driverEtaBadge}>
+              <Text style={styles.driverEtaText}>{driver?.eta} دق</Text>
+            </View>
           </View>
-        </View>
-      </LinearGradient>
+        </LinearGradient>
+      </View>
 
-      <View style={styles.driverInfoCard}>
+      <View style={styles.driverSheet}>
+        <View style={styles.sheetHandle} />
+        
         <View style={styles.driverHeader}>
           <View>
             <Text style={styles.driverStatus}>في الطريق إليك</Text>
-            <Text style={styles.driverEta}>سيصل خلال {driver?.eta} دقائق</Text>
+            <Text style={styles.driverEta}>يصل خلال {driver?.eta} دقائق</Text>
           </View>
           <View style={styles.driverActions}>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.success }]} activeOpacity={0.8}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.success }]}>
               <Ionicons name="call" size={20} color={colors.white} />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]} activeOpacity={0.8}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]}>
               <Ionicons name="chatbubble" size={20} color={colors.white} />
             </TouchableOpacity>
           </View>
         </View>
 
-        <View style={styles.driverDetails}>
-          <LinearGradient colors={colors.primaryGradient} style={styles.driverAvatar} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-            <Ionicons name="person" size={36} color={colors.white} />
-          </LinearGradient>
-          <View style={styles.driverInfo}>
+        <View style={styles.driverInfo}>
+          <View style={styles.driverAvatar}>
+            <Text style={styles.driverAvatarText}>{driver?.name.charAt(0)}</Text>
+          </View>
+          <View style={styles.driverDetails}>
             <Text style={styles.driverName}>{driver?.name}</Text>
             <View style={styles.driverRating}>
-              <Ionicons name="star" size={16} color={colors.warning} />
+              <Ionicons name="star" size={14} color="#fbbf24" />
               <Text style={styles.driverRatingText}>{driver?.rating}</Text>
-              <Text style={styles.driverTrips}> • {driver?.trips} رحلة</Text>
             </View>
           </View>
-        </View>
-
-        <View style={styles.vehicleCard}>
           <View style={styles.vehicleInfo}>
-            <Ionicons name="car" size={24} color={colors.primary} />
-            <View style={styles.vehicleDetails}>
-              <Text style={styles.vehicleText}>{driver?.car} {driver?.year}</Text>
-              <Text style={styles.vehicleColor}>{driver?.color}</Text>
-            </View>
-            <View style={styles.plateBadge}>
-              <Text style={styles.plateText}>{driver?.plate}</Text>
-            </View>
+            <Text style={styles.vehicleText}>{driver?.car}</Text>
+            <Text style={styles.vehiclePlate}>{driver?.plate}</Text>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.arrivingButton} onPress={() => setTripState(TRIP_STATES.DRIVER_ARRIVING)} activeOpacity={0.8}>
-          <LinearGradient colors={colors.successGradient} style={styles.arrivingButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            <Text style={styles.arrivingButtonText}>محاكاة وصول السائق</Text>
-          </LinearGradient>
+        <TouchableOpacity
+          style={styles.arrivingButton}
+          onPress={() => setTripState(TRIP_STATES.ARRIVING)}
+        >
+          <Text style={styles.arrivingButtonText}>محاكاة الوصول</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
-  const renderDriverArriving = () => (
-    <View style={styles.arrivingContainer}>
-      <View style={styles.progressContainer}>
-        <Text style={styles.progressTitle}>السائق في الطريق</Text>
-        <View style={styles.progressBar}>
-          <LinearGradient colors={colors.primaryGradient} style={[styles.progressFill, { width: `${tripProgress}%` }]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-        </View>
-        <Text style={styles.progressText}>{tripProgress}%</Text>
-      </View>
-      
-      {tripProgress >= 100 && (
-        <TouchableOpacity style={styles.startTripButton} onPress={() => setTripState(TRIP_STATES.TRIP_IN_PROGRESS)} activeOpacity={0.8}>
-          <LinearGradient colors={colors.primaryGradient} style={styles.startTripButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            <Text style={styles.startTripButtonText}>بدء الرحلة</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-
-  const renderDriverArrived = () => (
-    <View style={styles.arrivedContainer}>
-      <Ionicons name="checkmark-circle" size={80} color={colors.success} />
-      <Text style={styles.arrivedTitle}>وصل السائق!</Text>
-      <Text style={styles.arrivedSubtitle}>السائق في انتظارك عند موقعpickup</Text>
-      
-      <View style={styles.tripInfoCard}>
-        <View style={styles.tripRoute}>
-          <View style={styles.tripPoint}>
-            <View style={[styles.tripDot, { backgroundColor: colors.success }]} />
-            <Text style={styles.tripPointText}>{pickupLocation}</Text>
-          </View>
-          <View style={styles.tripLine} />
-          <View style={styles.tripPoint}>
-            <View style={[styles.tripDot, { backgroundColor: colors.primary }]} />
-            <Text style={styles.tripPointText}>{destination}</Text>
-          </View>
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.startTripButton} onPress={() => setTripState(TRIP_STATES.TRIP_IN_PROGRESS)} activeOpacity={0.8}>
-        <LinearGradient colors={colors.primaryGradient} style={styles.startTripButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-          <Text style={styles.startTripButtonText}>بدء الرحلة</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderTripInProgress = () => (
-    <View style={styles.tripContainer}>
-      <View style={styles.tripProgress}>
-        <Text style={styles.tripProgressTitle}>الرحلة جارية</Text>
-        <View style={styles.tripProgressBar}>
-          <LinearGradient colors={colors.successGradient} style={[styles.tripProgressFill, { width: `${tripProgress}%` }]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
-        </View>
-        <Text style={styles.tripProgressText}>{tripProgress}%</Text>
-      </View>
-
-      <View style={styles.liveTripInfo}>
-        <View style={styles.liveStat}>
-          <Ionicons name="speedometer" size={24} color={colors.primary} />
-          <Text style={styles.liveStatValue}>45 كم/س</Text>
-          <Text style={styles.liveStatLabel}>السرعة</Text>
-        </View>
-        <View style={styles.liveStat}>
-          <Ionicons name="navigate" size={24} color={colors.success} />
-          <Text style={styles.liveStatValue}>5.2 كم</Text>
-          <Text style={styles.liveStatLabel}>المتبقي</Text>
-        </View>
-        <View style={styles.liveStat}>
-          <Ionicons name="time" size={24} color={colors.warning} />
-          <Text style={styles.liveStatValue}>8 دق</Text>
-          <Text style={styles.liveStatLabel}>الوقت</Text>
-        </View>
-      </View>
-
-      {tripProgress >= 100 && (
-        <TouchableOpacity style={styles.completeButton} onPress={() => setTripState(TRIP_STATES.TRIP_COMPLETED)} activeOpacity={0.8}>
-          <LinearGradient colors={colors.successGradient} style={styles.completeButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            <Text style={styles.completeButtonText}>إنهاء الرحلة</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-
-  const renderTripCompleted = () => (
-    <View style={styles.completedContainer}>
-      <View style={styles.completedIcon}>
-        <Ionicons name="trophy" size={60} color={colors.warning} />
-      </View>
-      <Text style={styles.completedTitle}>رحلة سعيدة!</Text>
-      <Text style={styles.completedSubtitle}>شكراً لاستخدامك تاتكس</Text>
-
-      <View style={styles.tripSummary}>
-        <View style={styles.summaryHeader}>
-          <Text style={styles.summaryTitle}>ملخص الرحلة</Text>
-        </View>
-        <View style={styles.summaryGrid}>
-          <View style={styles.summaryItem}>
-            <Ionicons name="navigate" size={20} color={colors.primary} />
-            <Text style={styles.summaryValue}>{tripSummary?.distance}</Text>
-            <Text style={styles.summaryLabel}>المسافة</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Ionicons name="time" size={20} color={colors.success} />
-            <Text style={styles.summaryValue}>{tripSummary?.duration}</Text>
-            <Text style={styles.summaryLabel}>الوقت</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Ionicons name="wallet" size={20} color={colors.warning} />
-            <Text style={styles.summaryValue}>{tripSummary?.total} ر.س</Text>
-            <Text style={styles.summaryLabel}>المجموع</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.ratingContainer}>
-        <Text style={styles.ratingTitle}>قيّم تجربتك</Text>
-        <View style={styles.stars}>
-          {[1, 2, 3, 4, 5].map((star) => (
-            <TouchableOpacity key={star}>
-              <Ionicons name="star" size={32} color={colors.warning} />
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.newRideButton} onPress={handleReset} activeOpacity={0.8}>
-        <LinearGradient colors={colors.primaryGradient} style={styles.newRideButtonGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-          <Text style={styles.newRideButtonText}>حجز رحلة جديدة</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-    </View>
-  );
-
+  // Main render based on state
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>تاتكس تاكسي</Text>
-        <TouchableOpacity style={styles.headerBtn}>
+        <Text style={styles.headerTitle}>تاتكس</Text>
+        <TouchableOpacity style={styles.headerButton}>
           <Ionicons name="help-circle-outline" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {tripState === TRIP_STATES.IDLE && renderIdle()}
-        {(tripState === TRIP_STATES.PICKUP_LOCATION || tripState === TRIP_STATES.DESTINATION) && renderLocationSelection()}
-        {tripState === TRIP_STATES.SELECTING_RIDE && renderRideSelection()}
-        {tripState === TRIP_STATES.FINDING_DRIVER && renderFindingDriver()}
-        {tripState === TRIP_STATES.DRIVER_FOUND && renderDriverFound()}
-        {tripState === TRIP_STATES.DRIVER_ARRIVING && renderDriverArriving()}
-        {tripState === TRIP_STATES.DRIVER_ARRIVED && renderDriverArrived()}
-        {tripState === TRIP_STATES.TRIP_IN_PROGRESS && renderTripInProgress()}
-        {tripState === TRIP_STATES.TRIP_COMPLETED && renderTripCompleted()}
-      </ScrollView>
+      {/* Content based on state */}
+      {tripState === TRIP_STATES.IDLE && renderLocationInput()}
+      {tripState === TRIP_STATES.DESTINATION && renderLocationInput()}
+      {tripState === TRIP_STATES.RIDE_SELECT && renderRideSelection()}
+      {tripState === TRIP_STATES.FINDING && renderFindingDriver()}
+      {tripState === TRIP_STATES.DRIVER_FOUND && renderDriverFound()}
     </View>
   );
 };
@@ -543,11 +395,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.sm,
     backgroundColor: colors.white,
-    ...shadows.sm,
   },
-  headerBtn: {
+  headerButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -560,58 +410,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
   },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    flexGrow: 1,
-  },
-  // Idle State
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  emptyIconGradient: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-    ...shadows.lg,
-  },
-  emptyTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
-  emptySubtitle: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    marginBottom: spacing.xl,
-    textAlign: 'center',
-  },
-  startButton: {
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    ...shadows.lg,
-  },
-  startButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    gap: spacing.sm,
-  },
-  startButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  // Location Selection
+  // Location Input
   locationContainer: {
     flex: 1,
     padding: spacing.md,
@@ -627,23 +426,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
   },
-  searchContainer: {
+  locationInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.grayLight,
     borderRadius: borderRadius.xl,
     paddingHorizontal: spacing.md,
     height: 50,
     marginBottom: spacing.md,
-    ...shadows.md,
   },
-  searchInput: {
+  locationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.text,
+  },
+  locationInput: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     color: colors.text,
     marginLeft: spacing.sm,
   },
-  suggestionItem: {
+  locationSuggestion: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: spacing.md,
@@ -651,9 +455,10 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderLight,
   },
   suggestionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.grayLight,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -663,188 +468,208 @@ const styles = StyleSheet.create({
   },
   suggestionName: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
     color: colors.text,
   },
   suggestionAddress: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     marginTop: 2,
   },
   // Ride Selection
   rideContainer: {
     flex: 1,
   },
-  mapPreview: {
-    height: 150,
-    margin: spacing.md,
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    ...shadows.md,
+  mapPlaceholder: {
+    flex: 1,
   },
   mapGradient: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  routePreview: {
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  routeDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  routeLine: {
-    width: 2,
-    height: 40,
-    backgroundColor: colors.primary,
-    borderStyle: 'dashed',
-  },
-  routeText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  rideList: {
-    padding: spacing.md,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  rideItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  mapCenter: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: colors.white,
-    padding: spacing.md,
-    borderRadius: borderRadius.xl,
-    marginBottom: spacing.sm,
-    borderWidth: 2,
-    borderColor: 'transparent',
-    ...shadows.sm,
-  },
-  rideItemSelected: {
-    backgroundColor: colors.primary + '08',
-  },
-  rideIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  rideInfo: {
-    flex: 1,
-    marginLeft: spacing.md,
+  rideSheet: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: borderRadius.xl * 1.5,
+    borderTopRightRadius: borderRadius.xl * 1.5,
+    padding: spacing.md,
+    maxHeight: SCREEN_HEIGHT * 0.6,
+    ...shadows.lg,
   },
-  rideName: {
+  sheetHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: colors.gray,
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: spacing.md,
+  },
+  rideSheetTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  rideOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: spacing.md,
+    borderRadius: borderRadius.xl,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  rideOptionSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primary + '08',
+  },
+  rideOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  rideOptionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.grayLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rideOptionInfo: {
+    marginLeft: spacing.md,
+    flex: 1,
+  },
+  rideOptionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+  },
+  rideOptionName: {
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
   },
-  rideMeta: {
+  rideOptionMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  rideOptionCapacity: {
+    fontSize: 12,
+    color: colors.textTertiary,
+  },
+  rideOptionTime: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    marginBottom: 2,
+  },
+  rideOptionDescription: {
+    fontSize: 12,
+    color: colors.textTertiary,
+  },
+  rideOptionPrice: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    marginLeft: spacing.md,
+  },
+  rideOptionCheck: {
+    position: 'absolute',
+    left: spacing.md,
+    top: '50%',
+    marginTop: -12,
+  },
+  rideFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+  },
+  paymentMethod: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginTop: 4,
   },
-  rideTime: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  rideCapacity: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  ridePrice: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  popularBadge: {
-    position: 'absolute',
-    top: -8,
-    left: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.full,
-  },
-  popularText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  confirmContainer: {
-    padding: spacing.md,
+  paymentText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
   },
   confirmButton: {
+    flex: 1,
+    backgroundColor: colors.text,
+    paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    ...shadows.lg,
+    alignItems: 'center',
+    marginLeft: spacing.md,
   },
   confirmButtonDisabled: {
-    opacity: 0.6,
-  },
-  confirmGradient: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    backgroundColor: colors.gray,
   },
   confirmButtonText: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
-    color: colors.white,
-  },
-  confirmSubtext: {
-    fontSize: 18,
-    fontWeight: '800',
     color: colors.white,
   },
   // Finding Driver
   findingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
   },
   findingAnimation: {
-    width: 150,
-    height: 150,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.xl,
+    justifyContent: 'center',
   },
   pulseRing: {
     position: 'absolute',
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: colors.primary + '30',
-    opacity: 0,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: colors.primary + '30',
   },
   carIconCenter: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.text,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  findingSheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    borderTopLeftRadius: borderRadius.xl * 1.5,
+    borderTopRightRadius: borderRadius.xl * 1.5,
+    padding: spacing.xl,
     alignItems: 'center',
     ...shadows.lg,
   },
   findingTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   findingSubtitle: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
+    fontSize: 14,
+    color: colors.textTertiary,
     marginBottom: spacing.xl,
   },
   cancelButton: {
@@ -853,30 +678,25 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: 16,
-    color: colors.error,
     fontWeight: '600',
+    color: colors.text,
   },
   // Driver Found
   driverContainer: {
     flex: 1,
   },
-  driverMap: {
-    flex: 1,
-    justifyContent: 'center',
+  driverMarker: {
     alignItems: 'center',
   },
-  driverCarMarker: {
-    alignItems: 'center',
-  },
-  carMarker: {
+  driverMarkerIcon: {
     width: 50,
     height: 50,
     borderRadius: 25,
+    backgroundColor: colors.text,
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadows.lg,
   },
-  etaBadge: {
+  driverEtaBadge: {
     position: 'absolute',
     top: -8,
     right: -8,
@@ -886,16 +706,20 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
     ...shadows.sm,
   },
-  etaText: {
+  driverEtaText: {
     fontSize: 10,
     fontWeight: '700',
     color: colors.text,
   },
-  driverInfoCard: {
+  driverSheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: colors.white,
     borderTopLeftRadius: borderRadius.xl * 1.5,
     borderTopRightRadius: borderRadius.xl * 1.5,
-    padding: spacing.lg,
+    padding: spacing.md,
     ...shadows.lg,
   },
   driverHeader: {
@@ -911,7 +735,7 @@ const styles = StyleSheet.create({
   },
   driverEta: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     marginTop: 2,
   },
   driverActions: {
@@ -924,347 +748,65 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadows.md,
   },
-  driverDetails: {
+  driverInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.lg,
   },
   driverAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    ...shadows.md,
   },
-  driverInfo: {
-    marginLeft: spacing.md,
+  driverAvatarText: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  driverDetails: {
     flex: 1,
+    marginLeft: spacing.md,
   },
   driverName: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
     color: colors.text,
   },
   driverRating: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 2,
+    gap: 2,
   },
   driverRatingText: {
+    fontSize: 13,
+    color: colors.textTertiary,
+  },
+  vehicleInfo: {
+    alignItems: 'flex-end',
+  },
+  vehicleText: {
     fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    marginLeft: 2,
+    marginBottom: 2,
   },
-  driverTrips: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  vehicleCard: {
-    backgroundColor: colors.cardSecondary,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  vehicleInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  vehicleDetails: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  vehicleText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  vehicleColor: {
+  vehiclePlate: {
     fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  plateBadge: {
-    backgroundColor: colors.white,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.lg,
-    ...shadows.sm,
-  },
-  plateText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
+    color: colors.textTertiary,
   },
   arrivingButton: {
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    ...shadows.md,
-  },
-  arrivingButtonGradient: {
+    backgroundColor: colors.success,
     paddingVertical: spacing.md,
+    borderRadius: borderRadius.xl,
     alignItems: 'center',
   },
   arrivingButtonText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  // Driver Arriving
-  arrivingContainer: {
-    flex: 1,
-    padding: spacing.xl,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  progressContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  progressTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.lg,
-  },
-  progressBar: {
-    width: '100%',
-    height: 8,
-    backgroundColor: colors.grayLight,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  progressText: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.text,
-    marginTop: spacing.md,
-  },
-  startTripButton: {
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    marginTop: spacing.xl,
-    ...shadows.lg,
-  },
-  startTripButtonGradient: {
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  startTripButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  // Driver Arrived
-  arrivedContainer: {
-    flex: 1,
-    padding: spacing.xl,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arrivedTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
-  arrivedSubtitle: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.xl,
-  },
-  tripInfoCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    width: '100%',
-    marginBottom: spacing.xl,
-    ...shadows.md,
-  },
-  tripRoute: {
-    paddingVertical: spacing.sm,
-  },
-  tripPoint: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  tripDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  tripPointText: {
-    fontSize: 14,
-    color: colors.text,
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  tripLine: {
-    width: 2,
-    height: 20,
-    backgroundColor: colors.grayLight,
-    marginLeft: 5,
-    marginVertical: -spacing.sm,
-  },
-  // Trip In Progress
-  tripContainer: {
-    flex: 1,
-    padding: spacing.xl,
-  },
-  tripProgress: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  tripProgressTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  tripProgressBar: {
-    width: '100%',
-    height: 8,
-    backgroundColor: colors.grayLight,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  tripProgressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  tripProgressText: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.text,
-    marginTop: spacing.md,
-  },
-  liveTripInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    marginBottom: spacing.xl,
-    ...shadows.md,
-  },
-  liveStat: {
-    alignItems: 'center',
-  },
-  liveStatValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginTop: spacing.xs,
-  },
-  liveStatLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  completeButton: {
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    ...shadows.lg,
-  },
-  completeButtonGradient: {
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  completeButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  // Trip Completed
-  completedContainer: {
-    flex: 1,
-    padding: spacing.xl,
-    alignItems: 'center',
-  },
-  completedIcon: {
-    marginBottom: spacing.lg,
-  },
-  completedTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
-  completedSubtitle: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    marginBottom: spacing.xl,
-  },
-  tripSummary: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    width: '100%',
-    marginBottom: spacing.xl,
-    ...shadows.md,
-  },
-  summaryHeader: {
-    marginBottom: spacing.md,
-  },
-  summaryTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.text,
-    textAlign: 'center',
-  },
-  summaryGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  summaryItem: {
-    alignItems: 'center',
-  },
-  summaryValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginTop: spacing.xs,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  ratingContainer: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  ratingTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  stars: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  newRideButton: {
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    width: '100%',
-    ...shadows.lg,
-  },
-  newRideButtonGradient: {
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  newRideButtonText: {
-    fontSize: 17,
     fontWeight: '700',
     color: colors.white,
   },
