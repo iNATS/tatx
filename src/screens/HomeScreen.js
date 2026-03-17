@@ -27,14 +27,13 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(0);
 
-  // TATX Services - Circular Profile Icon Style
+  // TATX Services - Circular Profile Icon Style (No Background Images)
   const tatxServices = [
     { 
       id: 'taxi', 
       name: 'تاكسي', 
       icon: 'taxi', 
       screen: 'Taxi',
-      image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400',
       color: colors.taxi
     },
     { 
@@ -43,7 +42,6 @@ const HomeScreen = ({ navigation }) => {
       icon: 'fast-food', 
       screen: 'Category', 
       params: { name: 'طعام' },
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400',
       color: colors.food
     },
     { 
@@ -52,7 +50,6 @@ const HomeScreen = ({ navigation }) => {
       icon: 'cart', 
       screen: 'Category', 
       params: { name: 'سوبرماركت' },
-      image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
       color: colors.market
     },
     { 
@@ -61,7 +58,6 @@ const HomeScreen = ({ navigation }) => {
       icon: 'medkit', 
       screen: 'Category', 
       params: { name: 'صيدلية' },
-      image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400',
       color: colors.pharmacy
     },
     { 
@@ -70,7 +66,6 @@ const HomeScreen = ({ navigation }) => {
       icon: 'basket', 
       screen: 'Category', 
       params: { name: 'بقالة' },
-      image: 'https://images.unsplash.com/photo-1606851096779-93d580154689?w=400',
       color: colors.grocery
     },
     { 
@@ -79,7 +74,6 @@ const HomeScreen = ({ navigation }) => {
       icon: 'gift', 
       screen: 'Category', 
       params: { name: 'هدايا' },
-      image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400',
       color: colors.gifts
     },
     { 
@@ -88,7 +82,6 @@ const HomeScreen = ({ navigation }) => {
       icon: 'phone-portrait', 
       screen: 'Category', 
       params: { name: 'إلكترونيات' },
-      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400',
       color: colors.electronics
     },
     { 
@@ -97,7 +90,6 @@ const HomeScreen = ({ navigation }) => {
       icon: 'shirt', 
       screen: 'Category', 
       params: { name: 'أزياء' },
-      image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400',
       color: colors.fashion
     },
   ];
@@ -271,17 +263,8 @@ const HomeScreen = ({ navigation }) => {
                   onPress={() => handleServicePress(service)}
                   activeOpacity={0.85}
                 >
-                  <View style={styles.serviceImageContainer}>
-                    <Image source={{ uri: service.image }} style={styles.serviceImage} />
-                    <LinearGradient 
-                      colors={[service.color + 'DD', service.color + 'AA']} 
-                      style={styles.serviceOverlay}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                    />
-                    <View style={styles.serviceIconContainer}>
-                      <Ionicons name={service.icon} size={26} color={colors.white} />
-                    </View>
+                  <View style={[styles.serviceIconContainer, { backgroundColor: service.color }]}>
+                    <Ionicons name={service.icon} size={26} color={colors.white} />
                   </View>
                   <Text style={styles.serviceName}>{service.name}</Text>
                 </TouchableOpacity>
@@ -500,33 +483,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 76,
   },
-  serviceImageContainer: {
+  serviceIconContainer: {
     width: 68,
     height: 68,
     borderRadius: 34,
-    overflow: 'hidden',
-    marginBottom: spacing.xs,
-    ...shadows.md,
-  },
-  serviceImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-  },
-  serviceOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  serviceIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute',
-    alignSelf: 'center',
-    top: 10,
-    backdropFilter: 'blur(10px)',
+    marginBottom: spacing.xs,
+    ...shadows.md,
   },
   serviceName: {
     fontSize: 12,

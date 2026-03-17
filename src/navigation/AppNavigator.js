@@ -45,13 +45,13 @@ const FloatingTabBar = ({ state, descriptors, navigation }) => {
           const iconName = isFocused
             ? route.name === 'Home' ? 'home' 
               : route.name === 'Taxi' ? 'taxi'
+              : route.name === 'Shop' ? 'storefront'
               : route.name === 'Orders' ? 'list'
-              : route.name === 'Offers' ? 'pricetag'
               : 'person'
             : route.name === 'Home' ? 'home-outline'
               : route.name === 'Taxi' ? 'taxi-outline'
+              : route.name === 'Shop' ? 'storefront-outline'
               : route.name === 'Orders' ? 'list-outline'
-              : route.name === 'Offers' ? 'pricetag-outline'
               : 'person-outline';
 
           const onPress = () => {
@@ -122,14 +122,14 @@ const MainTabs = () => {
         options={{ tabBarLabel: 'تاكسي' }}
       />
       <Tab.Screen
+        name="Shop"
+        component={ProductScreen}
+        options={{ tabBarLabel: 'المتجر' }}
+      />
+      <Tab.Screen
         name="Orders"
         component={OrdersScreen}
         options={{ tabBarLabel: 'الطلبات' }}
-      />
-      <Tab.Screen
-        name="Offers"
-        component={ProductScreen}
-        options={{ tabBarLabel: 'العروض' }}
       />
       <Tab.Screen
         name="Account"

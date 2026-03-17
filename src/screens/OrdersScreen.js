@@ -2,120 +2,196 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { orders } from '../data/staticData';
-import FilterTabs from '../components/FilterTabs';
+import { useApp } from '../context/AppContext';
 
 const OrdersScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const [selectedFilter, setSelectedFilter] = useState('الكل');
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'delivered':
-        return colors.green;
-      case 'preparing':
-        return colors.warning;
-      case 'cancelled':
-        return colors.error;
-      default:
-        return colors.gray;
-    }
+  const { addToCart } = useApp();
+  const [selectedFilter, setSelectedFilter] = useState('all');
+
+  const orderFilters = [
+    { id: 'all', label: 'الكل', icon: 'apps' },
+    { id: 'pending', label: 'قيد المعالجة', icon: 'time' },
+    { id: 'preparing', label: 'قيد التحضير', icon: 'restaurant' },
+    { id: 'delivery', label: 'في التوصيل', icon: 'bicycle' },
+    { id: 'completed', label: 'مكتمل', icon: 'checkmark-done' },
+  ];
+
+  const orderStatusConfig = {
+    pending: { color: colors.warning, bg: colors.warning + '15', label: 'قيد المعالجة' },
+    preparing: { color: colors.info, bg: colors.info + '15', label: 'قيد التحضير' },
+    delivery: { color: colors.primary, bg: colors.primary + '15', label: 'في التوصيل' },
+    completed: { color: colors.success, bg: colors.success + '15', label: 'مكتمل' },
+    cancelled: { color: colors.error, bg: colors.error + '15', label: 'ملغي' },
   };
 
-  const renderOrder = (order) => (
-    <TouchableOpacity
-      key={order.id}
-      style={[styles.orderCard, shadows.sm]}
-      onPress={() => navigation.navigate('OrderDetail', { order })}
-      activeOpacity={0.7}
-    >
-      <View style={styles.orderHeader}>
-        <View style={styles.orderRestaurant}>
-          <Image source={{ uri: order.restaurantLogo }} style={styles.orderLogo} />
-          <View style={styles.restaurantInfo}>
-            <Text style={styles.orderRestaurantName}>{order.restaurantName}</Text>
-            <View style={styles.orderMeta}>
-              <Ionicons name="calendar-outline" size={12} color={colors.textSecondary} />
-              <Text style={styles.orderDate}>{order.date}</Text>
-              <Text style={styles.orderDivider}>•</Text>
-              <Ionicons name="time-outline" size={12} color={colors.textSecondary} />
-              <Text style={styles.orderDate}>{order.time}</Text>
+  const handleReorder = (order) => {
+    order.items.forEach(item => {
+      addToCart({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        quantity: item.quantity,
+      });
+    });
+  };
+
+  const handleTrackOrder = (order) => {
+    navigation.navigate('OrderDetail', { order });
+  };
+
+  const renderOrderCard = (order) => {
+    const statusConfig = orderStatusConfig[order.status] || orderStatusConfig.pending;
+    
+    return (
+      <TouchableOpacity
+        key={order.id}
+        style={styles.orderCard}
+        onPress={() => handleTrackOrder(order)}
+        activeOpacity={0.8}
+      >
+        {/* Order Header */}
+        <View style={styles.orderHeader}>
+          <View style={styles.orderRestaurant}>
+            <Image source={{ uri: order.restaurantLogo }} style={styles.orderLogo} />
+            <View style={styles.orderRestaurantInfo}>
+              <Text style={styles.orderRestaurantName}>{order.restaurantName}</Text>
+              <Text style={styles.orderDate}>{order.date} • {order.time}</Text>
             </View>
           </View>
-        </View>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) + '15' }]}>
-          <Text style={[styles.statusText, { color: getStatusColor(order.status) }]}>
-            {order.statusAr}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.orderItems}>
-        {order.items.slice(0, 2).map((item, index) => (
-          <View key={index} style={styles.orderItem}>
-            <Image source={{ uri: item.image }} style={styles.orderItemImage} />
-            <View style={styles.orderItemInfo}>
-              <Text style={styles.orderItemName}>{item.name}</Text>
-              <Text style={styles.orderItemQuantity}>الكمية: {item.quantity}</Text>
-            </View>
+          <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
+            <Text style={[styles.statusText, { color: statusConfig.color }]}>
+              {statusConfig.label}
+            </Text>
           </View>
-        ))}
-      </View>
-
-      <View style={styles.orderFooter}>
-        <View style={styles.totalInfo}>
-          <Text style={styles.totalLabel}>المجموع</Text>
-          <Text style={styles.orderTotal}>{order.total} ر.س</Text>
         </View>
-        <TouchableOpacity style={styles.reorderButton} activeOpacity={0.8}>
-          <Ionicons name="refresh" size={18} color={colors.primary} />
-          <Text style={styles.reorderButtonText}>إعادة الطلب</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
+
+        {/* Order Items */}
+        <View style={styles.orderItems}>
+          {order.items.slice(0, 3).map((item, index) => (
+            <View key={index} style={styles.orderItem}>
+              <Image source={{ uri: item.image }} style={styles.orderItemImage} />
+              <View style={styles.orderItemInfo}>
+                <Text style={styles.orderItemName}>{item.name}</Text>
+                <Text style={styles.orderItemQuantity}>الكمية: {item.quantity}</Text>
+              </View>
+              <Text style={styles.orderItemPrice}>{item.price} ر.س</Text>
+            </View>
+          ))}
+          {order.items.length > 3 && (
+            <View style={styles.moreItems}>
+              <Text style={styles.moreItemsText}>+{order.items.length - 3} منتجات أخرى</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Order Footer */}
+        <View style={styles.orderFooter}>
+          <View style={styles.orderTotal}>
+            <Text style={styles.orderTotalLabel}>المجموع</Text>
+            <Text style={styles.orderTotalValue}>{order.total} ر.س</Text>
+          </View>
+          <View style={styles.orderActions}>
+            {order.status !== 'completed' && order.status !== 'cancelled' && (
+              <TouchableOpacity 
+                style={styles.trackButton}
+                onPress={() => handleTrackOrder(order)}
+              >
+                <Ionicons name="location" size={18} color={colors.primary} />
+                <Text style={styles.trackButtonText}>تتبع</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity 
+              style={styles.reorderButton}
+              onPress={() => handleReorder(order)}
+            >
+              <Ionicons name="refresh" size={18} color={colors.text} />
+              <Text style={styles.reorderButtonText}>إعادة الطلب</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  // Filter orders based on selected filter
+  const filteredOrders = selectedFilter === 'all' 
+    ? orders 
+    : orders.filter(order => order.status === selectedFilter);
 
   return (
     <View style={styles.container}>
-      {/* Header with Safe Area */}
+      {/* Header */}
       <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <Text style={styles.title}>الطلبات</Text>
-        <TouchableOpacity style={styles.filterBtn} activeOpacity={0.7}>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>طلباتي</Text>
+          <Text style={styles.headerSubtitle}>تابع جميع طلباتك في مكان واحد</Text>
+        </View>
+        <TouchableOpacity style={styles.headerButton}>
           <Ionicons name="filter" size={22} color={colors.white} />
         </TouchableOpacity>
       </View>
 
       {/* Filter Tabs */}
-      <FilterTabs
-        filters={[
-          { id: 'الكل', label: 'الكل', icon: 'apps' },
-          { id: 'preparing', label: 'قيد التحضير', icon: 'time' },
-          { id: 'delivered', label: 'تم التوصيل', icon: 'checkmark-done' },
-          { id: 'cancelled', label: 'ملغاة', icon: 'close-circle' },
-        ]}
-        selectedFilter={selectedFilter}
-        onSelectFilter={setSelectedFilter}
-      />
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filtersContainer}
+      >
+        {orderFilters.map((filter) => (
+          <TouchableOpacity
+            key={filter.id}
+            style={[
+              styles.filterChip,
+              selectedFilter === filter.id && styles.filterChipActive,
+            ]}
+            onPress={() => setSelectedFilter(filter.id)}
+            activeOpacity={0.8}
+          >
+            <Ionicons 
+              name={filter.icon} 
+              size={18} 
+              color={selectedFilter === filter.id ? colors.white : colors.textSecondary} 
+            />
+            <Text style={[
+              styles.filterText,
+              selectedFilter === filter.id && styles.filterTextActive,
+            ]}>
+              {filter.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       {/* Orders List */}
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.ordersContent}
       >
-        {orders.length > 0 ? (
-          orders.map(renderOrder)
+        {filteredOrders.length > 0 ? (
+          filteredOrders.map(renderOrderCard)
         ) : (
           <View style={styles.emptyState}>
             <View style={styles.emptyIcon}>
-              <Ionicons name="bag-outline" size={48} color={colors.gray} />
+              <Ionicons name="receipt-outline" size={48} color={colors.textTertiary} />
             </View>
             <Text style={styles.emptyTitle}>لا توجد طلبات</Text>
             <Text style={styles.emptySubtitle}>ابدأ بالتسوق الآن</Text>
-            <TouchableOpacity style={styles.shopButton}>
+            <TouchableOpacity 
+              style={styles.shopButton}
+              onPress={() => navigation.navigate('Shop')}
+            >
               <Text style={styles.shopButtonText}>تسوق الآن</Text>
             </TouchableOpacity>
           </View>
         )}
+
+        {/* Bottom spacing */}
+        <View style={{ height: 20 }} />
       </ScrollView>
     </View>
   );
@@ -127,29 +203,66 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    backgroundColor: colors.primary,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.white,
+  headerContent: {
+    flex: 1,
   },
-  filterBtn: {
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.text,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  headerButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  filtersContainer: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.cardSecondary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    gap: spacing.xs,
+  },
+  filterChipActive: {
+    backgroundColor: colors.primary,
+    ...shadows.md,
+  },
+  filterText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  filterTextActive: {
+    color: colors.white,
+    fontWeight: '700',
+  },
   ordersContent: {
     padding: spacing.md,
-    paddingBottom: 100,
   },
   emptyState: {
     alignItems: 'center',
@@ -160,7 +273,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.grayLight,
+    backgroundColor: colors.cardSecondary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -181,6 +294,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
+    ...shadows.md,
   },
   shopButtonText: {
     fontSize: 16,
@@ -192,12 +306,16 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    ...shadows.md,
   },
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.md,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   orderRestaurant: {
     flexDirection: 'row',
@@ -205,12 +323,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   orderLogo: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
-    backgroundColor: colors.grayLight,
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    backgroundColor: colors.cardSecondary,
   },
-  restaurantInfo: {
+  orderRestaurantInfo: {
     marginLeft: spacing.md,
     flex: 1,
   },
@@ -218,20 +336,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 4,
-  },
-  orderMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+    marginBottom: 2,
   },
   orderDate: {
     fontSize: 12,
-    color: colors.textSecondary,
-  },
-  orderDivider: {
-    fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textTertiary,
   },
   statusBadge: {
     paddingHorizontal: spacing.md,
@@ -243,57 +352,75 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   orderItems: {
-    gap: spacing.sm,
     marginBottom: spacing.md,
   },
   orderItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    paddingVertical: spacing.sm,
   },
   orderItemImage: {
     width: 50,
     height: 50,
     borderRadius: 10,
-    backgroundColor: colors.grayLight,
+    backgroundColor: colors.cardSecondary,
   },
   orderItemInfo: {
     flex: 1,
+    marginLeft: spacing.md,
   },
   orderItemName: {
     fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    textAlign: 'right',
     marginBottom: 2,
   },
   orderItemQuantity: {
     fontSize: 12,
-    color: colors.textSecondary,
-    textAlign: 'right',
+    color: colors.textTertiary,
+  },
+  orderItemPrice: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  moreItems: {
+    paddingVertical: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+    marginTop: spacing.sm,
+  },
+  moreItemsText: {
+    fontSize: 13,
+    color: colors.textTertiary,
+    textAlign: 'center',
   },
   orderFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: colors.grayLight,
     paddingTop: spacing.md,
-  },
-  totalInfo: {
-    flexDirection: 'column',
-  },
-  totalLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginBottom: 2,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
   },
   orderTotal: {
+    flexDirection: 'column',
+  },
+  orderTotalLabel: {
+    fontSize: 12,
+    color: colors.textTertiary,
+    marginBottom: 2,
+  },
+  orderTotalValue: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: colors.text,
   },
-  reorderButton: {
+  orderActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  trackButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.primary + '10',
@@ -302,10 +429,24 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     gap: spacing.xs,
   },
+  trackButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  reorderButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.cardSecondary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.lg,
+    gap: spacing.xs,
+  },
   reorderButtonText: {
     fontSize: 14,
-    color: colors.primary,
     fontWeight: '600',
+    color: colors.text,
   },
 });
 

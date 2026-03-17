@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,11 @@ import {
   ActivityIndicator,
   Dimensions,
   Modal,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { useApp } from '../context/AppContext';
@@ -40,6 +42,9 @@ const TaxiScreen = ({ navigation }) => {
   const [selectedRide, setSelectedRide] = useState(null);
   const [driver, setDriver] = useState(null);
   const [progress, setProgress] = useState(0);
+  const [showBookModal, setShowBookModal] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
+  const webViewRef = useRef(null);
 
   const rideTypes = [
     { 
@@ -49,8 +54,7 @@ const TaxiScreen = ({ navigation }) => {
       price: 15, 
       time: '٣ دقائق', 
       capacity: 4,
-      description: 'رحلات يومية ميسورة التكلفة',
-      color: '#000000'
+      description: 'رحلات يومية ميسورة',
     },
     { 
       id: 'comfort', 
@@ -59,8 +63,7 @@ const TaxiScreen = ({ navigation }) => {
       price: 25, 
       time: '٥ دقائق', 
       capacity: 4,
-      description: 'سيارات أحدث مع مساحة إضافية',
-      color: '#22c55e'
+      description: 'سيارات أحدث وأوسع',
     },
     { 
       id: 'premium', 
@@ -69,8 +72,7 @@ const TaxiScreen = ({ navigation }) => {
       price: 40, 
       time: '٧ دقائق', 
       capacity: 4,
-      description: 'مركبات فاخرة من الدرجة الأولى',
-      color: '#eab308'
+      description: 'فخامة وتميز',
     },
     { 
       id: 'van', 
@@ -79,8 +81,16 @@ const TaxiScreen = ({ navigation }) => {
       price: 35, 
       time: '١٠ دقائق', 
       capacity: 7,
-      description: 'مثالي للمجموعات والعائلات',
-      color: '#3b82f6'
+      description: 'للعائلات والمجموعات',
+    },
+    { 
+      id: 'moto', 
+      name: 'دراجة', 
+      icon: 'bicycle-outline', 
+      price: 10, 
+      time: '٢ دقائق', 
+      capacity: 1,
+      description: 'سريع وعملي',
     },
   ];
 
@@ -100,6 +110,205 @@ const TaxiScreen = ({ navigation }) => {
     plate: 'أ ب ج 1234',
     eta: 3,
   };
+
+  // Leaflet map HTML with routing and search
+  const mapHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+      <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .search-box {
+          position: absolute;
+          top: 50px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1000;
+          background: white;
+          padding: 12px 16px;
+          border-radius: 24px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          width: 90%;
+          max-width: 400px;
+        }
+        .search-box input {
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 15px;
+        }
+        .search-box button {
+          background: #E91E63;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 20px;
+          color: white;
+          cursor: pointer;
+        }
+        .location-btn {
+          position: absolute;
+          bottom: 100px;
+          right: 20px;
+          z-index: 1000;
+          background: white;
+          width: 50px;
+          height: 50px;
+          border-radius: 25px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+        .leaflet-container { font-family: inherit; }
+        .leaflet-routing-container { display: none; }
+      </style>
+    </head>
+    <body>
+      <div class="search-box">
+        <span style="color: #666;">🔍</span>
+        <input type="text" id="searchInput" placeholder="ابحث عن مكان..." />
+        <button onclick="searchLocation()">بحث</button>
+      </div>
+      <div class="location-btn" onclick="getCurrentLocation()">
+        <span style="font-size: 24px;">📍</span>
+      </div>
+      <div id="map"></div>
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+      <script>
+        let map, marker, routingControl;
+        let pickupCoords = null;
+        let destinationCoords = null;
+
+        // Initialize map centered on Dammam
+        map = L.map('map').setView([26.4207, 50.0888], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add marker for current location
+        marker = L.marker([26.4207, 50.0888], {
+          icon: L.divIcon({
+            html: '<div style="background: #E91E63; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+          })
+        }).addTo(map);
+
+        // Get current location
+        function getCurrentLocation() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                map.setView([lat, lng], 15);
+                marker.setLatLng([lat, lng]);
+                pickupCoords = [lat, lng];
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                  type: 'location',
+                  latitude: lat,
+                  longitude: lng,
+                  address: 'موقعك الحالي'
+                }));
+              },
+              (error) => {
+                console.error('Error getting location:', error);
+              }
+            );
+          }
+        }
+
+        // Search location
+        function searchLocation() {
+          const query = document.getElementById('searchInput').value;
+          if (query) {
+            fetch(\`https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(query)}&limit=1\`)
+              .then(response => response.json())
+              .then(data => {
+                if (data.length > 0) {
+                  const lat = parseFloat(data[0].lat);
+                  const lng = parseFloat(data[0].lon);
+                  map.setView([lat, lng], 15);
+                  
+                  // Add destination marker
+                  if (destinationCoords) {
+                    L.marker([lat, lng], {
+                      icon: L.divIcon({
+                        html: '<div style="background: #10B981; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                      })
+                    }).addTo(map);
+                  }
+                  
+                  destinationCoords = [lat, lng];
+                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'destination',
+                    latitude: lat,
+                    longitude: lng,
+                    address: query
+                  }));
+                }
+              })
+              .catch(error => console.error('Search error:', error));
+          }
+        }
+
+        // Draw route
+        function drawRoute(start, end) {
+          if (routingControl) {
+            routingControl.remove();
+          }
+          routingControl = L.Routing.control({
+            waypoints: [
+              L.latLng(start[0], start[1]),
+              L.latLng(end[0], end[1])
+            ],
+            routeWhileDragging: true,
+            show: false,
+            createMarker: function() { return null; }
+          }).addTo(map);
+        }
+
+        // Listen for messages from React Native
+        window.addEventListener('message', (event) => {
+          const data = event.data;
+          if (data.type === 'setPickup') {
+            pickupCoords = [data.lat, data.lng];
+            map.setView([data.lat, data.lng], 15);
+            marker.setLatLng([data.lat, data.lng]);
+          }
+          if (data.type === 'setDestination') {
+            destinationCoords = [data.lat, data.lng];
+            if (pickupCoords) {
+              drawRoute(pickupCoords, destinationCoords);
+            }
+          }
+          if (data.type === 'centerOnDriver') {
+            map.setView([data.lat, data.lng], 16);
+          }
+        });
+
+        // Send initial ready state
+        setTimeout(() => {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'ready' }));
+        }, 1000);
+      </script>
+    </body>
+    </html>
+  `;
 
   useEffect(() => {
     if (tripState === TRIP_STATES.FINDING) {
@@ -130,12 +339,13 @@ const TaxiScreen = ({ navigation }) => {
       setTripState(TRIP_STATES.DESTINATION);
     } else {
       setDestination(location.name);
-      setTripState(TRIP_STATES.RIDE_SELECT);
+      setShowBookModal(true);
     }
   };
 
-  const handleFindDriver = () => {
-    if (selectedRide && destination) {
+  const handleBookRide = () => {
+    if (selectedRide) {
+      setShowBookModal(false);
       setTripState(TRIP_STATES.FINDING);
     }
   };
@@ -149,21 +359,31 @@ const TaxiScreen = ({ navigation }) => {
     setProgress(0);
   };
 
-  // Uber-style Location Input
+  const handleMessage = (event) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === 'ready') {
+        setMapReady(true);
+      }
+      if (data.type === 'location' || data.type === 'destination') {
+        console.log('Map message:', data);
+      }
+    } catch (error) {
+      console.error('Message parsing error:', error);
+    }
+  };
+
+  // Location Input View
   const renderLocationInput = () => (
     <View style={styles.locationContainer}>
       <View style={styles.locationHeader}>
-        <TouchableOpacity onPress={() => tripState === TRIP_STATES.IDLE ? null : setTripState(TRIP_STATES.IDLE)}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
         <Text style={styles.locationTitle}>
           {tripState === TRIP_STATES.IDLE ? 'موقعpickup' : 'الوجهة'}
         </Text>
-        <View style={{ width: 24 }} />
       </View>
 
       <View style={styles.locationInputWrapper}>
-        <View style={styles.locationDot} />
+        <View style={[styles.locationDot, { backgroundColor: tripState === TRIP_STATES.IDLE ? colors.success : colors.primary }]} />
         <TextInput
           style={styles.locationInput}
           placeholder={tripState === TRIP_STATES.IDLE ? 'أدخل موقعpickup' : 'أدخل الوجهة'}
@@ -188,184 +408,98 @@ const TaxiScreen = ({ navigation }) => {
               <Text style={styles.suggestionName}>{location.name}</Text>
               <Text style={styles.suggestionAddress}>{location.address}</Text>
             </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
           </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
   );
 
-  // Uber-style Ride Selection
-  const renderRideSelection = () => (
-    <View style={styles.rideContainer}>
-      {/* Map Placeholder */}
-      <View style={styles.mapPlaceholder}>
-        <LinearGradient colors={['#1a1a1a', '#2d2d2d']} style={styles.mapGradient}>
-          <View style={styles.mapCenter}>
-            <Ionicons name="location" size={32} color={colors.primary} />
-          </View>
-        </LinearGradient>
-      </View>
-
-      {/* Bottom Sheet */}
-      <View style={styles.rideSheet}>
-        <View style={styles.sheetHandle} />
-        
-        <Text style={styles.rideSheetTitle}>اختر الرحلة</Text>
-        
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {rideTypes.map((ride) => (
-            <TouchableOpacity
-              key={ride.id}
-              style={[
-                styles.rideOption,
-                selectedRide?.id === ride.id && styles.rideOptionSelected,
-              ]}
-              onPress={() => setSelectedRide(ride)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.rideOptionLeft}>
-                <View style={styles.rideOptionIcon}>
-                  <Ionicons name={ride.icon} size={32} color={ride.color} />
+  // Book Modal
+  const renderBookModal = () => (
+    <Modal
+      visible={showBookModal}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setShowBookModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHandle} />
+          
+          <Text style={styles.modalTitle}>تأكيد الحجز</Text>
+          
+          {selectedRide && (
+            <View style={styles.selectedRideInfo}>
+              <View style={styles.selectedRideHeader}>
+                <Ionicons name={selectedRide.icon} size={32} color={colors.text} />
+                <View style={styles.selectedRideDetails}>
+                  <Text style={styles.selectedRideName}>{selectedRide.name}</Text>
+                  <Text style={styles.selectedRideTime}>{selectedRide.time} • {selectedRide.capacity} ركاب</Text>
                 </View>
-                <View style={styles.rideOptionInfo}>
-                  <View style={styles.rideOptionHeader}>
-                    <Text style={styles.rideOptionName}>{ride.name}</Text>
-                    <View style={styles.rideOptionMeta}>
-                      <Ionicons name="person-outline" size={14} color={colors.textTertiary} />
-                      <Text style={styles.rideOptionCapacity}>{ride.capacity}</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.rideOptionTime}>{ride.time}</Text>
-                  <Text style={styles.rideOptionDescription}>{ride.description}</Text>
-                </View>
+                <Text style={styles.selectedRidePrice}>{selectedRide.price} ر.س</Text>
               </View>
-              <Text style={styles.rideOptionPrice}>{ride.price} ر.س</Text>
-              {selectedRide?.id === ride.id && (
-                <View style={styles.rideOptionCheck}>
-                  <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
-                </View>
-              )}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+              <Text style={styles.selectedRideDescription}>{selectedRide.description}</Text>
+            </View>
+          )}
 
-        <View style={styles.rideFooter}>
-          <View style={styles.paymentMethod}>
-            <Ionicons name="wallet" size={20} color={colors.text} />
-            <Text style={styles.paymentText}>نقدي</Text>
+          <View style={styles.modalRoute}>
+            <View style={styles.modalRoutePoint}>
+              <View style={[styles.modalRouteDot, { backgroundColor: colors.success }]} />
+              <Text style={styles.modalRouteText}>{pickup || 'موقعpickup'}</Text>
+            </View>
+            <View style={styles.modalRouteLine} />
+            <View style={styles.modalRoutePoint}>
+              <View style={[styles.modalRouteDot, { backgroundColor: colors.primary }]} />
+              <Text style={styles.modalRouteText}>{destination}</Text>
+            </View>
           </View>
+
+          <View style={styles.modalPayment}>
+            <Ionicons name="wallet" size={20} color={colors.text} />
+            <Text style={styles.modalPaymentText}>الدفع نقداً</Text>
+            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+          </View>
+
           <TouchableOpacity
-            style={[styles.confirmButton, !selectedRide && styles.confirmButtonDisabled]}
-            onPress={handleFindDriver}
+            style={styles.modalBookButton}
+            onPress={handleBookRide}
             disabled={!selectedRide}
             activeOpacity={0.8}
           >
-            <Text style={styles.confirmButtonText}>
-              {selectedRide ? `تأكيد ${selectedRide.name}` : 'اختر رحلة'}
-            </Text>
+            <Text style={styles.modalBookButtonText}>تأكيد الحجز</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.modalCancelButton}
+            onPress={() => setShowBookModal(false)}
+          >
+            <Text style={styles.modalCancelButtonText}>إلغاء</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </Modal>
   );
 
-  // Uber-style Finding Driver
-  const renderFindingDriver = () => (
-    <View style={styles.findingContainer}>
-      <View style={styles.mapPlaceholder}>
-        <LinearGradient colors={['#1a1a1a', '#2d2d2d']} style={styles.mapGradient}>
-          <View style={styles.findingAnimation}>
-            <View style={styles.pulseRing} />
-            <View style={styles.pulseRing} />
-            <View style={styles.pulseRing} />
-            <View style={styles.carIconCenter}>
-              <Ionicons name="car" size={32} color={colors.white} />
-            </View>
-          </View>
-        </LinearGradient>
-      </View>
-      
-      <View style={styles.findingSheet}>
-        <View style={styles.sheetHandle} />
-        <Text style={styles.findingTitle}>جاري البحث عن سائق...</Text>
-        <Text style={styles.findingSubtitle}>نبحث عن أفضل السائقين بالقرب منك</Text>
-        
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => setTripState(TRIP_STATES.RIDE_SELECT)}
-        >
-          <Text style={styles.cancelButtonText}>إلغاء</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  // Uber-style Driver Found
-  const renderDriverFound = () => (
-    <View style={styles.driverContainer}>
-      <View style={styles.mapPlaceholder}>
-        <LinearGradient colors={['#1a1a1a', '#2d2d2d']} style={styles.mapGradient}>
-          <View style={styles.driverMarker}>
-            <View style={styles.driverMarkerIcon}>
-              <Ionicons name="car" size={24} color={colors.white} />
-            </View>
-            <View style={styles.driverEtaBadge}>
-              <Text style={styles.driverEtaText}>{driver?.eta} دق</Text>
-            </View>
-          </View>
-        </LinearGradient>
-      </View>
-
-      <View style={styles.driverSheet}>
-        <View style={styles.sheetHandle} />
-        
-        <View style={styles.driverHeader}>
-          <View>
-            <Text style={styles.driverStatus}>في الطريق إليك</Text>
-            <Text style={styles.driverEta}>يصل خلال {driver?.eta} دقائق</Text>
-          </View>
-          <View style={styles.driverActions}>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.success }]}>
-              <Ionicons name="call" size={20} color={colors.white} />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]}>
-              <Ionicons name="chatbubble" size={20} color={colors.white} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.driverInfo}>
-          <View style={styles.driverAvatar}>
-            <Text style={styles.driverAvatarText}>{driver?.name.charAt(0)}</Text>
-          </View>
-          <View style={styles.driverDetails}>
-            <Text style={styles.driverName}>{driver?.name}</Text>
-            <View style={styles.driverRating}>
-              <Ionicons name="star" size={14} color="#fbbf24" />
-              <Text style={styles.driverRatingText}>{driver?.rating}</Text>
-            </View>
-          </View>
-          <View style={styles.vehicleInfo}>
-            <Text style={styles.vehicleText}>{driver?.car}</Text>
-            <Text style={styles.vehiclePlate}>{driver?.plate}</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.arrivingButton}
-          onPress={() => setTripState(TRIP_STATES.ARRIVING)}
-        >
-          <Text style={styles.arrivingButtonText}>محاكاة الوصول</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  // Main render based on state
   return (
     <View style={styles.container}>
+      {/* Full Screen Map */}
+      <View style={styles.mapContainer}>
+        <WebView
+          ref={webViewRef}
+          originWhitelist={['*']}
+          source={{ html: mapHTML }}
+          style={styles.map}
+          onMessage={handleMessage}
+          javaScriptEnabled
+          domStorageEnabled
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
+
       {/* Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top + 8, spacing.md) }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -375,12 +509,65 @@ const TaxiScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Content based on state */}
-      {tripState === TRIP_STATES.IDLE && renderLocationInput()}
-      {tripState === TRIP_STATES.DESTINATION && renderLocationInput()}
-      {tripState === TRIP_STATES.RIDE_SELECT && renderRideSelection()}
-      {tripState === TRIP_STATES.FINDING && renderFindingDriver()}
-      {tripState === TRIP_STATES.DRIVER_FOUND && renderDriverFound()}
+      {/* Location Input Overlay */}
+      {(tripState === TRIP_STATES.IDLE || tripState === TRIP_STATES.DESTINATION) && (
+        <View style={[styles.overlayContainer, { paddingTop: Math.max(insets.top + 100, 120) }]}>
+          <View style={styles.overlayCard}>
+            {renderLocationInput()}
+          </View>
+        </View>
+      )}
+
+      {/* Ride Selection Slider */}
+      {tripState === TRIP_STATES.RIDE_SELECT && (
+        <View style={[styles.rideContainer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+          <View style={styles.rideCard}>
+            <Text style={styles.rideTitle}>اختر الرحلة</Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.rideSlider}
+            >
+              {rideTypes.map((ride) => (
+                <TouchableOpacity
+                  key={ride.id}
+                  style={[
+                    styles.rideSliderCard,
+                    selectedRide?.id === ride.id && styles.rideSliderCardSelected,
+                  ]}
+                  onPress={() => setSelectedRide(ride)}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.rideSliderIcon}>
+                    <Ionicons name={ride.icon} size={36} color={colors.text} />
+                  </View>
+                  <Text style={styles.rideSliderName}>{ride.name}</Text>
+                  <Text style={styles.rideSliderTime}>{ride.time}</Text>
+                  <Text style={styles.rideSliderPrice}>{ride.price} ر.س</Text>
+                  {selectedRide?.id === ride.id && (
+                    <View style={styles.rideSliderCheck}>
+                      <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.bookButton}
+              onPress={() => setShowBookModal(true)}
+              disabled={!selectedRide}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.bookButtonText}>
+                {selectedRide ? `حجز ${selectedRide.name}` : 'اختر رحلة'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* Book Modal */}
+      {renderBookModal()}
     </View>
   );
 };
@@ -390,36 +577,56 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  mapContainer: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  map: {
+    flex: 1,
+  },
   header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    backgroundColor: colors.white,
+    zIndex: 1000,
   },
   headerButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.grayLight,
+    backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.md,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
   },
-  // Location Input
-  locationContainer: {
-    flex: 1,
+  overlayContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: spacing.md,
+    zIndex: 999,
+  },
+  overlayCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
+    ...shadows.lg,
+  },
+  locationContainer: {
+    maxHeight: SCREEN_HEIGHT * 0.5,
   },
   locationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   locationTitle: {
     fontSize: 20,
@@ -436,10 +643,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   locationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.text,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   locationInput: {
     flex: 1,
@@ -478,33 +684,100 @@ const styles = StyleSheet.create({
   },
   // Ride Selection
   rideContainer: {
-    flex: 1,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: spacing.md,
+    zIndex: 999,
   },
-  mapPlaceholder: {
-    flex: 1,
+  rideCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    paddingBottom: spacing.md,
+    ...shadows.lg,
   },
-  mapGradient: {
-    flex: 1,
-    justifyContent: 'center',
+  rideTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  rideSlider: {
+    gap: spacing.md,
+    paddingHorizontal: spacing.xs,
+  },
+  rideSliderCard: {
+    width: 140,
+    backgroundColor: colors.grayLight,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
     alignItems: 'center',
+    position: 'relative',
   },
-  mapCenter: {
+  rideSliderCardSelected: {
+    backgroundColor: colors.primary + '15',
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  rideSliderIcon: {
     width: 60,
     height: 60,
     borderRadius: 30,
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: spacing.sm,
   },
-  rideSheet: {
+  rideSliderName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 2,
+  },
+  rideSliderTime: {
+    fontSize: 12,
+    color: colors.textTertiary,
+    marginBottom: 4,
+  },
+  rideSliderPrice: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  rideSliderCheck: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+  },
+  bookButton: {
+    backgroundColor: colors.text,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.xl,
+    alignItems: 'center',
+    marginTop: spacing.md,
+  },
+  bookButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
     backgroundColor: colors.white,
     borderTopLeftRadius: borderRadius.xl * 1.5,
     borderTopRightRadius: borderRadius.xl * 1.5,
     padding: spacing.md,
-    maxHeight: SCREEN_HEIGHT * 0.6,
-    ...shadows.lg,
+    paddingBottom: spacing.xl,
   },
-  sheetHandle: {
+  modalHandle: {
     width: 40,
     height: 4,
     backgroundColor: colors.gray,
@@ -512,303 +785,110 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: spacing.md,
   },
-  rideSheetTitle: {
+  modalTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: spacing.md,
     textAlign: 'center',
+    marginBottom: spacing.lg,
   },
-  rideOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.md,
-    borderRadius: borderRadius.xl,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  rideOptionSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '08',
-  },
-  rideOptionLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  rideOptionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  selectedRideInfo: {
     backgroundColor: colors.grayLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rideOptionInfo: {
-    marginLeft: spacing.md,
-    flex: 1,
-  },
-  rideOptionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 2,
-  },
-  rideOptionName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  rideOptionMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  rideOptionCapacity: {
-    fontSize: 12,
-    color: colors.textTertiary,
-  },
-  rideOptionTime: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  rideOptionDescription: {
-    fontSize: 12,
-    color: colors.textTertiary,
-  },
-  rideOptionPrice: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginLeft: spacing.md,
-  },
-  rideOptionCheck: {
-    position: 'absolute',
-    left: spacing.md,
-    top: '50%',
-    marginTop: -12,
-  },
-  rideFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-  },
-  paymentMethod: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  paymentText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  confirmButton: {
-    flex: 1,
-    backgroundColor: colors.text,
-    paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
-    alignItems: 'center',
-    marginLeft: spacing.md,
-  },
-  confirmButtonDisabled: {
-    backgroundColor: colors.gray,
-  },
-  confirmButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  // Finding Driver
-  findingContainer: {
-    flex: 1,
-  },
-  findingAnimation: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pulseRing: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 2,
-    borderColor: colors.primary + '30',
-  },
-  carIconCenter: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.text,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  findingSheet: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.xl * 1.5,
-    borderTopRightRadius: borderRadius.xl * 1.5,
-    padding: spacing.xl,
-    alignItems: 'center',
-    ...shadows.lg,
-  },
-  findingTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  findingSubtitle: {
-    fontSize: 14,
-    color: colors.textTertiary,
-    marginBottom: spacing.xl,
-  },
-  cancelButton: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  // Driver Found
-  driverContainer: {
-    flex: 1,
-  },
-  driverMarker: {
-    alignItems: 'center',
-  },
-  driverMarkerIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: colors.text,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  driverEtaBadge: {
-    position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: colors.white,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.full,
-    ...shadows.sm,
-  },
-  driverEtaText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  driverSheet: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.xl * 1.5,
-    borderTopRightRadius: borderRadius.xl * 1.5,
     padding: spacing.md,
-    ...shadows.lg,
+    marginBottom: spacing.md,
   },
-  driverHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  driverStatus: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  driverEta: {
-    fontSize: 14,
-    color: colors.textTertiary,
-    marginTop: 2,
-  },
-  driverActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  actionButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  driverInfo: {
+  selectedRideHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.sm,
   },
-  driverAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  driverAvatarText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  driverDetails: {
+  selectedRideDetails: {
     flex: 1,
     marginLeft: spacing.md,
   },
-  driverName: {
+  selectedRideName: {
     fontSize: 17,
     fontWeight: '700',
     color: colors.text,
   },
-  driverRating: {
+  selectedRideTime: {
+    fontSize: 13,
+    color: colors.textTertiary,
+    marginTop: 2,
+  },
+  selectedRidePrice: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  selectedRideDescription: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  modalRoute: {
+    paddingVertical: spacing.md,
+    marginBottom: spacing.md,
+  },
+  modalRoutePoint: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
-    gap: 2,
+    marginBottom: spacing.md,
   },
-  driverRatingText: {
-    fontSize: 13,
-    color: colors.textTertiary,
+  modalRouteDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
-  vehicleInfo: {
-    alignItems: 'flex-end',
-  },
-  vehicleText: {
+  modalRouteText: {
     fontSize: 14,
+    color: colors.text,
+    marginLeft: spacing.sm,
+    flex: 1,
+  },
+  modalRouteLine: {
+    width: 2,
+    height: 20,
+    backgroundColor: colors.grayLight,
+    marginLeft: 5,
+    marginVertical: -spacing.sm,
+  },
+  modalPayment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+    marginBottom: spacing.md,
+  },
+  modalPaymentText: {
+    fontSize: 15,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 2,
+    marginLeft: spacing.sm,
+    flex: 1,
   },
-  vehiclePlate: {
-    fontSize: 13,
-    color: colors.textTertiary,
-  },
-  arrivingButton: {
-    backgroundColor: colors.success,
+  modalBookButton: {
+    backgroundColor: colors.text,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
     alignItems: 'center',
+    marginBottom: spacing.sm,
   },
-  arrivingButtonText: {
+  modalBookButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: colors.white,
+  },
+  modalCancelButton: {
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  modalCancelButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
 });
 
