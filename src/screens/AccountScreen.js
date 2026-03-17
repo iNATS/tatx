@@ -149,9 +149,6 @@ const AccountScreen = ({ navigation }) => {
           </View>
           <Text style={styles.copyrightText}>© 2026 تاتكس. جميع الحقوق محفوظة.</Text>
         </View>
-
-        {/* Bottom spacing */}
-        <View style={{ height: Math.max(insets.bottom, spacing.lg) }} />
       </ScrollView>
     </View>
   );
@@ -209,6 +206,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: spacing.md,
+    paddingBottom: 100,
   },
   // Store Banner
   storeBanner: {

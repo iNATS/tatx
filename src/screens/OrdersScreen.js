@@ -121,8 +121,6 @@ const OrdersScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         )}
-        {/* Bottom spacing */}
-        <View style={{ height: 20 }} />
       </ScrollView>
     </View>
   );
@@ -184,6 +182,7 @@ const styles = StyleSheet.create({
   },
   ordersContent: {
     padding: spacing.md,
+    paddingBottom: 100,
   },
   emptyState: {
     alignItems: 'center',

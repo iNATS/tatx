@@ -135,14 +135,11 @@ const WalletScreen = ({ navigation }) => {
             );
           })}
         </View>
-
-        {/* Bottom padding */}
-        <View style={{ height: Math.max(insets.bottom, spacing.lg) }} />
       </ScrollView>
 
       {/* Floating Top-up Button */}
       <TouchableOpacity 
-        style={[styles.topupButton, { marginBottom: Math.max(insets.bottom, spacing.md) }]}
+        style={[styles.topupButton, { bottom: spacing.md }]}
         activeOpacity={0.8}
       >
         <Ionicons name="wallet" size={22} color={colors.white} />
@@ -180,6 +177,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: spacing.md,
+    paddingBottom: 120,
   },
   balanceCard: {
     backgroundColor: colors.primary,

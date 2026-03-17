@@ -33,7 +33,7 @@ const FloatingTabBar = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.tabBarContainer, { paddingBottom: Math.max(insets.bottom, spacing.sm) }]}>
+    <View style={[styles.tabBarContainer, { paddingBottom: Math.max(insets.bottom, 10) }]}>
       <View style={styles.tabBar}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
@@ -184,16 +184,21 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'transparent',
     elevation: 0,
+    paddingBottom: 10,
   },
   tabBar: {
     flexDirection: 'row',
     backgroundColor: colors.white,
     marginHorizontal: spacing.md,
-    marginBottom: spacing.sm,
     borderRadius: borderRadius.xl * 1.5,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.xs,
     ...shadows.lg,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   tabItem: {
     flex: 1,

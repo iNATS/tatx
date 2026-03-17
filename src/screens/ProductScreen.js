@@ -198,13 +198,13 @@ const ProductScreen = ({ navigation }) => {
         </View>
 
         {/* Bottom spacing for cart summary */}
-        <View style={{ height: cartCount > 0 ? 100 : 20 }} />
+        <View style={{ height: cartCount > 0 ? 80 : 20 }} />
       </ScrollView>
 
       {/* Cart Summary - Floating */}
       {cartCount > 0 && (
         <TouchableOpacity
-          style={[styles.cartSummary, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}
+          style={[styles.cartSummary, { bottom: spacing.md }]}
           onPress={() => navigation.navigate('Cart')}
           activeOpacity={0.9}
         >
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   scrollContent: {
-    paddingBottom: spacing.xl,
+    paddingBottom: 120,
   },
   // Search Section
   searchSection: {

@@ -225,7 +225,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Bottom spacing */}
-        <View style={{ height: 20 }} />
+        <View style={{ height: 40 }} />
       </ScrollView>
     </View>
   );
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContent: {
-    paddingBottom: spacing.xl,
+    paddingBottom: 100,
   },
   // Quick Services
   quickServicesSection: {
