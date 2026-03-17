@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing } from '../constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { products } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 
 const ProductScreen = ({ navigation }) => {
   const { isRTL, addToCart, cartCount } = useApp();
+  const insets = useSafeAreaInsets();
   const [selectedFilter, setSelectedFilter] = useState('الكل');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -22,50 +24,68 @@ const ProductScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>أسواق النخبة</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-          <View style={styles.cartButton}>
-            <Ionicons name="cart" size={24} color={colors.white} />
-            {cartCount > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeText}>{cartCount}</Text>
-              </View>
-            )}
-          </View>
+      {/* Header with Safe Area */}
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
+        <View style={styles.headerLeft}>
+          <Text style={styles.title}>أسواق النخبة</Text>
+          <Text style={styles.subtitle}>تسوق من أفضل المتاجر</Text>
+        </View>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Cart')}
+          style={styles.cartButton}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="cart" size={22} color={colors.white} />
+          {cartCount > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>{cartCount}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
       {/* Search */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color={colors.gray} />
+          <Ionicons name="search" size={20} color={colors.textSecondary} />
           <TextInput
             style={styles.searchInput}
-            placeholder="البحث عن المنتج بالأسم"
-            placeholderTextColor={colors.gray}
+            placeholder="ابحث عن منتج..."
+            placeholderTextColor={colors.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      {/* Tabs */}
-      <View style={styles.tabs}>
-        <Text style={styles.tabActive}>السوبرماركت</Text>
-      </View>
-
       {/* Filters */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersContainer}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        style={styles.filtersContainer}
+        contentContainerStyle={styles.filtersContent}
+      >
         {filters.map((filter) => (
           <TouchableOpacity
             key={filter}
-            style={[styles.filter, selectedFilter === filter && styles.filterActive]}
+            style={[
+              styles.filter, 
+              selectedFilter === filter && styles.filterActive,
+              selectedFilter === filter && { backgroundColor: colors.primary }
+            ]}
             onPress={() => setSelectedFilter(filter)}
+            activeOpacity={0.7}
           >
             <Text
-              style={[styles.filterText, selectedFilter === filter && styles.filterTextActive]}
+              style={[
+                styles.filterText, 
+                selectedFilter === filter && styles.filterTextActive
+              ]}
             >
               {filter}
             </Text>
@@ -74,31 +94,49 @@ const ProductScreen = ({ navigation }) => {
       </ScrollView>
 
       {/* Products Grid */}
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.productsScroll}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        style={styles.productsScroll}
+        contentContainerStyle={styles.productsContent}
+      >
         <View style={styles.productsGrid}>
           {filteredProducts.map((product) => (
-            <View key={product.id} style={styles.productCard}>
-              <Image source={{ uri: product.image }} style={styles.productImage} />
-              <View style={styles.productInfo}>
-                <Text style={styles.productName}>{product.name}</Text>
-                <Text style={styles.productPrice}>ر.س {product.price}</Text>
-                <TouchableOpacity
-                  style={styles.addButton}
-                  onPress={() => {
-                    addToCart({
-                      id: product.id,
-                      name: product.name,
-                      price: product.price,
-                      image: product.image,
-                      quantity: 1,
-                    });
-                  }}
-                >
-                  <Ionicons name="cart-outline" size={20} color={colors.white} />
-                  <Text style={styles.addButtonText}>اضف الى السلة</Text>
-                </TouchableOpacity>
+            <TouchableOpacity 
+              key={product.id} 
+              style={styles.productCard}
+              activeOpacity={0.8}
+              onPress={() => {}}
+            >
+              <View style={styles.productImageContainer}>
+                <Image source={{ uri: product.image }} style={styles.productImage} />
+                {product.discount && (
+                  <View style={styles.discountBadge}>
+                    <Text style={styles.discountText}>{product.discount}%</Text>
+                  </View>
+                )}
               </View>
-            </View>
+              <View style={styles.productInfo}>
+                <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
+                <View style={styles.productFooter}>
+                  <Text style={styles.productPrice}>ر.س {product.price}</Text>
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => {
+                      addToCart({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        image: product.image,
+                        quantity: 1,
+                      });
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="add" size={20} color={colors.white} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -106,14 +144,26 @@ const ProductScreen = ({ navigation }) => {
       {/* Cart Summary */}
       {cartCount > 0 && (
         <TouchableOpacity
-          style={styles.cartSummary}
+          style={[styles.cartSummary, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}
           onPress={() => navigation.navigate('Cart')}
+          activeOpacity={0.9}
         >
-          <Text style={styles.cartSummaryText}>
-            {cartCount} منتج
-          </Text>
-          <Text style={styles.cartSummaryText}>عرض السلة</Text>
-          <Text style={styles.cartSummaryText}>ر.س {cartTotal}</Text>
+          <View style={styles.cartSummaryLeft}>
+            <View style={styles.cartSummaryIcon}>
+              <Ionicons name="cart" size={20} color={colors.white} />
+              <Text style={styles.cartSummaryCount}>{cartCount}</Text>
+            </View>
+            <Text style={styles.cartSummaryText}>
+              {cartCount} {cartCount === 1 ? 'منتج' : 'منتجات'}
+            </Text>
+          </View>
+          <View style={styles.cartSummaryRight}>
+            <Text style={styles.cartSummaryLabel}>المجموع</Text>
+            <Text style={styles.cartSummaryTotal}>ر.س {cartTotal}</Text>
+          </View>
+          <View style={styles.cartSummaryArrow}>
+            <Ionicons name="arrow-forward" size={20} color={colors.white} />
+          </View>
         </TouchableOpacity>
       )}
     </View>
@@ -129,39 +179,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.md,
-    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
     backgroundColor: colors.white,
   },
+  headerLeft: {
+    flex: 1,
+  },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '800',
     color: colors.text,
   },
+  subtitle: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
   cartButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    ...shadows.md,
   },
   cartBadge: {
     position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: colors.white,
+    top: -2,
+    right: -2,
+    backgroundColor: colors.error,
     borderRadius: 10,
-    width: 20,
+    minWidth: 20,
     height: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 4,
   },
   cartBadgeText: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: colors.primary,
+    color: colors.white,
   },
   searchContainer: {
     padding: spacing.md,
@@ -169,125 +229,171 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.grayLight,
-    borderRadius: 25,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.xl,
     paddingHorizontal: spacing.md,
-    height: 48,
+    height: 50,
     gap: spacing.sm,
+    ...shadows.sm,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: colors.text,
   },
-  tabs: {
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  tabActive: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.primary,
-    textAlign: 'right',
-    borderBottomWidth: 2,
-    borderBottomColor: colors.primary,
-    paddingBottom: spacing.sm,
-  },
   filtersContainer: {
-    paddingHorizontal: spacing.sm,
     marginBottom: spacing.md,
   },
-  filters: {
-    flexDirection: 'row',
+  filtersContent: {
+    paddingHorizontal: spacing.md,
     gap: spacing.sm,
   },
   filter: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
-    borderRadius: 20,
-    backgroundColor: colors.grayLight,
-    marginHorizontal: spacing.xs,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.white,
+    ...shadows.sm,
   },
   filterActive: {
     backgroundColor: colors.primary,
+    ...shadows.md,
   },
   filterText: {
     fontSize: 14,
     color: colors.textSecondary,
+    fontWeight: '600',
   },
   filterTextActive: {
     color: colors.white,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   productsScroll: {
     flex: 1,
   },
+  productsContent: {
+    padding: spacing.sm,
+    paddingBottom: 100,
+  },
   productsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: spacing.sm,
     gap: spacing.sm,
   },
   productCard: {
-    width: '48%',
+    width: '48.5%',
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: borderRadius.xl,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...shadows.md,
+  },
+  productImageContainer: {
+    position: 'relative',
   },
   productImage: {
     width: '100%',
-    height: 120,
+    height: 140,
     backgroundColor: colors.grayLight,
   },
+  discountBadge: {
+    position: 'absolute',
+    top: spacing.sm,
+    left: spacing.sm,
+    backgroundColor: colors.error,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+  },
+  discountText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.white,
+  },
   productInfo: {
-    padding: spacing.sm,
+    padding: spacing.md,
   },
   productName: {
     fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
+    minHeight: 36,
     textAlign: 'right',
+  },
+  productFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   productPrice: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: colors.primary,
-    textAlign: 'right',
-    marginBottom: spacing.sm,
   },
   addButton: {
-    flexDirection: 'row',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.primary,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: 20,
-    alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
-  },
-  addButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.white,
+    alignItems: 'center',
+    ...shadows.sm,
   },
   cartSummary: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.primary,
     padding: spacing.md,
-    paddingBottom: spacing.lg + 10,
+    ...shadows.lg,
+  },
+  cartSummaryLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  cartSummaryIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.full,
+  },
+  cartSummaryCount: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.white,
+    marginLeft: 2,
   },
   cartSummaryText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.white,
+  },
+  cartSummaryRight: {
+    alignItems: 'center',
+  },
+  cartSummaryLabel: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  cartSummaryTotal: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.white,
+  },
+  cartSummaryArrow: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
