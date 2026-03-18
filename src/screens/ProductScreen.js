@@ -11,24 +11,44 @@ import ItemDetailModal from '../components/ItemDetailModal';
 const ProductScreen = ({ navigation }) => {
   const { isRTL, addToCart, cartCount } = useApp();
   const insets = useSafeAreaInsets();
-  const [selectedFilter, setSelectedFilter] = useState('الكل');
+  const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [showItemModal, setShowItemModal] = useState(false);
 
-  const filters = [
-    { id: 'الكل', label: 'الكل', icon: 'apps', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200' },
-    { id: 'اطعمة', label: 'طعام', icon: 'fast-food', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200' },
-    { id: 'البان', label: 'ألبان', icon: 'wine', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200' },
-    { id: 'عنايه شخصية', label: 'عناية', icon: 'sparkles', image: 'https://images.unsplash.com/photo-1556228720-19875c4d84b6?w=200' },
-    { id: 'مشروبات', label: 'مشروبات', icon: 'water', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=200' },
-    { id: 'حلويات', label: 'حلويات', icon: 'ice-cream', image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=200' },
+  // Category tabs with full background images
+  const categories = [
+    { id: 'all', name: 'الكل', icon: 'apps', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300' },
+    { id: 'food', name: 'طعام', icon: 'fast-food', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300' },
+    { id: 'dairy', name: 'ألبان', icon: 'wine', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300' },
+    { id: 'care', name: 'عناية', icon: 'sparkles', image: 'https://images.unsplash.com/photo-1556228720-19875c4d84b6?w=300' },
+    { id: 'drinks', name: 'مشروبات', icon: 'water', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300' },
+    { id: 'sweets', name: 'حلويات', icon: 'ice-cream', image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=300' },
+  ];
+
+  // Featured offers
+  const featuredOffers = [
+    {
+      id: '1',
+      title: 'خصم 30%',
+      subtitle: 'على جميع المنتجات',
+      image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600',
+      gradient: ['#E91E63', '#FF4081'],
+      code: 'SAVE30',
+    },
+    {
+      id: '2',
+      title: 'توصيل مجاني',
+      subtitle: 'للطلبات فوق 100 ر.س',
+      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600',
+      gradient: ['#10B981', '#34D399'],
+      code: 'FREEDEL',
+    },
   ];
 
   const filteredProducts = products.filter((product) => {
-    const matchesFilter = selectedFilter === 'الكل' || product.category === selectedFilter;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
+    return matchesSearch;
   });
 
   const cartTotal = filteredProducts.reduce((sum, p) => sum + p.price, 0);
@@ -44,7 +64,7 @@ const ProductScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* iOS 18 Header */}
+      {/* Header with Large Title */}
       <View style={[styles.headerContainer, { paddingTop: Math.max(insets.top, 8) }]}>
         <View style={styles.headerTop}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -59,12 +79,14 @@ const ProductScreen = ({ navigation }) => {
             style={styles.cartButton}
             activeOpacity={0.8}
           >
-            <Ionicons name="cart" size={24} color={colors.white} />
-            {cartCount > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeText}>{cartCount}</Text>
-              </View>
-            )}
+            <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.cartButtonGradient}>
+              <Ionicons name="cart" size={22} color={colors.white} />
+              {cartCount > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{cartCount}</Text>
+                </View>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
@@ -88,89 +110,127 @@ const ProductScreen = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Filter Pills with Images */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filtersContainer}
-      >
-        {filters.map((filter) => {
-          const isSelected = selectedFilter === filter.id;
-          return (
-            <TouchableOpacity
-              key={filter.id}
-              style={[
-                styles.filterCard,
-                isSelected && styles.filterCardSelected,
-              ]}
-              onPress={() => setSelectedFilter(filter.id)}
-              activeOpacity={0.85}
-            >
-              <Image source={{ uri: filter.image }} style={styles.filterImage} />
-              <LinearGradient 
-                colors={isSelected ? [colors.primary + 'DD', colors.primary + 'AA'] : ['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.4)']}
-                style={styles.filterOverlay}
-              />
-              <View style={styles.filterContent}>
-                <Ionicons name={filter.icon} size={20} color={colors.white} />
-                <Text style={styles.filterText}>{filter.label}</Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      {/* Products Grid */}
       <ScrollView 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.productsContent}
+        contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.productsGrid}>
-          {filteredProducts.map((product) => (
-            <TouchableOpacity 
-              key={product.id} 
-              style={styles.productCard}
-              activeOpacity={0.85}
-              onPress={() => handleProductPress(product)}
-            >
-              <View style={styles.productImageContainer}>
-                <Image source={{ uri: product.image }} style={styles.productImage} />
-                {product.discount && (
-                  <View style={styles.discountBadge}>
-                    <Text style={styles.discountText}>{product.discount}%</Text>
-                  </View>
-                )}
-                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={styles.productGradient} />
-                <TouchableOpacity 
-                  style={styles.wishlistBtn}
-                  activeOpacity={0.8}
+        {/* Featured Offers */}
+        <View style={styles.offersSection}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.offersContainer}>
+              {featuredOffers.map((offer) => (
+                <TouchableOpacity
+                  key={offer.id}
+                  style={styles.offerCard}
+                  activeOpacity={0.85}
                 >
-                  <Ionicons name="heart-outline" size={18} color={colors.white} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.productInfo}>
-                <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
-                <View style={styles.productFooter}>
-                  <View>
-                    {product.oldPrice && (
-                      <Text style={styles.productOldPrice}>{product.oldPrice} ر.س</Text>
-                    )}
-                    <Text style={styles.productPrice}>{product.price} ر.س</Text>
+                  <Image source={{ uri: offer.image }} style={styles.offerBackgroundImage} />
+                  <LinearGradient 
+                    colors={offer.gradient} 
+                    style={styles.offerOverlay}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  />
+                  <View style={styles.offerContent}>
+                    <Text style={styles.offerTitle}>{offer.title}</Text>
+                    <Text style={styles.offerSubtitle}>{offer.subtitle}</Text>
+                    <View style={styles.offerCode}>
+                      <Ionicons name="pricetag" size={14} color="rgba(255,255,255,0.9)" />
+                      <Text style={styles.offerCodeText}>{offer.code}</Text>
+                    </View>
                   </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Category Tabs with Images */}
+        <View style={styles.categoriesSection}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.categoriesContainer}>
+              {categories.map((category) => {
+                const isSelected = selectedFilter === category.id;
+                return (
                   <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      handleProductPress(product);
-                    }}
+                    key={category.id}
+                    style={[
+                      styles.categoryCard,
+                      isSelected && styles.categoryCardSelected,
+                    ]}
+                    onPress={() => setSelectedFilter(category.id)}
+                    activeOpacity={0.85}
+                  >
+                    <Image source={{ uri: category.image }} style={styles.categoryImage} />
+                    <LinearGradient 
+                      colors={isSelected ? [colors.primary + 'DD', colors.primary + 'AA'] : ['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.4)']}
+                      style={styles.categoryOverlay}
+                    />
+                    <View style={styles.categoryContent}>
+                      <Ionicons name={category.icon} size={24} color={colors.white} />
+                      <Text style={styles.categoryText}>{category.name}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Products Grid */}
+        <View style={styles.productsSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>المنتجات</Text>
+            <Text style={styles.sectionCount}>{filteredProducts.length} منتج</Text>
+          </View>
+          
+          <View style={styles.productsGrid}>
+            {filteredProducts.map((product) => (
+              <TouchableOpacity 
+                key={product.id} 
+                style={styles.productCard}
+                activeOpacity={0.85}
+                onPress={() => handleProductPress(product)}
+              >
+                <View style={styles.productImageContainer}>
+                  <Image source={{ uri: product.image }} style={styles.productImage} />
+                  {product.discount && (
+                    <View style={styles.discountBadge}>
+                      <Text style={styles.discountText}>{product.discount}%</Text>
+                    </View>
+                  )}
+                  <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={styles.productGradient} />
+                  <TouchableOpacity 
+                    style={styles.wishlistBtn}
                     activeOpacity={0.8}
                   >
-                    <Ionicons name="add" size={20} color={colors.white} />
+                    <Ionicons name="heart-outline" size={18} color={colors.white} />
                   </TouchableOpacity>
                 </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+                <View style={styles.productInfo}>
+                  <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
+                  <View style={styles.productFooter}>
+                    <View>
+                      {product.oldPrice && (
+                        <Text style={styles.productOldPrice}>{product.oldPrice} ر.س</Text>
+                      )}
+                      <Text style={styles.productPrice}>{product.price} ر.س</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.addButton}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleProductPress(product);
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons name="add" size={20} color={colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         {/* Bottom spacing */}
@@ -196,6 +256,7 @@ const ProductScreen = ({ navigation }) => {
               </Text>
             </View>
             <View style={styles.cartSummaryLeft}>
+              <Text style={styles.cartSummaryLabel}>المجموع</Text>
               <Text style={styles.cartSummaryTotal}>{cartTotal} ر.س</Text>
               <Ionicons name="arrow-forward" size={20} color={colors.white} />
             </View>
@@ -245,7 +306,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '800',
     color: colors.text,
   },
@@ -258,11 +319,15 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primary,
+    overflow: 'hidden',
+    ...shadows.md,
+  },
+  cartButtonGradient: {
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    ...shadows.md,
   },
   cartBadge: {
     position: 'absolute',
@@ -300,47 +365,132 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
   },
-  filtersContainer: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    gap: spacing.md,
+  scrollContent: {
+    paddingBottom: 120,
+  },
+  // Offers Section
+  offersSection: {
     backgroundColor: colors.card,
+    paddingVertical: spacing.md,
     marginBottom: spacing.md,
   },
-  filterCard: {
-    width: 90,
-    height: 90,
+  offersContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing.md,
+    gap: spacing.md,
+  },
+  offerCard: {
+    width: 300,
+    height: 140,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
-    ...shadows.md,
-  },
-  filterCardSelected: {
     ...shadows.lg,
   },
-  filterImage: {
+  offerBackgroundImage: {
     width: '100%',
     height: '100%',
     position: 'absolute',
   },
-  filterOverlay: {
+  offerOverlay: {
     ...StyleSheet.absoluteFillObject,
   },
-  filterContent: {
+  offerContent: {
+    flex: 1,
+    padding: spacing.md,
+    justifyContent: 'flex-end',
+  },
+  offerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.white,
+    marginBottom: 4,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  offerSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.95)',
+    marginBottom: spacing.sm,
+  },
+  offerCode: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: borderRadius.full,
+    alignSelf: 'flex-start',
+    gap: 4,
+    backdropFilter: 'blur(10px)',
+  },
+  offerCodeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  // Categories Section
+  categoriesSection: {
+    backgroundColor: colors.card,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.md,
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing.md,
+    gap: spacing.md,
+  },
+  categoryCard: {
+    width: 100,
+    height: 100,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    ...shadows.md,
+  },
+  categoryCardSelected: {
+    ...shadows.lg,
+  },
+  categoryImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  categoryOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  categoryContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 4,
   },
-  filterText: {
-    fontSize: 12,
+  categoryText: {
+    fontSize: 13,
     fontWeight: '700',
     color: colors.white,
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  productsContent: {
-    padding: spacing.sm,
+  // Products Section
+  productsSection: {
+    paddingHorizontal: spacing.sm,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.text,
+  },
+  sectionCount: {
+    fontSize: 14,
+    color: colors.textSecondary,
   },
   productsGrid: {
     flexDirection: 'row',
@@ -431,6 +581,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...shadows.md,
   },
+  // Cart Summary
   cartSummary: {
     position: 'absolute',
     left: spacing.md,
@@ -475,6 +626,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  cartSummaryLabel: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.8)',
   },
   cartSummaryTotal: {
     fontSize: 18,
