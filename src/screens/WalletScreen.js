@@ -1,151 +1,183 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
-import { walletTransactions } from '../data/staticData';
 
 const WalletScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const totalBalance = 200.00;
+  const [activeTab, setActiveTab] = useState('all');
 
-  const getTransactionIcon = (type) => {
-    switch (type) {
-      case 'deposit':
-        return { name: 'arrow-down', color: colors.success, bg: colors.success + '15' };
-      case 'payment':
-        return { name: 'arrow-up', color: colors.primary, bg: colors.primary + '15' };
-      case 'refund':
-        return { name: 'return-up-back', color: colors.warning, bg: colors.warning + '15' };
-      default:
-        return { name: 'cash', color: colors.gray, bg: colors.gray + '15' };
-    }
-  };
+  const balance = 2450.00;
+  const points = 320;
+
+  const transactions = [
+    { id: '1', type: 'credit', title: 'إضافة رصيد', date: 'اليوم، 10:30 ص', amount: 500, icon: 'wallet' },
+    { id: '2', type: 'debit', title: 'طلب #ORD-123', date: 'أمس، 2:15 م', amount: -85, icon: 'receipt' },
+    { id: '3', type: 'debit', title: 'طلب #ORD-122', date: '15 مارس، 11:00 ص', amount: -120, icon: 'receipt' },
+    { id: '4', type: 'credit', title: 'استرجاع مبلغ', date: '14 مارس، 4:30 م', amount: 45, icon: 'return-up-back' },
+    { id: '5', type: 'debit', title: 'طلب #ORD-121', date: '12 مارس، 1:00 م', amount: -65, icon: 'receipt' },
+  ];
+
+  const quickActions = [
+    { id: 'add', title: 'إضافة رصيد', icon: 'add-circle', color: colors.success },
+    { id: 'transfer', title: 'تحويل', icon: 'swap-horizontal', color: colors.info },
+    { id: 'withdraw', title: 'سحب', icon: 'arrow-up', color: colors.warning },
+    { id: 'history', title: 'السجل', icon: 'time', color: colors.primary },
+  ];
 
   return (
     <View style={styles.container}>
-      {/* Header with Safe Area */}
+      {/* Header */}
       <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <TouchableOpacity 
-          onPress={() => navigation.goBack()}
-          style={styles.headerButton}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="close" size={24} color={colors.text} />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>المحفظة</Text>
-        <TouchableOpacity style={styles.headerButton} activeOpacity={0.7}>
+        <Text style={styles.headerTitle}>المحفظة</Text>
+        <TouchableOpacity style={styles.headerButton}>
           <Ionicons name="settings-outline" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Balance Card */}
         <View style={styles.balanceCard}>
-          <View style={styles.balanceHeader}>
-            <Text style={styles.balanceLabel}>الرصيد الاجمالي</Text>
-            <TouchableOpacity style={styles.infoButton}>
-              <Ionicons name="information-circle-outline" size={20} color={colors.white} />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.balanceAmount}>{totalBalance.toFixed(2)}</Text>
-          <Text style={styles.balanceCurrency}>ر.س</Text>
-          
-          <View style={styles.balanceActions}>
-            <TouchableOpacity style={styles.balanceAction} activeOpacity={0.8}>
-              <View style={[styles.actionIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                <Ionicons name="add" size={22} color={colors.white} />
-              </View>
-              <Text style={styles.actionText}>شحن</Text>
-            </TouchableOpacity>
-            <View style={styles.actionDivider} />
-            <TouchableOpacity style={styles.balanceAction} activeOpacity={0.8}>
-              <View style={[styles.actionIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                <Ionicons name="arrow-up" size={22} color={colors.white} />
-              </View>
-              <Text style={styles.actionText}>سحب</Text>
-            </TouchableOpacity>
-            <View style={styles.actionDivider} />
-            <TouchableOpacity style={styles.balanceAction} activeOpacity={0.8}>
-              <View style={[styles.actionIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                <Ionicons name="swap-horizontal" size={22} color={colors.white} />
-              </View>
-              <Text style={styles.actionText}>تحويل</Text>
+          <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.balanceGradient}>
+            <View style={styles.balanceHeader}>
+              <Text style={styles.balanceLabel}>الرصيد الحالي</Text>
+              <TouchableOpacity style={styles.infoButton}>
+                <Ionicons name="information-circle-outline" size={20} color="rgba(255,255,255,0.8)" />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.balanceAmount}>{balance.toLocaleString()} ر.س</Text>
+            <View style={styles.balanceActions}>
+              {quickActions.map((action) => (
+                <TouchableOpacity key={action.id} style={styles.balanceAction}>
+                  <View style={[styles.balanceActionIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+                    <Ionicons name={action.icon} size={22} color={colors.white} />
+                  </View>
+                  <Text style={styles.balanceActionText}>{action.title}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </LinearGradient>
+        </View>
+
+        {/* Points Card */}
+        <View style={styles.pointsCard}>
+          <View style={styles.pointsContent}>
+            <View style={styles.pointsIcon}>
+              <Ionicons name="star" size={28} color={colors.warning} />
+            </View>
+            <View style={styles.pointsInfo}>
+              <Text style={styles.pointsLabel}>نقاط المكافآت</Text>
+              <Text style={styles.pointsAmount}>{points} نقطة</Text>
+            </View>
+            <TouchableOpacity style={styles.pointsButton}>
+              <Text style={styles.pointsButtonText}>استبدال</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Quick Stats */}
+        {/* Stats Row */}
         <View style={styles.statsRow}>
-          <View style={[styles.statCard, shadows.sm]}>
+          <View style={styles.statCard}>
             <View style={[styles.statIcon, { backgroundColor: colors.success + '15' }]}>
               <Ionicons name="arrow-down" size={20} color={colors.success} />
             </View>
-            <Text style={styles.statLabel}>ايداع</Text>
+            <Text style={styles.statLabel}>إيداع</Text>
             <Text style={styles.statValue}>500 ر.س</Text>
           </View>
-          <View style={[styles.statCard, shadows.sm]}>
-            <View style={[styles.statIcon, { backgroundColor: colors.primary + '15' }]}>
-              <Ionicons name="arrow-up" size={20} color={colors.primary} />
+          <View style={styles.statCard}>
+            <View style={[styles.statIcon, { backgroundColor: colors.error + '15' }]}>
+              <Ionicons name="arrow-up" size={20} color={colors.error} />
             </View>
             <Text style={styles.statLabel}>سحب</Text>
-            <Text style={styles.statValue}>300 ر.س</Text>
+            <Text style={styles.statValue}>270 ر.س</Text>
+          </View>
+          <View style={styles.statCard}>
+            <View style={[styles.statIcon, { backgroundColor: colors.info + '15' }]}>
+              <Ionicons name="repeat" size={20} color={colors.info} />
+            </View>
+            <Text style={styles.statLabel}>تحويل</Text>
+            <Text style={styles.statValue}>150 ر.س</Text>
           </View>
         </View>
 
         {/* Transactions */}
-        <View style={[styles.transactionsCard, shadows.sm]}>
+        <View style={styles.transactionsCard}>
           <View style={styles.transactionsHeader}>
-            <Text style={styles.sectionTitle}>سجل المعاملات</Text>
+            <Text style={styles.cardTitle}>المعاملات</Text>
             <TouchableOpacity>
               <Text style={styles.seeAll}>عرض الكل</Text>
             </TouchableOpacity>
           </View>
-          
-          {walletTransactions.map((transaction) => {
-            const iconConfig = getTransactionIcon(transaction.type);
-            return (
-              <TouchableOpacity 
-                key={transaction.id} 
-                style={styles.transactionItem}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.transactionIcon, { backgroundColor: iconConfig.bg }]}>
-                  <Ionicons name={iconConfig.name} size={20} color={iconConfig.color} />
-                </View>
-                <View style={styles.transactionInfo}>
-                  <Text style={styles.transactionType}>{transaction.typeAr}</Text>
-                  <Text style={styles.transactionOrder}>طلب #{transaction.orderId}</Text>
-                  <Text style={styles.transactionDate}>
-                    {transaction.date} • {transaction.time}
-                  </Text>
-                </View>
-                <Text
-                  style={[
-                    styles.transactionAmount,
-                    { color: transaction.isCredit ? colors.success : colors.text },
-                  ]}
-                >
-                  {transaction.isCredit ? '+' : '-'} {transaction.amount.toFixed(2)} ر.س
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
 
-      {/* Floating Top-up Button */}
-      <TouchableOpacity 
-        style={[styles.topupButton, { bottom: spacing.md }]}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="wallet" size={22} color={colors.white} />
-        <Text style={styles.topupButtonText}>شحن الرصيد</Text>
-        <Ionicons name="arrow-forward" size={22} color={colors.white} />
-      </TouchableOpacity>
+          {/* Filter Tabs */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.filterTabs}>
+              {['all', 'credit', 'debit'].map((tab) => (
+                <TouchableOpacity
+                  key={tab}
+                  style={[styles.filterTab, activeTab === tab && styles.filterTabActive]}
+                  onPress={() => setActiveTab(tab)}
+                >
+                  <Text
+                    style={[
+                      styles.filterTabText,
+                      activeTab === tab && styles.filterTabTextActive,
+                    ]}
+                  >
+                    {tab === 'all' ? 'الكل' : tab === 'credit' ? 'إيداع' : 'سحب'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+
+          {/* Transactions List */}
+          <View style={styles.transactionsList}>
+            {transactions
+              .filter((t) => activeTab === 'all' || t.type === activeTab)
+              .map((transaction) => (
+                <TouchableOpacity key={transaction.id} style={styles.transactionItem}>
+                  <View
+                    style={[
+                      styles.transactionIcon,
+                      {
+                        backgroundColor:
+                          transaction.type === 'credit' ? colors.success + '15' : colors.error + '15',
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name={transaction.icon}
+                      size={20}
+                      color={transaction.type === 'credit' ? colors.success : colors.error}
+                    />
+                  </View>
+                  <View style={styles.transactionInfo}>
+                    <Text style={styles.transactionTitle}>{transaction.title}</Text>
+                    <Text style={styles.transactionDate}>{transaction.date}</Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.transactionAmount,
+                      { color: transaction.type === 'credit' ? colors.success : colors.error },
+                    ]}
+                  >
+                    {transaction.amount > 0 ? '+' : ''}
+                    {transaction.amount} ر.س
+                  </Text>
+                </TouchableOpacity>
+              ))}
+          </View>
+        </View>
+
+        {/* Bottom spacing */}
+        <View style={{ height: 40 }} />
+      </ScrollView>
     </View>
   );
 };
@@ -160,141 +192,214 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.sm,
+    paddingBottom: spacing.md,
+    backgroundColor: colors.white,
   },
   headerButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.grayLight,
+    backgroundColor: colors.cardSecondary,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
+  headerTitle: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '800',
     color: colors.text,
   },
   scrollContent: {
     padding: spacing.md,
-    paddingBottom: 120,
   },
+  // Balance Card
   balanceCard: {
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.xl * 1.5,
-    padding: spacing.xl,
-    alignItems: 'center',
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    marginBottom: spacing.md,
     ...shadows.lg,
+  },
+  balanceGradient: {
+    padding: spacing.md,
   },
   balanceHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.sm,
   },
   balanceLabel: {
-    fontSize: 15,
+    fontSize: 14,
     color: 'rgba(255,255,255,0.8)',
   },
   infoButton: {
-    marginLeft: spacing.xs,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   balanceAmount: {
-    fontSize: 48,
-    fontWeight: 'bold',
+    fontSize: 36,
+    fontWeight: '800',
     color: colors.white,
-  },
-  balanceCurrency: {
-    fontSize: 18,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: -8,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   balanceActions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
     justifyContent: 'space-around',
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.2)',
   },
   balanceAction: {
     alignItems: 'center',
-    flex: 1,
   },
-  actionIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  balanceActionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.xs,
   },
-  actionText: {
-    fontSize: 13,
+  balanceActionText: {
+    fontSize: 12,
     color: colors.white,
     fontWeight: '600',
   },
-  actionDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+  // Points Card
+  pointsCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
   },
+  pointsContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pointsIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.warning + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pointsInfo: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  pointsLabel: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 4,
+  },
+  pointsAmount: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.text,
+  },
+  pointsButton: {
+    backgroundColor: colors.warning,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+  },
+  pointsButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  // Stats Row
   statsRow: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.md,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     alignItems: 'center',
+    ...shadows.sm,
   },
   statIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   statLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.textSecondary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   statValue: {
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
   },
+  // Transactions Card
   transactionsCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
     padding: spacing.md,
-    marginTop: spacing.md,
+    ...shadows.sm,
   },
   transactionsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.md,
-    paddingHorizontal: spacing.sm,
   },
-  sectionTitle: {
-    fontSize: 17,
+  cardTitle: {
+    fontSize: 16,
     fontWeight: '700',
     color: colors.text,
   },
   seeAll: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.primary,
     fontWeight: '600',
+  },
+  filterTabs: {
+    flexDirection: 'row',
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  filterTab: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.cardSecondary,
+  },
+  filterTabActive: {
+    backgroundColor: colors.primary,
+  },
+  filterTabText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  filterTabTextActive: {
+    color: colors.white,
+    fontWeight: '700',
+  },
+  transactionsList: {
+    gap: spacing.sm,
   },
   transactionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   transactionIcon: {
     width: 44,
@@ -307,43 +412,19 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: spacing.md,
   },
-  transactionType: {
+  transactionTitle: {
     fontSize: 15,
     fontWeight: '600',
     color: colors.text,
     marginBottom: 2,
   },
-  transactionOrder: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
   transactionDate: {
-    fontSize: 11,
-    color: colors.gray,
+    fontSize: 12,
+    color: colors.textTertiary,
   },
   transactionAmount: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-  },
-  topupButton: {
-    position: 'absolute',
-    bottom: 0,
-    left: spacing.md,
-    right: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
-    gap: spacing.sm,
-    ...shadows.lg,
-  },
-  topupButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.white,
   },
 });
 

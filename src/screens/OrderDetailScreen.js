@@ -1,119 +1,209 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing } from '../constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 
 const OrderDetailScreen = ({ route, navigation }) => {
-  const { order } = route.params;
+  const { order } = route.params || {};
+  const insets = useSafeAreaInsets();
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'delivered':
-        return colors.green;
-      case 'preparing':
-        return colors.warning;
-      case 'cancelled':
-        return colors.error;
-      default:
-        return colors.gray;
-    }
+  const [activeStep, setActiveStep] = useState(2);
+
+  // Order timeline steps
+  const timelineSteps = [
+    { id: 0, title: 'تم استلام الطلب', time: '10:30 ص', completed: true },
+    { id: 1, title: 'قيد التحضير', time: '10:35 ص', completed: true },
+    { id: 2, title: 'في طريقه إليك', time: '11:00 ص', completed: true, current: true },
+    { id: 3, title: 'تم التوصيل', time: '-', completed: false },
+  ];
+
+  const driver = {
+    name: 'أحمد محمد',
+    rating: 4.9,
+    phone: '+966 50 123 4567',
+    vehicle: 'تويوتا كامري',
+    plate: 'أ ب ج 1234',
   };
+
+  if (!order) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.emptyState}>
+          <Ionicons name="receipt-outline" size={64} color={colors.textTertiary} />
+          <Text style={styles.emptyTitle}>التطلب غير موجود</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Help')}>
-          <Text style={styles.helpLink}>المساعدة</Text>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>تفاصيل الطلب</Text>
-        <View style={{ width: 28 }} />
+        <Text style={styles.headerTitle}>تفاصيل الطلب</Text>
+        <TouchableOpacity style={styles.headerButton}>
+          <Ionicons name="share-outline" size={24} color={colors.text} />
+        </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Order Info */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>معلومات الطلب</Text>
-          
-          <View style={styles.restaurantInfo}>
-            <View style={styles.restaurantDetails}>
-              <Text style={styles.restaurantName}>{order.restaurantName}</Text>
-              <View style={styles.rating}>
-                {[...Array(5)].map((_, i) => (
-                  <Ionicons
-                    key={i}
-                    name="star"
-                    size={16}
-                    color={i < order.rating ? colors.warning : colors.gray}
-                  />
-                ))}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Order Status Card */}
+        <View style={styles.statusCard}>
+          <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.statusGradient}>
+            <View style={styles.statusHeader}>
+              <Text style={styles.statusTitle}>رقم الطلب: {order.id}</Text>
+              <View style={styles.statusBadge}>
+                <Text style={styles.statusText}>قيد التوصيل</Text>
               </View>
-              <Text style={styles.status}>{order.statusAr}</Text>
             </View>
-            <Image source={{ uri: order.restaurantLogo }} style={styles.restaurantLogo} />
+            <Text style={styles.statusSubtitle}>
+              {order.restaurantName} • {order.items.length} منتجات
+            </Text>
+            <Text style={styles.statusTotal}>المجموع: {order.total} ر.س</Text>
+          </LinearGradient>
+        </View>
+
+        {/* Timeline */}
+        <View style={styles.timelineCard}>
+          <Text style={styles.cardTitle}>حالة الطلب</Text>
+          <View style={styles.timeline}>
+            {timelineSteps.map((step, index) => (
+              <View key={step.id} style={styles.timelineItem}>
+                <View style={styles.timelineLeft}>
+                  <View
+                    style={[
+                      styles.timelineDot,
+                      step.completed && styles.timelineDotActive,
+                      step.current && styles.timelineDotCurrent,
+                    ]}
+                  >
+                    {step.completed && (
+                      <Ionicons name="checkmark" size={14} color={colors.white} />
+                    )}
+                  </View>
+                  {index < timelineSteps.length - 1 && (
+                    <View
+                      style={[
+                        styles.timelineLine,
+                        step.completed && styles.timelineLineActive,
+                      ]}
+                    />
+                  )}
+                </View>
+                <View style={styles.timelineRight}>
+                  <Text
+                    style={[
+                      styles.timelineTitle,
+                      step.completed && styles.timelineTitleActive,
+                    ]}
+                  >
+                    {step.title}
+                  </Text>
+                  <Text style={styles.timelineTime}>{step.time}</Text>
+                </View>
+              </View>
+            ))}
           </View>
+        </View>
 
-          <TouchableOpacity style={styles.rateButton}>
-            <Text style={styles.rateButtonText}>تقييم</Text>
-          </TouchableOpacity>
-
-          <View style={styles.orderDetails}>
-            <View style={styles.detailRow}>
-              <Ionicons name="hash" size={20} color={colors.primary} />
-              <Text style={styles.detailText}>{order.id}</Text>
+        {/* Driver Info */}
+        <View style={styles.driverCard}>
+          <Text style={styles.cardTitle}>معلومات السائق</Text>
+          <View style={styles.driverInfo}>
+            <View style={styles.driverAvatar}>
+              <Text style={styles.driverAvatarText}>{driver.name.charAt(0)}</Text>
             </View>
-            <View style={styles.detailRow}>
-              <Ionicons name="location" size={20} color={colors.primary} />
-              <Text style={styles.detailText}>{order.address}</Text>
+            <View style={styles.driverDetails}>
+              <Text style={styles.driverName}>{driver.name}</Text>
+              <View style={styles.driverRating}>
+                <Ionicons name="star" size={14} color={colors.warning} />
+                <Text style={styles.driverRatingText}>{driver.rating}</Text>
+              </View>
             </View>
-            <View style={styles.detailRow}>
-              <Ionicons name="calendar" size={20} color={colors.primary} />
-              <Text style={styles.detailText}>
-                {order.date} | {order.time}
-              </Text>
+            <View style={styles.driverActions}>
+              <TouchableOpacity style={[styles.driverActionButton, { backgroundColor: colors.success }]}>
+                <Ionicons name="call" size={20} color={colors.white} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.driverActionButton, { backgroundColor: colors.primary }]}>
+                <Ionicons name="chatbubble" size={20} color={colors.white} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.vehicleInfo}>
+            <View style={styles.vehicleDetail}>
+              <Ionicons name="car" size={18} color={colors.textSecondary} />
+              <Text style={styles.vehicleText}>{driver.vehicle}</Text>
+            </View>
+            <View style={styles.plateBadge}>
+              <Text style={styles.plateText}>{driver.plate}</Text>
             </View>
           </View>
         </View>
 
-        {/* Products */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>المنتجات</Text>
+        {/* Delivery Address */}
+        <View style={styles.addressCard}>
+          <Text style={styles.cardTitle}>عنوان التوصيل</Text>
+          <View style={styles.addressInfo}>
+            <Ionicons name="location" size={20} color={colors.primary} />
+            <Text style={styles.addressText}>الدمام، شارع الملك عبد العزيز</Text>
+          </View>
+        </View>
+
+        {/* Order Items */}
+        <View style={styles.itemsCard}>
+          <Text style={styles.cardTitle}>المنتجات ({order.items.length})</Text>
           {order.items.map((item, index) => (
-            <View key={index} style={styles.productItem}>
-              <View style={styles.productDetails}>
-                <Text style={styles.productName}>{item.name}</Text>
-                <Text style={styles.productDescription}>{item.description}</Text>
-                <Text style={styles.productQuantity}>الكمية : {item.quantity}</Text>
-                <Text style={styles.productPrice}>السعر : {item.price * item.quantity} ر.س</Text>
+            <View key={index} style={styles.orderItem}>
+              <Image source={{ uri: item.image }} style={styles.itemImage} />
+              <View style={styles.itemInfo}>
+                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemQuantity}>الكمية: {item.quantity}</Text>
               </View>
-              <Image source={{ uri: item.image }} style={styles.productImage} />
+              <Text style={styles.itemPrice}>{item.price * item.quantity} ر.س</Text>
             </View>
           ))}
         </View>
 
-        {/* Summary */}
-        <View style={styles.section}>
+        {/* Payment Summary */}
+        <View style={styles.summaryCard}>
+          <Text style={styles.cardTitle}>ملخص الدفع</Text>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>قيمة المنتجات</Text>
-            <Text style={styles.summaryValue}>{order.subtotal} ر.س</Text>
+            <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
+            <Text style={styles.summaryValue}>{order.total} ر.س</Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>قيمة التوصيل</Text>
-            <Text style={styles.summaryValue}>{order.deliveryFee} ر.س</Text>
+            <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
+            <Text style={styles.summaryValue}>{order.deliveryFee || 0} ر.س</Text>
           </View>
-          {order.discount > 0 && (
-            <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, styles.discountLabel]}>قيمة الخصم</Text>
-              <Text style={[styles.summaryValue, styles.discountValue]}>
-                {order.discount} ر.س
-              </Text>
-            </View>
-          )}
-          <View style={[styles.summaryRow, styles.totalRow]}>
-            <Text style={styles.totalLabel}>المجموع</Text>
-            <Text style={styles.totalValue}>{order.total} ر.س</Text>
+          <View style={[styles.summaryRow, styles.summaryTotal]}>
+            <Text style={styles.summaryTotalLabel}>المجموع الكلي</Text>
+            <Text style={styles.summaryTotalValue}>{order.total} ر.س</Text>
+          </View>
+          <View style={styles.paymentMethod}>
+            <Ionicons name="wallet" size={18} color={colors.textSecondary} />
+            <Text style={styles.paymentText}>الدفع نقداً</Text>
           </View>
         </View>
+
+        {/* Action Buttons */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="refresh" size={18} color={colors.primary} />
+            <Text style={styles.actionButtonText}>إعادة الطلب</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="chatbubble-outline" size={18} color={colors.primary} />
+            <Text style={styles.actionButtonText}>الدعم</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Bottom spacing */}
+        <View style={{ height: 40 }} />
       </ScrollView>
     </View>
   );
@@ -128,136 +218,299 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.md,
-    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
     backgroundColor: colors.white,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.cardSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  helpLink: {
-    fontSize: 14,
-    color: colors.primary,
-    textDecorationLine: 'underline',
-  },
-  section: {
-    backgroundColor: colors.white,
-    marginVertical: spacing.sm,
-    padding: spacing.md,
-  },
-  sectionTitle: {
+  headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.text,
-    textAlign: 'right',
-    marginBottom: spacing.md,
   },
-  restaurantInfo: {
+  scrollContent: {
+    padding: spacing.md,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    marginTop: spacing.md,
+  },
+  // Status Card
+  statusCard: {
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    marginBottom: spacing.md,
+    ...shadows.lg,
+  },
+  statusGradient: {
+    padding: spacing.md,
+  },
+  statusHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
-  restaurantDetails: {
-    flex: 1,
-  },
-  restaurantName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-    textAlign: 'right',
-    marginBottom: spacing.xs,
-  },
-  rating: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginBottom: spacing.xs,
-    gap: 2,
-  },
-  status: {
-    fontSize: 14,
-    color: colors.green,
-    fontWeight: '600',
-    textAlign: 'right',
-  },
-  restaurantLogo: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: colors.grayLight,
-  },
-  rateButton: {
-    alignSelf: 'flex-end',
-    borderWidth: 1,
-    borderColor: colors.primary,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    borderRadius: 20,
-    marginBottom: spacing.md,
-  },
-  rateButtonText: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  orderDetails: {
-    gap: spacing.sm,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  detailText: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.text,
-    textAlign: 'right',
-  },
-  productItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.grayLight,
-    gap: spacing.md,
-  },
-  productDetails: {
-    flex: 1,
-  },
-  productName: {
+  statusTitle: {
     fontSize: 16,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  statusBadge: {
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: borderRadius.full,
+    backdropFilter: 'blur(10px)',
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  statusSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: spacing.xs,
+  },
+  statusTotal: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: colors.white,
+  },
+  // Timeline
+  timelineCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: spacing.md,
+  },
+  timeline: {
+    paddingLeft: spacing.sm,
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    paddingBottom: spacing.md,
+  },
+  timelineLeft: {
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  timelineDot: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.cardSecondary,
+    borderWidth: 2,
+    borderColor: colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  timelineDotActive: {
+    backgroundColor: colors.success,
+    borderColor: colors.success,
+  },
+  timelineDotCurrent: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  timelineLine: {
+    width: 2,
+    flex: 1,
+    backgroundColor: colors.cardSecondary,
+    marginTop: 2,
+  },
+  timelineLineActive: {
+    backgroundColor: colors.success,
+  },
+  timelineRight: {
+    flex: 1,
+    paddingTop: 2,
+  },
+  timelineTitle: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 2,
+  },
+  timelineTitleActive: {
+    color: colors.text,
+    fontWeight: '600',
+  },
+  timelineTime: {
+    fontSize: 12,
+    color: colors.textTertiary,
+  },
+  // Driver Card
+  driverCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  driverInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  driverAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  driverAvatarText: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  driverDetails: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  driverName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  driverRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  driverRatingText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  driverActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  driverActionButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  vehicleInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.cardSecondary,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+  },
+  vehicleDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  vehicleText: {
+    fontSize: 14,
+    color: colors.text,
+  },
+  plateBadge: {
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.lg,
+    ...shadows.sm,
+  },
+  plateText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  // Address Card
+  addressCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  addressInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  addressText: {
+    flex: 1,
+    fontSize: 14,
+    color: colors.text,
+  },
+  // Items Card
+  itemsCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  orderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  itemImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    backgroundColor: colors.cardSecondary,
+  },
+  itemInfo: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  itemName: {
+    fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    textAlign: 'right',
     marginBottom: 2,
   },
-  productDescription: {
+  itemQuantity: {
     fontSize: 12,
-    color: colors.textSecondary,
-    textAlign: 'right',
-    marginBottom: 2,
+    color: colors.textTertiary,
   },
-  productQuantity: {
+  itemPrice: {
     fontSize: 14,
-    color: colors.primary,
-    fontWeight: '600',
-    textAlign: 'right',
-    marginBottom: 2,
+    fontWeight: '700',
+    color: colors.text,
   },
-  productPrice: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
-    textAlign: 'right',
-  },
-  productImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 8,
-    backgroundColor: colors.grayLight,
+  // Summary Card
+  summaryCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -266,35 +519,62 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   summaryLabel: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: 14,
+    color: colors.textSecondary,
   },
   summaryValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: colors.text,
   },
-  discountLabel: {
-    color: colors.primary,
-  },
-  discountValue: {
-    color: colors.primary,
-  },
-  totalRow: {
+  summaryTotal: {
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: colors.borderLight,
     marginTop: spacing.sm,
     paddingTop: spacing.md,
   },
-  totalLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  summaryTotalLabel: {
+    fontSize: 16,
+    fontWeight: '700',
     color: colors.text,
   },
-  totalValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  summaryTotalValue: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  paymentMethod: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+  },
+  paymentText: {
+    fontSize: 14,
     color: colors.text,
+  },
+  // Action Buttons
+  actionButtons: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.xl,
+    gap: spacing.xs,
+    ...shadows.sm,
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary,
   },
 });
 
