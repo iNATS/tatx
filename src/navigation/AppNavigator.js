@@ -27,6 +27,7 @@ import PaymentScreen from '../screens/PaymentScreen';
 import TaxiScreen from '../screens/TaxiScreen';
 import CategoryScreen from '../screens/CategoryScreen';
 import VendorSignupScreen from '../screens/VendorSignupScreen';
+import WholesaleScreen from '../screens/WholesaleScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -170,6 +171,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Chat" component={ChatScreen} />
         <Stack.Screen name="Location" component={LocationScreen} />
         <Stack.Screen name="Payment" component={PaymentScreen} />
+        <Stack.Screen name="Wholesale" component={WholesaleScreen} />
         <Stack.Screen name="Search" component={ProductScreen} />
         <Stack.Screen name="RestaurantDetail" component={HomeScreen} />
         <Stack.Screen name="Help" component={ChatScreen} />

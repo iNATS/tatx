@@ -53,6 +53,13 @@ const HomeScreen = ({ navigation }) => {
       color: colors.market
     },
     { 
+      id: 'wholesale', 
+      name: 'جملة', 
+      icon: 'pricetag', 
+      screen: 'Wholesale',
+      color: colors.warning
+    },
+    { 
       id: 'pharmacy', 
       name: 'صيدلية', 
       icon: 'medkit', 
