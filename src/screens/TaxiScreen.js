@@ -336,9 +336,25 @@ const TaxiScreen = ({ navigation }) => {
   const handleLocationSelect = (location) => {
     if (tripState === TRIP_STATES.IDLE) {
       setPickup(location.name);
+      // Send pickup to map
+      if (webViewRef.current) {
+        webViewRef.current.postMessage(JSON.stringify({
+          type: 'setPickup',
+          lat: 26.4207,
+          lng: 50.0888,
+        }));
+      }
       setTripState(TRIP_STATES.DESTINATION);
     } else {
       setDestination(location.name);
+      // Send destination to map
+      if (webViewRef.current) {
+        webViewRef.current.postMessage(JSON.stringify({
+          type: 'setDestination',
+          lat: 26.4350,
+          lng: 50.1050,
+        }));
+      }
       setShowBookModal(true);
     }
   };
