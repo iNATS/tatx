@@ -23,6 +23,7 @@ import AccountScreen from '../screens/AccountScreen';
 import WalletScreen from '../screens/WalletScreen';
 import ChatScreen from '../screens/ChatScreen';
 import LocationScreen from '../screens/LocationScreen';
+import PaymentScreen from '../screens/PaymentScreen';
 import TaxiScreen from '../screens/TaxiScreen';
 import CategoryScreen from '../screens/CategoryScreen';
 import VendorSignupScreen from '../screens/VendorSignupScreen';
@@ -168,6 +169,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Wallet" component={WalletScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
         <Stack.Screen name="Location" component={LocationScreen} />
+        <Stack.Screen name="Payment" component={PaymentScreen} />
         <Stack.Screen name="Search" component={ProductScreen} />
         <Stack.Screen name="RestaurantDetail" component={HomeScreen} />
         <Stack.Screen name="Help" component={ChatScreen} />

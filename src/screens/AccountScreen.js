@@ -15,8 +15,8 @@ const AccountScreen = ({ navigation }) => {
       items: [
         { id: 'profile', label: 'الملف الشخصي', icon: 'person', color: colors.primary, screen: null },
         { id: 'wallet', label: 'المحفظة', icon: 'wallet', color: colors.success, screen: 'Wallet' },
-        { id: 'addresses', label: 'عناويني', icon: 'location', color: colors.info, screen: 'Location' },
-        { id: 'cards', label: 'طرق الدفع', icon: 'card', color: colors.warning, screen: null },
+        { id: 'payment', label: 'طرق الدفع', icon: 'card', color: colors.info, screen: 'Payment' },
+        { id: 'addresses', label: 'عناويني', icon: 'location', color: colors.primary, screen: 'Location' },
       ],
     },
     {
