@@ -300,66 +300,78 @@ const TaxiScreen = ({ navigation }) => {
         <View style={styles.sheetContent}>
           {tripPhase === 'idle' ? (
             <>
-            <View style={[styles.stepperRow, { flexDirection: rowDirection }]}>
-              {[{ id: 1, label: 'من' }, { id: 2, label: 'إلى' }, { id: 3, label: 'تأكيد' }].map((step) => {
-                const active = bookingStep >= step.id;
-                return (
-                  <View key={step.id} style={styles.stepItem}>
-                    <View style={[styles.stepCircle, active && styles.stepCircleActive]}>
-                      <Text style={[styles.stepCircleText, active && styles.stepCircleTextActive]}>{step.id}</Text>
+              <View style={[styles.stepperRow, { flexDirection: rowDirection }]}>
+                {[{ id: 1, label: 'من' }, { id: 2, label: 'إلى' }, { id: 3, label: 'تأكيد' }].map((step) => {
+                  const active = bookingStep >= step.id;
+                  return (
+                    <View key={step.id} style={styles.stepItem}>
+                      <View style={[styles.stepCircle, active && styles.stepCircleActive]}>
+                        <Text style={[styles.stepCircleText, active && styles.stepCircleTextActive]}>{step.id}</Text>
+                      </View>
+                      <Text style={[styles.stepLabel, active && styles.stepLabelActive]}>{step.label}</Text>
                     </View>
-                    <Text style={[styles.stepLabel, active && styles.stepLabelActive]}>{step.label}</Text>
-                  </View>
-                );
-              })}
-            </View>
-            <Text style={[styles.sheetTitle, { textAlign: textAlignStart }]}>اختر نوع الرحلة</Text>
-            <View style={[styles.miniPlacesRow, { flexDirection: rowDirection }]}>
-              {suggestedPlaces.map((place) => (
-                <TouchableOpacity key={place.id} style={styles.miniPlaceChip} onPress={() => chooseSuggestedPlace(place)}>
-                  <Ionicons name={place.icon} size={16} color={colors.primary} />
-                  <Text style={styles.miniPlaceText}>{place.title}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <View style={[styles.ridesRow, { flexDirection: rowDirection }]}>
-              {rideTypes.map((ride) => {
-                const isSelected = selectedRide === ride.id;
-                return (
-                  <TouchableOpacity
-                    key={ride.id}
-                    style={[styles.rideCard, isSelected && styles.rideCardSelected]}
-                    onPress={() => setSelectedRide(ride.id)}
-                  >
-                    <View style={[styles.rideIconWrap, isSelected && styles.rideIconWrapSelected]}>
-                      <Ionicons name={ride.icon} size={18} color={isSelected ? colors.white : colors.primary} />
-                    </View>
-                    <Text style={[styles.rideLabel, isSelected && styles.rideLabelSelected]}>{ride.label}</Text>
-                    <Text style={[styles.rideMeta, isSelected && styles.rideMetaSelected]}>{ride.note}</Text>
-                    <PriceDisplay
-                      value={ride.price}
-                      color={isSelected ? colors.white : colors.primary}
-                      size={16}
-                      iconSize={13}
-                      bold
-                      align="row-reverse"
-                      style={styles.ridePriceWrap}
-                    />
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
-            <View style={[styles.footer, { flexDirection: rowDirection }]}>
-              <View style={styles.footerTextWrap}>
-                <Text style={styles.footerLabel}>السعر المتوقع</Text>
-                <PriceDisplay value={selectedRideData.price} color={colors.primary} size={20} iconSize={16} bold align="row-reverse" />
+                  );
+                })}
               </View>
-              <TouchableOpacity style={styles.footerButton} onPress={requestRide}>
-                <Text style={styles.footerButtonText}>طلب رحلة</Text>
-              </TouchableOpacity>
-            </View>
+
+              <View style={[styles.sheetHeaderRow, { flexDirection: rowDirection }]}>
+                <View style={styles.sheetPriceBadge}>
+                  <PriceDisplay value={selectedRideData.price} color={colors.primary} size={16} iconSize={12} bold align="row-reverse" />
+                </View>
+                <View style={styles.sheetHeaderText}>
+                  <Text style={[styles.sheetCompactTitle, { textAlign: textAlignStart }]}>اختر رحلتك</Text>
+                  <Text style={[styles.sheetCompactSubtitle, { textAlign: textAlignStart }]}>سيارة مناسبة وزمن وصول سريع</Text>
+                </View>
+              </View>
+
+              <View style={[styles.miniPlacesRow, { flexDirection: rowDirection }]}>
+                {suggestedPlaces.map((place) => (
+                  <TouchableOpacity key={place.id} style={styles.miniPlaceChip} onPress={() => chooseSuggestedPlace(place)}>
+                    <Ionicons name={place.icon} size={14} color={colors.primary} />
+                    <Text style={styles.miniPlaceText}>{place.title}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <View style={[styles.ridesRow, { flexDirection: rowDirection }]}>
+                {rideTypes.map((ride) => {
+                  const isSelected = selectedRide === ride.id;
+                  return (
+                    <TouchableOpacity
+                      key={ride.id}
+                      style={[styles.rideCard, isSelected && styles.rideCardSelected]}
+                      onPress={() => setSelectedRide(ride.id)}
+                    >
+                      <View style={[styles.rideTopRow, { flexDirection: rowDirection }]}>
+                        <Text style={[styles.rideEta, isSelected && styles.rideEtaSelected]}>{ride.eta}</Text>
+                        <View style={[styles.rideIconWrap, isSelected && styles.rideIconWrapSelected]}>
+                          <Ionicons name={ride.icon} size={16} color={isSelected ? colors.white : colors.primary} />
+                        </View>
+                      </View>
+                      <Text style={[styles.rideLabel, isSelected && styles.rideLabelSelected]}>{ride.label}</Text>
+                      <PriceDisplay
+                        value={ride.price}
+                        color={isSelected ? colors.white : colors.primary}
+                        size={14}
+                        iconSize={11}
+                        bold
+                        align="row-reverse"
+                        style={styles.ridePriceWrap}
+                      />
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              <View style={[styles.footer, { flexDirection: rowDirection }]}>
+                <View style={styles.footerTextWrap}>
+                  <Text style={styles.footerLabel}>المقاعد {selectedRideData.seats}</Text>
+                  <Text style={styles.footerCaption}>{selectedRideData.label}</Text>
+                </View>
+                <TouchableOpacity style={styles.footerButton} onPress={requestRide}>
+                  <Text style={styles.footerButtonText}>تأكيد الرحلة</Text>
+                </TouchableOpacity>
+              </View>
             </>
           ) : tripPhase === 'completed' ? (
             <>
@@ -504,21 +516,21 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     ...shadows.float,
   },
-  sheetContent: { flex: 1, justifyContent: 'space-between', paddingBottom: spacing.xs },
+  sheetContent: { flex: 1, justifyContent: 'space-between', paddingBottom: 2 },
   sheetHandle: {
     width: 48,
     height: 5,
     borderRadius: 999,
     backgroundColor: colors.border,
     alignSelf: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
-  stepperRow: { justifyContent: 'space-between', marginBottom: spacing.sm },
+  stepperRow: { justifyContent: 'space-between', marginBottom: spacing.xs },
   stepItem: { alignItems: 'center', flex: 1 },
   stepCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: colors.cardSecondary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -526,39 +538,64 @@ const styles = StyleSheet.create({
   stepCircleActive: { backgroundColor: colors.primary },
   stepCircleText: { color: colors.textSecondary, fontFamily: fonts.bold, fontSize: 12 },
   stepCircleTextActive: { color: colors.white },
-  stepLabel: { marginTop: 6, color: colors.textSecondary, fontSize: 11 },
+  stepLabel: { marginTop: 4, color: colors.textSecondary, fontSize: 10 },
   stepLabelActive: { color: colors.text, fontFamily: fonts.semiBold },
+  sheetHeaderRow: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+  },
+  sheetHeaderText: { flex: 1 },
+  sheetPriceBadge: {
+    minWidth: 72,
+    height: 36,
+    borderRadius: borderRadius.full,
+    backgroundColor: '#FFF1F4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+  },
+  sheetCompactTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18 },
+  sheetCompactSubtitle: { color: colors.textSecondary, fontSize: 11, marginTop: 2 },
   sheetTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 24 },
   sheetSubtitle: { color: colors.textSecondary, fontSize: 12, lineHeight: 18, marginTop: 2, marginBottom: spacing.sm },
   pointDot: { width: 12, height: 12, borderRadius: 6, marginHorizontal: spacing.md },
   pickupDot: { backgroundColor: colors.success },
   destinationDot: { backgroundColor: colors.primary },
   inputDivider: { height: 1, backgroundColor: colors.border },
-  miniPlacesRow: { gap: spacing.xs, paddingTop: spacing.xs, paddingBottom: spacing.xs, flexWrap: 'wrap' },
+  miniPlacesRow: { gap: 6, paddingTop: 2, paddingBottom: spacing.xs, justifyContent: 'space-between' },
   miniPlaceChip: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    justifyContent: 'center',
+    gap: 4,
     backgroundColor: colors.cardSecondary,
     borderRadius: borderRadius.full,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 7,
   },
-  miniPlaceText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 12 },
-  ridesRow: { gap: spacing.xs, paddingTop: spacing.xs, paddingBottom: spacing.xs },
+  miniPlaceText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 11 },
+  ridesRow: { gap: 6, paddingTop: 2, paddingBottom: spacing.xs },
   rideCard: {
     flex: 1,
     backgroundColor: colors.cardSecondary,
-    borderRadius: 16,
-    padding: spacing.sm,
+    borderRadius: 18,
+    paddingHorizontal: 8,
+    paddingVertical: 9,
   },
   rideCardSelected: {
     backgroundColor: colors.primary,
   },
+  rideTopRow: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
   rideIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 10,
     backgroundColor: 'rgba(255,255,255,0.16)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -566,23 +603,26 @@ const styles = StyleSheet.create({
   rideIconWrapSelected: {
     backgroundColor: 'rgba(255,255,255,0.16)',
   },
-  rideLabel: { marginTop: spacing.sm, color: colors.text, fontFamily: fonts.bold, fontSize: 14 },
+  rideEta: { color: colors.textSecondary, fontFamily: fonts.semiBold, fontSize: 10 },
+  rideEtaSelected: { color: 'rgba(255,255,255,0.86)' },
+  rideLabel: { color: colors.text, fontFamily: fonts.bold, fontSize: 13 },
   rideLabelSelected: { color: colors.white },
-  rideMeta: { marginTop: 4, color: colors.textSecondary, fontSize: 10, lineHeight: 14 },
-  rideMetaSelected: { color: 'rgba(255,255,255,0.82)' },
-  ridePriceWrap: { marginTop: 6, alignSelf: 'flex-end' },
+  ridePriceWrap: { marginTop: 4, alignSelf: 'flex-end' },
   footer: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: spacing.xs,
+    marginTop: 2,
   },
   footerTextWrap: { flex: 1 },
   footerLabel: { color: colors.textSecondary, fontSize: 12 },
+  footerCaption: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, marginTop: 2 },
   footerButton: {
     backgroundColor: colors.primary,
     borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: 13,
+    minWidth: 126,
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
   },
   footerButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14 },
   tripHeader: { justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
