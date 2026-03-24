@@ -13,7 +13,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tatx.app"
+      "bundleIdentifier": "com.tatx.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,6 +29,11 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
       "output": "single"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7ee0b464-385f-4d93-bdb9-b212de847b6a"
+      }
     }
   }
 }
