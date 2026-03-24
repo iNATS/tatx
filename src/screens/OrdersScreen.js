@@ -1,453 +1,205 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { orders } from '../data/staticData';
 import { useApp } from '../context/AppContext';
+import PageHeader from '../components/PageHeader';
+
+const orderFilters = [
+  { id: 'all', label: 'الكل', icon: 'apps' },
+  { id: 'pending', label: 'قيد المعالجة', icon: 'time-outline' },
+  { id: 'preparing', label: 'قيد التحضير', icon: 'restaurant-outline' },
+  { id: 'delivery', label: 'في التوصيل', icon: 'car-outline' },
+  { id: 'completed', label: 'مكتمل', icon: 'checkmark-done-outline' },
+];
+
+const orderStatusConfig = {
+  pending: { color: colors.warning, bg: colors.warningLight, label: 'قيد المعالجة' },
+  preparing: { color: colors.info, bg: colors.infoLight, label: 'قيد التحضير' },
+  delivery: { color: colors.primary, bg: colors.cardSecondary, label: 'في التوصيل' },
+  completed: { color: colors.success, bg: colors.successLight, label: 'مكتمل' },
+  cancelled: { color: colors.error, bg: colors.errorLight, label: 'ملغي' },
+};
 
 const OrdersScreen = ({ navigation }) => {
-  const insets = useSafeAreaInsets();
-  const { addToCart } = useApp();
+  const { addToCart, formatCurrency, rowDirection, textAlignStart } = useApp();
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const orderFilters = [
-    { id: 'all', label: 'الكل', icon: 'apps' },
-    { id: 'pending', label: 'قيد المعالجة', icon: 'time' },
-    { id: 'preparing', label: 'قيد التحضير', icon: 'restaurant' },
-    { id: 'delivery', label: 'في التوصيل', icon: 'bicycle' },
-    { id: 'completed', label: 'مكتمل', icon: 'checkmark-done' },
-  ];
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      const matchesFilter = selectedFilter === 'all' || order.status === selectedFilter;
+      const matchesSearch =
+        !searchQuery ||
+        order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.restaurantName.toLowerCase().includes(searchQuery.toLowerCase());
 
-  const orderStatusConfig = {
-    pending: { color: colors.warning, bg: colors.warning + '15', label: 'قيد المعالجة' },
-    preparing: { color: colors.info, bg: colors.info + '15', label: 'قيد التحضير' },
-    delivery: { color: colors.primary, bg: colors.primary + '15', label: 'في التوصيل' },
-    completed: { color: colors.success, bg: colors.success + '15', label: 'مكتمل' },
-    cancelled: { color: colors.error, bg: colors.error + '15', label: 'ملغي' },
-  };
+      return matchesFilter && matchesSearch;
+    });
+  }, [searchQuery, selectedFilter]);
 
   const handleReorder = (order) => {
-    order.items.forEach(item => {
+    order.items.forEach((item) => {
       addToCart({
         id: item.id,
         name: item.name,
         price: item.price,
         image: item.image,
         quantity: item.quantity,
+        description: item.description,
       });
     });
+    navigation.navigate('Cart');
   };
-
-  const handleTrackOrder = (order) => {
-    navigation.navigate('OrderDetail', { order });
-  };
-
-  const renderOrderCard = (order) => {
-    const statusConfig = orderStatusConfig[order.status] || orderStatusConfig.pending;
-    
-    return (
-      <TouchableOpacity
-        key={order.id}
-        style={styles.orderCard}
-        onPress={() => handleTrackOrder(order)}
-        activeOpacity={0.8}
-      >
-        {/* Order Header */}
-        <View style={styles.orderHeader}>
-          <View style={styles.orderRestaurant}>
-            <Image source={{ uri: order.restaurantLogo }} style={styles.orderLogo} />
-            <View style={styles.orderRestaurantInfo}>
-              <Text style={styles.orderRestaurantName}>{order.restaurantName}</Text>
-              <Text style={styles.orderDate}>{order.date} • {order.time}</Text>
-            </View>
-          </View>
-          <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
-            <Text style={[styles.statusText, { color: statusConfig.color }]}>
-              {statusConfig.label}
-            </Text>
-          </View>
-        </View>
-
-        {/* Order Items */}
-        <View style={styles.orderItems}>
-          {order.items.slice(0, 3).map((item, index) => (
-            <View key={index} style={styles.orderItem}>
-              <Image source={{ uri: item.image }} style={styles.orderItemImage} />
-              <View style={styles.orderItemInfo}>
-                <Text style={styles.orderItemName}>{item.name}</Text>
-                <Text style={styles.orderItemQuantity}>الكمية: {item.quantity}</Text>
-              </View>
-              <Text style={styles.orderItemPrice}>{item.price} ر.س</Text>
-            </View>
-          ))}
-          {order.items.length > 3 && (
-            <View style={styles.moreItems}>
-              <Text style={styles.moreItemsText}>+{order.items.length - 3} منتجات أخرى</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Order Footer */}
-        <View style={styles.orderFooter}>
-          <View style={styles.orderTotal}>
-            <Text style={styles.orderTotalLabel}>المجموع</Text>
-            <Text style={styles.orderTotalValue}>{order.total} ر.س</Text>
-          </View>
-          <View style={styles.orderActions}>
-            {order.status !== 'completed' && order.status !== 'cancelled' && (
-              <TouchableOpacity 
-                style={styles.trackButton}
-                onPress={() => handleTrackOrder(order)}
-              >
-                <Ionicons name="location" size={18} color={colors.primary} />
-                <Text style={styles.trackButtonText}>تتبع</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity 
-              style={styles.reorderButton}
-              onPress={() => handleReorder(order)}
-            >
-              <Ionicons name="refresh" size={18} color={colors.text} />
-              <Text style={styles.reorderButtonText}>إعادة الطلب</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  // Filter orders based on selected filter
-  const filteredOrders = selectedFilter === 'all' 
-    ? orders 
-    : orders.filter(order => order.status === selectedFilter);
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>طلباتي</Text>
-          <Text style={styles.headerSubtitle}>تابع جميع طلباتك في مكان واحد</Text>
-        </View>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="filter" size={22} color={colors.white} />
-        </TouchableOpacity>
-      </View>
+      <PageHeader
+        navigation={navigation}
+        showBack={false}
+        title="طلباتي"
+        subtitle="تتبع الطلبات الحالية وراجع الطلبات السابقة"
+        actionIcon="notifications-outline"
+        onActionPress={() => navigation.navigate('Notifications')}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="ابحث برقم الطلب أو اسم المتجر"
+        filters={orderFilters}
+        selectedFilter={selectedFilter}
+        onSelectFilter={setSelectedFilter}
+      />
 
-      {/* Filter Tabs */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filtersContainer}
-      >
-        {orderFilters.map((filter) => (
-          <TouchableOpacity
-            key={filter.id}
-            style={[
-              styles.filterChip,
-              selectedFilter === filter.id && styles.filterChipActive,
-            ]}
-            onPress={() => setSelectedFilter(filter.id)}
-            activeOpacity={0.8}
-          >
-            <Ionicons 
-              name={filter.icon} 
-              size={18} 
-              color={selectedFilter === filter.id ? colors.white : colors.textSecondary} 
-            />
-            <Text style={[
-              styles.filterText,
-              selectedFilter === filter.id && styles.filterTextActive,
-            ]}>
-              {filter.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        {filteredOrders.length ? (
+          filteredOrders.map((order) => {
+            const statusConfig = orderStatusConfig[order.status] || orderStatusConfig.pending;
 
-      {/* Orders List */}
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.ordersContent}
-      >
-        {filteredOrders.length > 0 ? (
-          filteredOrders.map(renderOrderCard)
+            return (
+              <TouchableOpacity
+                key={order.id}
+                style={styles.orderCard}
+                activeOpacity={0.92}
+                onPress={() => navigation.navigate('OrderDetail', { order })}
+              >
+                <View style={[styles.orderHeader, { flexDirection: rowDirection }]}>
+                  <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
+                    <Text style={[styles.statusText, { color: statusConfig.color }]}>{statusConfig.label}</Text>
+                  </View>
+                  <View style={styles.restaurantWrap}>
+                    <Text style={[styles.restaurantName, { textAlign: textAlignStart }]}>{order.restaurantName}</Text>
+                    <Text style={[styles.orderMeta, { textAlign: textAlignStart }]}>{order.date} • {order.time}</Text>
+                  </View>
+                  <Image source={{ uri: order.restaurantLogo }} style={styles.orderLogo} />
+                </View>
+
+                <View style={styles.itemsWrap}>
+                  {order.items.slice(0, 2).map((item) => (
+                    <View key={`${order.id}-${item.id}`} style={[styles.itemRow, { flexDirection: rowDirection }]}>
+                      <Text style={styles.itemPrice}>{formatCurrency(item.price * item.quantity)}</Text>
+                      <Text style={[styles.itemName, { textAlign: textAlignStart }]} numberOfLines={1}>
+                        {item.quantity}x {item.name}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+
+                <View style={[styles.footerRow, { flexDirection: rowDirection }]}>
+                  <TouchableOpacity style={styles.secondaryButton} onPress={() => handleReorder(order)}>
+                    <Ionicons name="refresh-outline" size={18} color={colors.primary} />
+                    <Text style={styles.secondaryButtonText}>إعادة الطلب</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.primaryButton}
+                    onPress={() => navigation.navigate('OrderDetail', { order })}
+                  >
+                    <Text style={styles.primaryButtonText}>تتبع الطلب</Text>
+                  </TouchableOpacity>
+                  <View style={styles.totalWrap}>
+                    <Text style={[styles.totalLabel, { textAlign: textAlignStart }]}>الإجمالي</Text>
+                    <Text style={[styles.totalValue, { textAlign: textAlignStart }]}>{formatCurrency(order.total)}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })
         ) : (
           <View style={styles.emptyState}>
-            <View style={styles.emptyIcon}>
-              <Ionicons name="receipt-outline" size={48} color={colors.textTertiary} />
-            </View>
-            <Text style={styles.emptyTitle}>لا توجد طلبات</Text>
-            <Text style={styles.emptySubtitle}>ابدأ بالتسوق الآن</Text>
-            <TouchableOpacity 
-              style={styles.shopButton}
-              onPress={() => navigation.navigate('Shop')}
-            >
-              <Text style={styles.shopButtonText}>تسوق الآن</Text>
+            <Ionicons name="receipt-outline" size={48} color={colors.textTertiary} />
+            <Text style={styles.emptyTitle}>لا توجد طلبات مطابقة</Text>
+            <Text style={styles.emptySubtitle}>جرّب تغيير الفلتر أو ابدأ طلبًا جديدًا.</Text>
+            <TouchableOpacity style={styles.emptyButton} onPress={() => navigation.navigate('Shop')}>
+              <Text style={styles.emptyButtonText}>اذهب إلى المتجر</Text>
             </TouchableOpacity>
           </View>
         )}
-
-        {/* Bottom spacing */}
-        <View style={{ height: 20 }} />
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    backgroundColor: colors.white,
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  headerContent: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.text,
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  filtersContainer: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    gap: spacing.sm,
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
-  filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.cardSecondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    gap: spacing.xs,
-  },
-  filterChipActive: {
-    backgroundColor: colors.primary,
-    ...shadows.md,
-  },
-  filterText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  filterTextActive: {
-    color: colors.white,
-    fontWeight: '700',
-  },
-  ordersContent: {
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { paddingHorizontal: spacing.md, paddingBottom: 140 },
+  orderCard: {
+    backgroundColor: colors.card,
+    borderRadius: 26,
     padding: spacing.md,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.xxl * 2,
-  },
-  emptyIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.cardSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: spacing.md,
+    ...shadows.sm,
   },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.xs,
+  orderHeader: { alignItems: 'center' },
+  orderLogo: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: colors.cardSecondary,
   },
-  emptySubtitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: spacing.lg,
+  restaurantWrap: { flex: 1, marginHorizontal: spacing.md },
+  restaurantName: { color: colors.text, fontFamily: fonts.bold, fontSize: 16 },
+  orderMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: borderRadius.full,
   },
-  shopButton: {
+  statusText: { fontSize: 12, fontFamily: fonts.semiBold },
+  itemsWrap: {
+    marginTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+    paddingTop: spacing.md,
+    gap: spacing.sm,
+  },
+  itemRow: { justifyContent: 'space-between', alignItems: 'center' },
+  itemName: { flex: 1, color: colors.textSecondary, fontSize: 13 },
+  itemPrice: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, marginHorizontal: spacing.md },
+  footerRow: { alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.md },
+  totalWrap: { minWidth: 78 },
+  totalLabel: { color: colors.textSecondary, fontSize: 12 },
+  totalValue: { color: colors.primary, fontFamily: fonts.bold, fontSize: 16, marginTop: 4 },
+  primaryButton: {
     backgroundColor: colors.primary,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
-    ...shadows.md,
-  },
-  shopButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  orderCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    ...shadows.md,
-  },
-  orderHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
-  orderRestaurant: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  orderLogo: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: colors.cardSecondary,
-  },
-  orderRestaurantInfo: {
-    marginLeft: spacing.md,
-    flex: 1,
-  },
-  orderRestaurantName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  orderDate: {
-    fontSize: 12,
-    color: colors.textTertiary,
-  },
-  statusBadge: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingVertical: 12,
     borderRadius: borderRadius.full,
   },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  orderItems: {
-    marginBottom: spacing.md,
-  },
-  orderItem: {
+  primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14 },
+  secondaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  orderItemImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 10,
-    backgroundColor: colors.cardSecondary,
-  },
-  orderItemInfo: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  orderItemName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  orderItemQuantity: {
-    fontSize: 12,
-    color: colors.textTertiary,
-  },
-  orderItemPrice: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  moreItems: {
-    paddingVertical: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    marginTop: spacing.sm,
-  },
-  moreItemsText: {
-    fontSize: 13,
-    color: colors.textTertiary,
-    textAlign: 'center',
-  },
-  orderFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-  },
-  orderTotal: {
-    flexDirection: 'column',
-  },
-  orderTotalLabel: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    marginBottom: 2,
-  },
-  orderTotalValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: colors.text,
-  },
-  orderActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  trackButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary + '10',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.lg,
     gap: spacing.xs,
-  },
-  trackButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  reorderButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.cardSecondary,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.lg,
-    gap: spacing.xs,
+    paddingVertical: 12,
+    borderRadius: borderRadius.full,
   },
-  reorderButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-  },
+  secondaryButtonText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 14 },
+  emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xxxl },
+  emptyTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, marginTop: spacing.md },
+  emptySubtitle: { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.sm },
+  emptyButton: { marginTop: spacing.lg, backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: spacing.xl, paddingVertical: 14 },
+  emptyButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
 });
 
 export default OrdersScreen;

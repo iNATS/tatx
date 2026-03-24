@@ -1,27 +1,28 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Platform } from 'react-native';
-import { colors, spacing } from '../constants/theme';
+import React, { useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
 
 const { width } = Dimensions.get('window');
 
 const onboardingData = [
   {
     id: '1',
-    title: 'اهلا بكم',
-    subtitle: 'شكرا لتحميلكم تاتكس',
-    image: 'https://images.unsplash.com/photo-1512428559087-560fa5ce7d25?w=400',
+    title: 'تنقل واضح وسهل من أول لحظة',
+    subtitle: 'الوصول إلى الخدمات الأساسية والطلبات يتم بخطوات بسيطة وواضحة.',
+    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800',
   },
   {
     id: '2',
-    title: 'دائما معك',
-    subtitle: 'خدمات متعددة في شاشة واحدة',
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400',
+    title: 'خدمات يومية للسوق السعودي',
+    subtitle: 'مطاعم، مشاوير، ومتاجر محلية بعملة الريال ومحتوى مناسب للمستخدم السعودي.',
+    image: 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=800',
   },
   {
     id: '3',
-    title: 'اطلب الآن',
-    subtitle: 'توصيل سريع وطعام لذيذ',
-    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400',
+    title: 'متابعة أسهل للطلبات والحساب',
+    subtitle: 'العناوين، الدفع، والطلبات محفوظة في مكان واحد لتجربة استخدام أكثر سلاسة.',
+    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800',
   },
 ];
 
@@ -30,25 +31,20 @@ const OnboardingScreen = ({ navigation }) => {
   const scrollViewRef = useRef(null);
 
   const handleScroll = (event) => {
-    const contentOffset = event.nativeEvent.contentOffset.x;
-    const index = Math.round(contentOffset / width);
+    const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setCurrentIndex(index);
   };
 
   const handleNext = () => {
     if (currentIndex < onboardingData.length - 1) {
       scrollViewRef.current?.scrollTo({ x: (currentIndex + 1) * width, animated: true });
-    } else {
-      navigation.replace('Login');
+      return;
     }
-  };
-
-  const handleSkip = () => {
     navigation.replace('Login');
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#F5F9FF', '#FFFFFF']} style={styles.container}>
       <ScrollView
         ref={scrollViewRef}
         horizontal
@@ -56,119 +52,121 @@ const OnboardingScreen = ({ navigation }) => {
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        decelerationRate="fast"
       >
-        {onboardingData.map((item, index) => (
+        {onboardingData.map((item) => (
           <View key={item.id} style={[styles.slide, { width }]}>
-            <Text style={styles.title}>{item.title}</Text>
-            <View style={styles.imageContainer}>
-              <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
+            <View style={styles.card}>
+              <Image source={{ uri: item.image }} style={styles.image} />
+              <View style={styles.textBlock}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.subtitle}>{item.subtitle}</Text>
+              </View>
             </View>
-            <Text style={styles.subtitle}>{item.subtitle}</Text>
           </View>
         ))}
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>تخطي</Text>
+        <TouchableOpacity onPress={() => navigation.replace('Login')} style={styles.ghostButton} activeOpacity={0.8}>
+          <Text style={styles.ghostButtonText}>تخطي</Text>
         </TouchableOpacity>
 
         <View style={styles.pagination}>
-          {onboardingData.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.dot,
-                index === currentIndex && styles.dotActive,
-              ]}
-            />
+          {onboardingData.map((item, index) => (
+            <View key={item.id} style={[styles.dot, index === currentIndex && styles.dotActive]} />
           ))}
         </View>
 
-        <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
-          <Text style={styles.nextText}>
-            {currentIndex === onboardingData.length - 1 ? 'ابدأ' : 'التالي'}
-          </Text>
+        <TouchableOpacity onPress={handleNext} style={styles.primaryButton} activeOpacity={0.9}>
+          <Text style={styles.primaryButtonText}>{currentIndex === onboardingData.length - 1 ? 'ابدأ' : 'التالي'}</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
   },
   slide: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xxl,
+    paddingBottom: spacing.xxxl,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: spacing.xl,
-    textAlign: 'center',
-  },
-  imageContainer: {
-    width: 250,
-    height: 250,
-    borderRadius: 125,
+  card: {
+    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: 36,
     overflow: 'hidden',
-    marginBottom: spacing.xl,
-    backgroundColor: colors.grayLight,
+    ...shadows.xl,
   },
   image: {
     width: '100%',
-    height: '100%',
+    height: '58%',
+  },
+  textBlock: {
+    flex: 1,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+    justifyContent: 'space-between',
+  },
+  title: {
+    ...typography.h1,
+    color: colors.text,
+    textAlign: 'right',
   },
   subtitle: {
-    fontSize: 16,
+    ...typography.body,
     color: colors.textSecondary,
-    textAlign: 'center',
-    paddingHorizontal: spacing.lg,
+    textAlign: 'right',
+    marginTop: spacing.md,
   },
   footer: {
+    position: 'absolute',
+    left: spacing.lg,
+    right: spacing.lg,
+    bottom: spacing.xl,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.lg,
-    paddingBottom: Platform.OS === 'ios' ? spacing.xxl : spacing.lg,
+    justifyContent: 'space-between',
   },
-  skipButton: {
-    padding: spacing.sm,
+  ghostButton: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
-  skipText: {
-    fontSize: 16,
-    color: colors.primary,
+  ghostButtonText: {
+    color: colors.textSecondary,
+    fontFamily: fonts.semiBold,
+    fontSize: 15,
   },
   pagination: {
     flexDirection: 'row',
     gap: spacing.sm,
   },
   dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.grayLight,
+    width: 8,
+    height: 8,
+    borderRadius: borderRadius.full,
+    backgroundColor: '#D4D9E3',
   },
   dotActive: {
+    width: 26,
     backgroundColor: colors.primary,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
   },
-  nextButton: {
-    padding: spacing.sm,
+  primaryButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 14,
+    borderRadius: borderRadius.full,
+    ...shadows.md,
   },
-  nextText: {
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '600',
+  primaryButtonText: {
+    color: colors.white,
+    fontFamily: fonts.semiBold,
+    fontSize: 15,
   },
 });
 

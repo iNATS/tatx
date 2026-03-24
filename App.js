@@ -4,11 +4,9 @@ import { I18nManager, ActivityIndicator, View } from 'react-native';
 import { AppProvider } from './src/context/AppContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { loadFonts } from './src/utils/loadFonts';
-import { fonts } from './src/constants/theme';
 
-// Enable RTL for Arabic
+// Allow RTL layouts without forcing them globally so English can stay LTR.
 I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -36,7 +34,7 @@ export default function App() {
 
   return (
     <AppProvider>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <AppNavigator />
     </AppProvider>
   );

@@ -1,911 +1,505 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  ActivityIndicator,
-  Dimensions,
-  Modal,
-  Platform,
-} from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import PriceDisplay from '../components/PriceDisplay';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const rideTypes = [
+  { id: 'economy', name: 'Economy', label: 'اقتصادي', eta: '3 دقائق', price: 18, seats: 4, note: 'أفضل سعر للمشاوير اليومية', icon: 'car-outline' },
+  { id: 'comfort', name: 'Comfort', label: 'راحة', eta: '5 دقائق', price: 28, seats: 4, note: 'أسرع وصول وسيارات أحدث', icon: 'car-sport-outline' },
+  { id: 'family', name: 'Family', label: 'عائلي', eta: '7 دقائق', price: 36, seats: 6, note: 'مساحة أكبر للأفراد أو الأمتعة', icon: 'people-outline' },
+];
 
-const TRIP_STATES = {
-  IDLE: 'idle',
-  PICKUP: 'pickup',
-  DESTINATION: 'destination',
-  RIDE_SELECT: 'ride_select',
-  FINDING: 'finding',
-  DRIVER_FOUND: 'driver_found',
-  ARRIVING: 'arriving',
-  IN_PROGRESS: 'in_progress',
-  COMPLETED: 'completed',
-};
+const suggestedPlaces = [
+  { id: '1', title: 'المنزل', address: 'حي الياسمين، الرياض', lat: 24.8396, lng: 46.6437, icon: 'home-outline' },
+  { id: '2', title: 'العمل', address: 'مركز الملك عبدالله المالي', lat: 24.7667, lng: 46.6436, icon: 'briefcase-outline' },
+  { id: '3', title: 'المطار', address: 'مطار الملك خالد الدولي', lat: 24.9576, lng: 46.6988, icon: 'airplane-outline' },
+];
+
+const mapHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body, #map { height: 100%; width: 100%; margin: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f7f1f3; }
+    .leaflet-control-attribution { display: none; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map', { zoomControl: false }).setView([24.774265, 46.738586], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+    let pickupMarker = null;
+    let destinationMarker = null;
+    let routeLine = null;
+
+    const pickupIcon = L.divIcon({
+      html: '<div style="width:18px;height:18px;border-radius:9px;background:#34C759;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.18)"></div>',
+      className: '',
+      iconSize: [18, 18],
+      iconAnchor: [9, 9]
+    });
+
+    const destinationIcon = L.divIcon({
+      html: '<div style="width:18px;height:18px;border-radius:9px;background:#DA3C57;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.18)"></div>',
+      className: '',
+      iconSize: [18, 18],
+      iconAnchor: [9, 9]
+    });
+
+    function send(data) {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify(data));
+      }
+    }
+
+    function drawRoute() {
+      if (!pickupMarker || !destinationMarker) return;
+      const a = pickupMarker.getLatLng();
+      const b = destinationMarker.getLatLng();
+      if (routeLine) map.removeLayer(routeLine);
+      routeLine = L.polyline([a, b], {
+        color: '#DA3C57',
+        weight: 5,
+        opacity: 0.9,
+        dashArray: '10 8'
+      }).addTo(map);
+      map.fitBounds(routeLine.getBounds(), { padding: [60, 60] });
+    }
+
+    function setPickup(lat, lng, label) {
+      if (pickupMarker) map.removeLayer(pickupMarker);
+      pickupMarker = L.marker([lat, lng], { icon: pickupIcon }).addTo(map);
+      send({ type: 'pickup-set', label, lat, lng });
+      drawRoute();
+    }
+
+    function setDestination(lat, lng, label) {
+      if (destinationMarker) map.removeLayer(destinationMarker);
+      destinationMarker = L.marker([lat, lng], { icon: destinationIcon }).addTo(map);
+      send({ type: 'destination-set', label, lat, lng });
+      drawRoute();
+    }
+
+    function setCurrentLocation() {
+      if (!navigator.geolocation) {
+        setPickup(24.774265, 46.738586, 'موقعي الحالي');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          map.setView([lat, lng], 14);
+          setPickup(lat, lng, 'موقعي الحالي');
+        },
+        () => {
+          setPickup(24.774265, 46.738586, 'موقعي الحالي');
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    }
+
+    async function searchPlace(query, kind) {
+      if (!query) return;
+      try {
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(query + ' الرياض');
+        const res = await fetch(url, { headers: { 'Accept-Language': 'ar' } });
+        const data = await res.json();
+        if (!data || !data.length) return;
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        if (kind === 'pickup') setPickup(lat, lng, query);
+        if (kind === 'destination') setDestination(lat, lng, query);
+      } catch (e) {}
+    }
+
+    window.addEventListener('message', async (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'init') setCurrentLocation();
+        if (data.type === 'pickup-search') searchPlace(data.query, 'pickup');
+        if (data.type === 'destination-search') searchPlace(data.query, 'destination');
+        if (data.type === 'destination-coords') setDestination(data.lat, data.lng, data.label);
+      } catch (e) {}
+    });
+
+    setTimeout(() => send({ type: 'ready' }), 300);
+  </script>
+</body>
+</html>
+`;
 
 const TaxiScreen = ({ navigation }) => {
-  const { isRTL } = useApp();
   const insets = useSafeAreaInsets();
-  
-  const [tripState, setTripState] = useState(TRIP_STATES.IDLE);
-  const [pickup, setPickup] = useState('');
-  const [destination, setDestination] = useState('');
-  const [selectedRide, setSelectedRide] = useState(null);
-  const [driver, setDriver] = useState(null);
-  const [progress, setProgress] = useState(0);
-  const [showBookModal, setShowBookModal] = useState(false);
-  const [mapReady, setMapReady] = useState(false);
+  const { rowDirection, textAlignStart, isRTL } = useApp();
   const webViewRef = useRef(null);
+  const timersRef = useRef([]);
+  const [pickup, setPickup] = useState('جاري تحديد موقعك');
+  const [destination, setDestination] = useState('');
+  const [selectedRide, setSelectedRide] = useState(rideTypes[0].id);
+  const [tripPhase, setTripPhase] = useState('idle');
+  const backIcon = isRTL ? 'arrow-forward' : 'arrow-back';
+  const driver = { name: 'الكابتن سامي', car: 'هيونداي سوناتا', plate: 'ح ر س 4821' };
 
-  const rideTypes = [
-    { 
-      id: 'uberx', 
-      name: 'تاكسي', 
-      icon: 'car-outline', 
-      price: 15, 
-      time: '٣ دقائق', 
-      capacity: 4,
-      description: 'رحلات يومية ميسورة',
-    },
-    { 
-      id: 'comfort', 
-      name: 'مريح', 
-      icon: 'directions-car', 
-      price: 25, 
-      time: '٥ دقائق', 
-      capacity: 4,
-      description: 'سيارات أحدث وأوسع',
-    },
-    { 
-      id: 'premium', 
-      name: 'فاخر', 
-      icon: 'diamond-outline', 
-      price: 40, 
-      time: '٧ دقائق', 
-      capacity: 4,
-      description: 'فخامة وتميز',
-    },
-    { 
-      id: 'van', 
-      name: 'عائلي', 
-      icon: 'people-outline', 
-      price: 35, 
-      time: '١٠ دقائق', 
-      capacity: 7,
-      description: 'للعائلات والمجموعات',
-    },
-    { 
-      id: 'moto', 
-      name: 'دراجة', 
-      icon: 'bicycle-outline', 
-      price: 10, 
-      time: '٢ دقائق', 
-      capacity: 1,
-      description: 'سريع وعملي',
-    },
-  ];
-
-  const locations = [
-    { id: '1', name: 'موقعك الحالي', address: 'تم التحديد تلقائياً', icon: 'location' },
-    { id: '2', name: 'المنزل', address: 'شارع الملك عبد العزيز', icon: 'home' },
-    { id: '3', name: 'العمل', address: 'طريق الظهران', icon: 'business' },
-    { id: '4', name: 'مول الراشد', address: 'طريق الملك عبد العزيز', icon: 'shopping-bag' },
-  ];
-
-  const mockDriver = {
-    name: 'أحمد محمد',
-    rating: 4.9,
-    trips: 2450,
-    car: 'تويوتا كامري 2024',
-    color: 'أبيض',
-    plate: 'أ ب ج 1234',
-    eta: 3,
-  };
-
-  // Leaflet map HTML with routing and search
-  const mapHTML = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-      <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-        .search-box {
-          position: absolute;
-          top: 50px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 1000;
-          background: white;
-          padding: 12px 16px;
-          border-radius: 24px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          width: 90%;
-          max-width: 400px;
-        }
-        .search-box input {
-          flex: 1;
-          border: none;
-          outline: none;
-          font-size: 15px;
-        }
-        .search-box button {
-          background: #E91E63;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 20px;
-          color: white;
-          cursor: pointer;
-        }
-        .location-btn {
-          position: absolute;
-          bottom: 100px;
-          right: 20px;
-          z-index: 1000;
-          background: white;
-          width: 50px;
-          height: 50px;
-          border-radius: 25px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-        }
-        .leaflet-container { font-family: inherit; }
-        .leaflet-routing-container { display: none; }
-      </style>
-    </head>
-    <body>
-      <div class="search-box">
-        <span style="color: #666;">🔍</span>
-        <input type="text" id="searchInput" placeholder="ابحث عن مكان..." />
-        <button onclick="searchLocation()">بحث</button>
-      </div>
-      <div class="location-btn" onclick="getCurrentLocation()">
-        <span style="font-size: 24px;">📍</span>
-      </div>
-      <div id="map"></div>
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-      <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-      <script>
-        let map, marker, routingControl;
-        let pickupCoords = null;
-        let destinationCoords = null;
-
-        // Initialize map centered on Dammam
-        map = L.map('map').setView([26.4207, 50.0888], 13);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Add marker for current location
-        marker = L.marker([26.4207, 50.0888], {
-          icon: L.divIcon({
-            html: '<div style="background: #E91E63; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-          })
-        }).addTo(map);
-
-        // Get current location
-        function getCurrentLocation() {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-                map.setView([lat, lng], 15);
-                marker.setLatLng([lat, lng]);
-                pickupCoords = [lat, lng];
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                  type: 'location',
-                  latitude: lat,
-                  longitude: lng,
-                  address: 'موقعك الحالي'
-                }));
-              },
-              (error) => {
-                console.error('Error getting location:', error);
-              }
-            );
-          }
-        }
-
-        // Search location
-        function searchLocation() {
-          const query = document.getElementById('searchInput').value;
-          if (query) {
-            fetch(\`https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(query)}&limit=1\`)
-              .then(response => response.json())
-              .then(data => {
-                if (data.length > 0) {
-                  const lat = parseFloat(data[0].lat);
-                  const lng = parseFloat(data[0].lon);
-                  map.setView([lat, lng], 15);
-                  
-                  // Add destination marker
-                  if (destinationCoords) {
-                    L.marker([lat, lng], {
-                      icon: L.divIcon({
-                        html: '<div style="background: #10B981; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
-                      })
-                    }).addTo(map);
-                  }
-                  
-                  destinationCoords = [lat, lng];
-                  window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'destination',
-                    latitude: lat,
-                    longitude: lng,
-                    address: query
-                  }));
-                }
-              })
-              .catch(error => console.error('Search error:', error));
-          }
-        }
-
-        // Draw route
-        function drawRoute(start, end) {
-          if (routingControl) {
-            routingControl.remove();
-          }
-          routingControl = L.Routing.control({
-            waypoints: [
-              L.latLng(start[0], start[1]),
-              L.latLng(end[0], end[1])
-            ],
-            routeWhileDragging: true,
-            show: false,
-            createMarker: function() { return null; }
-          }).addTo(map);
-        }
-
-        // Listen for messages from React Native
-        window.addEventListener('message', (event) => {
-          const data = event.data;
-          if (data.type === 'setPickup') {
-            pickupCoords = [data.lat, data.lng];
-            map.setView([data.lat, data.lng], 15);
-            marker.setLatLng([data.lat, data.lng]);
-          }
-          if (data.type === 'setDestination') {
-            destinationCoords = [data.lat, data.lng];
-            if (pickupCoords) {
-              drawRoute(pickupCoords, destinationCoords);
-            }
-          }
-          if (data.type === 'centerOnDriver') {
-            map.setView([data.lat, data.lng], 16);
-          }
-        });
-
-        // Send initial ready state
-        setTimeout(() => {
-          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'ready' }));
-        }, 1000);
-      </script>
-    </body>
-    </html>
-  `;
+  const selectedRideData = useMemo(
+    () => rideTypes.find((ride) => ride.id === selectedRide) || rideTypes[0],
+    [selectedRide]
+  );
 
   useEffect(() => {
-    if (tripState === TRIP_STATES.FINDING) {
-      const timer = setTimeout(() => {
-        setDriver(mockDriver);
-        setTripState(TRIP_STATES.DRIVER_FOUND);
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+    };
+  }, []);
 
-    if (tripState === TRIP_STATES.ARRIVING) {
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          return prev + 5;
-        });
-      }, 300);
-      return () => clearInterval(interval);
-    }
-  }, [tripState]);
-
-  const handleLocationSelect = (location) => {
-    if (tripState === TRIP_STATES.IDLE) {
-      setPickup(location.name);
-      // Send pickup to map
-      if (webViewRef.current) {
-        webViewRef.current.postMessage(JSON.stringify({
-          type: 'setPickup',
-          lat: 26.4207,
-          lng: 50.0888,
-        }));
-      }
-      setTripState(TRIP_STATES.DESTINATION);
-    } else {
-      setDestination(location.name);
-      // Send destination to map
-      if (webViewRef.current) {
-        webViewRef.current.postMessage(JSON.stringify({
-          type: 'setDestination',
-          lat: 26.4350,
-          lng: 50.1050,
-        }));
-      }
-      setShowBookModal(true);
-    }
-  };
-
-  const handleBookRide = () => {
-    if (selectedRide) {
-      setShowBookModal(false);
-      setTripState(TRIP_STATES.FINDING);
-    }
-  };
-
-  const handleReset = () => {
-    setTripState(TRIP_STATES.IDLE);
-    setPickup('');
-    setDestination('');
-    setSelectedRide(null);
-    setDriver(null);
-    setProgress(0);
-  };
-
-  const handleMessage = (event) => {
+  const handleMapMessage = (event) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
       if (data.type === 'ready') {
-        setMapReady(true);
+        webViewRef.current?.postMessage(JSON.stringify({ type: 'init' }));
       }
-      if (data.type === 'location' || data.type === 'destination') {
-        console.log('Map message:', data);
+      if (data.type === 'pickup-set') {
+        setPickup(data.label);
+      }
+      if (data.type === 'destination-set') {
+        setDestination(data.label);
       }
     } catch (error) {
-      console.error('Message parsing error:', error);
+      console.warn('Taxi map message error', error);
     }
   };
 
-  // Location Input View
-  const renderLocationInput = () => (
-    <View style={styles.locationContainer}>
-      <View style={styles.locationHeader}>
-        <Text style={styles.locationTitle}>
-          {tripState === TRIP_STATES.IDLE ? 'موقعpickup' : 'الوجهة'}
-        </Text>
-      </View>
+  const searchPickup = (value) => {
+    setPickup(value);
+    webViewRef.current?.postMessage(JSON.stringify({ type: 'pickup-search', query: value }));
+  };
 
-      <View style={styles.locationInputWrapper}>
-        <View style={[styles.locationDot, { backgroundColor: tripState === TRIP_STATES.IDLE ? colors.success : colors.primary }]} />
-        <TextInput
-          style={styles.locationInput}
-          placeholder={tripState === TRIP_STATES.IDLE ? 'أدخل موقعpickup' : 'أدخل الوجهة'}
-          placeholderTextColor={colors.textTertiary}
-          value={tripState === TRIP_STATES.IDLE ? pickup : destination}
-          onChangeText={tripState === TRIP_STATES.IDLE ? setPickup : setDestination}
-        />
-      </View>
+  const searchDestination = (value) => {
+    setDestination(value);
+    webViewRef.current?.postMessage(JSON.stringify({ type: 'destination-search', query: value }));
+  };
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {locations.map((location) => (
-          <TouchableOpacity
-            key={location.id}
-            style={styles.locationSuggestion}
-            onPress={() => handleLocationSelect(location)}
-            activeOpacity={0.7}
-          >
-            <View style={styles.suggestionIcon}>
-              <Ionicons name={location.icon} size={20} color={colors.text} />
-            </View>
-            <View style={styles.suggestionInfo}>
-              <Text style={styles.suggestionName}>{location.name}</Text>
-              <Text style={styles.suggestionAddress}>{location.address}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
-  );
+  const chooseSuggestedPlace = (place) => {
+    setDestination(place.title);
+    webViewRef.current?.postMessage(
+      JSON.stringify({ type: 'destination-coords', lat: place.lat, lng: place.lng, label: place.title })
+    );
+  };
 
-  // Book Modal
-  const renderBookModal = () => (
-    <Modal
-      visible={showBookModal}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setShowBookModal(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHandle} />
-          
-          <Text style={styles.modalTitle}>تأكيد الحجز</Text>
-          
-          {selectedRide && (
-            <View style={styles.selectedRideInfo}>
-              <View style={styles.selectedRideHeader}>
-                <Ionicons name={selectedRide.icon} size={32} color={colors.text} />
-                <View style={styles.selectedRideDetails}>
-                  <Text style={styles.selectedRideName}>{selectedRide.name}</Text>
-                  <Text style={styles.selectedRideTime}>{selectedRide.time} • {selectedRide.capacity} ركاب</Text>
-                </View>
-                <Text style={styles.selectedRidePrice}>{selectedRide.price} ر.س</Text>
-              </View>
-              <Text style={styles.selectedRideDescription}>{selectedRide.description}</Text>
-            </View>
-          )}
+  const requestRide = () => {
+    if (!destination.trim()) {
+      Alert.alert('الوجهة مطلوبة', 'أدخل وجهتك أو اختر مكانًا سريعًا أولاً.');
+      return;
+    }
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+    setTripPhase('searching');
+    timersRef.current.push(setTimeout(() => setTripPhase('arriving'), 1800));
+    timersRef.current.push(setTimeout(() => setTripPhase('on_trip'), 4200));
+  };
 
-          <View style={styles.modalRoute}>
-            <View style={styles.modalRoutePoint}>
-              <View style={[styles.modalRouteDot, { backgroundColor: colors.success }]} />
-              <Text style={styles.modalRouteText}>{pickup || 'موقعpickup'}</Text>
-            </View>
-            <View style={styles.modalRouteLine} />
-            <View style={styles.modalRoutePoint}>
-              <View style={[styles.modalRouteDot, { backgroundColor: colors.primary }]} />
-              <Text style={styles.modalRouteText}>{destination}</Text>
-            </View>
-          </View>
-
-          <View style={styles.modalPayment}>
-            <Ionicons name="wallet" size={20} color={colors.text} />
-            <Text style={styles.modalPaymentText}>الدفع نقداً</Text>
-            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-          </View>
-
-          <TouchableOpacity
-            style={styles.modalBookButton}
-            onPress={handleBookRide}
-            disabled={!selectedRide}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.modalBookButtonText}>تأكيد الحجز</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.modalCancelButton}
-            onPress={() => setShowBookModal(false)}
-          >
-            <Text style={styles.modalCancelButtonText}>إلغاء</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
+  const resetTrip = () => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+    setTripPhase('idle');
+  };
 
   return (
     <View style={styles.container}>
-      {/* Full Screen Map */}
-      <View style={styles.mapContainer}>
+      {Platform.OS === 'web' ? (
+        <View style={styles.webFallback}>
+          <Text style={styles.webFallbackText}>الخريطة التفاعلية تعمل على الجوال. في الويب نعرض لك تدفق الحجز فقط.</Text>
+        </View>
+      ) : (
         <WebView
           ref={webViewRef}
           originWhitelist={['*']}
           source={{ html: mapHTML }}
+          onMessage={handleMapMessage}
           style={styles.map}
-          onMessage={handleMessage}
           javaScriptEnabled
           domStorageEnabled
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
         />
-      </View>
-
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top + 8, spacing.md) }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>تاتكس</Text>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="help-circle-outline" size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Location Input Overlay */}
-      {(tripState === TRIP_STATES.IDLE || tripState === TRIP_STATES.DESTINATION) && (
-        <View style={[styles.overlayContainer, { paddingTop: Math.max(insets.top + 100, 120) }]}>
-          <View style={styles.overlayCard}>
-            {renderLocationInput()}
-          </View>
-        </View>
       )}
 
-      {/* Ride Selection Slider */}
-      {tripState === TRIP_STATES.RIDE_SELECT && (
-        <View style={[styles.rideContainer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
-          <View style={styles.rideCard}>
-            <Text style={styles.rideTitle}>اختر الرحلة</Text>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.rideSlider}
-            >
-              {rideTypes.map((ride) => (
-                <TouchableOpacity
-                  key={ride.id}
-                  style={[
-                    styles.rideSliderCard,
-                    selectedRide?.id === ride.id && styles.rideSliderCardSelected,
-                  ]}
-                  onPress={() => setSelectedRide(ride)}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.rideSliderIcon}>
-                    <Ionicons name={ride.icon} size={36} color={colors.text} />
-                  </View>
-                  <Text style={styles.rideSliderName}>{ride.name}</Text>
-                  <Text style={styles.rideSliderTime}>{ride.time}</Text>
-                  <Text style={styles.rideSliderPrice}>{ride.price} ر.س</Text>
-                  {selectedRide?.id === ride.id && (
-                    <View style={styles.rideSliderCheck}>
-                      <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
-                    </View>
-                  )}
+      <View style={[styles.topBar, { top: insets.top + spacing.sm, flexDirection: rowDirection }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.topButton}>
+          <Ionicons name={backIcon} size={22} color={colors.text} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.topButton} onPress={() => Alert.alert('جدولة الرحلة', 'سيتم إتاحة جدولة الرحلات في النسخة التالية.')}>
+          <Ionicons name="time-outline" size={22} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.sheet, { bottom: Math.max(insets.bottom + 84, 96) }]}>
+        <View style={styles.sheetHandle} />
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
+          {tripPhase === 'idle' ? (
+            <>
+            <Text style={[styles.sheetTitle, { textAlign: textAlignStart }]}>إلى أين؟</Text>
+            <View style={styles.searchCard}>
+              <View style={[styles.inputRow, { flexDirection: rowDirection }]}>
+                <View style={[styles.pointDot, styles.pickupDot]} />
+                <TextInput
+                  value={pickup}
+                  onChangeText={searchPickup}
+                  placeholder="نقطة الانطلاق"
+                  placeholderTextColor={colors.textTertiary}
+                  style={[styles.input, { textAlign: textAlignStart }]}
+                />
+              </View>
+              <View style={styles.inputDivider} />
+              <View style={[styles.inputRow, { flexDirection: rowDirection }]}>
+                <View style={[styles.pointDot, styles.destinationDot]} />
+                <TextInput
+                  value={destination}
+                  onChangeText={searchDestination}
+                  placeholder="أضف الوجهة"
+                  placeholderTextColor={colors.textTertiary}
+                  style={[styles.input, { textAlign: textAlignStart }]}
+                />
+              </View>
+            </View>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.miniPlacesRow, { flexDirection: rowDirection }]}>
+              {suggestedPlaces.map((place) => (
+                <TouchableOpacity key={place.id} style={styles.miniPlaceChip} onPress={() => chooseSuggestedPlace(place)}>
+                  <Ionicons name={place.icon} size={16} color={colors.primary} />
+                  <Text style={styles.miniPlaceText}>{place.title}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <TouchableOpacity
-              style={styles.bookButton}
-              onPress={() => setShowBookModal(true)}
-              disabled={!selectedRide}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.bookButtonText}>
-                {selectedRide ? `حجز ${selectedRide.name}` : 'اختر رحلة'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
 
-      {/* Book Modal */}
-      {renderBookModal()}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.ridesRow, { flexDirection: rowDirection }]}>
+              {rideTypes.map((ride) => {
+                const isSelected = selectedRide === ride.id;
+                return (
+                  <TouchableOpacity
+                    key={ride.id}
+                    style={[styles.rideCard, isSelected && styles.rideCardSelected]}
+                    onPress={() => setSelectedRide(ride.id)}
+                  >
+                    <Text style={[styles.rideLabel, isSelected && styles.rideLabelSelected]}>{ride.label}</Text>
+                    <PriceDisplay
+                      value={ride.price}
+                      color={isSelected ? colors.white : colors.primary}
+                      size={16}
+                      iconSize={13}
+                      bold
+                      align="row-reverse"
+                      style={styles.ridePriceWrap}
+                    />
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            <View style={[styles.footer, { flexDirection: rowDirection }]}>
+              <View style={styles.footerTextWrap}>
+                <Text style={styles.footerLabel}>السعر المتوقع</Text>
+                <PriceDisplay value={selectedRideData.price} color={colors.primary} size={20} iconSize={16} bold align="row-reverse" />
+              </View>
+              <TouchableOpacity style={styles.footerButton} onPress={requestRide}>
+                <Text style={styles.footerButtonText}>طلب رحلة</Text>
+              </TouchableOpacity>
+            </View>
+            </>
+          ) : (
+            <>
+            <View style={[styles.tripHeader, { flexDirection: rowDirection }]}>
+              <View style={[styles.tripBadge, tripPhase === 'on_trip' && styles.tripBadgeActive]}>
+                <Text style={[styles.tripBadgeText, tripPhase === 'on_trip' && styles.tripBadgeTextActive]}>
+                  {tripPhase === 'searching' ? 'جاري البحث' : tripPhase === 'arriving' ? 'الكابتن في الطريق' : 'الرحلة جارية'}
+                </Text>
+              </View>
+              <Text style={[styles.sheetTitle, { textAlign: textAlignStart }]}>
+                {tripPhase === 'searching' ? 'جارٍ تجهيز رحلتك' : driver.name}
+              </Text>
+            </View>
+
+            <View style={[styles.tripInfoCard, { flexDirection: rowDirection }]}>
+              <View style={styles.tripInfoText}>
+                <Text style={[styles.tripInfoTitle, { textAlign: textAlignStart }]}>
+                  {tripPhase === 'searching' ? 'جاري مطابقة السائق الأقرب' : `${driver.car} • ${driver.plate}`}
+                </Text>
+                <Text style={[styles.tripInfoSubtitle, { textAlign: textAlignStart }]}>
+                  {tripPhase === 'searching' ? `الوجهة: ${destination}` : `من ${pickup} إلى ${destination}`}
+                </Text>
+              </View>
+              <View style={styles.tripIconWrap}>
+                <Ionicons name={tripPhase === 'on_trip' ? 'navigate-outline' : 'car-outline'} size={22} color={colors.primary} />
+              </View>
+            </View>
+
+            <View style={[styles.tripActions, { flexDirection: rowDirection }]}>
+              <TouchableOpacity style={styles.tripAction} onPress={() => Alert.alert('اتصال', `التواصل مع ${driver.name}`)}>
+                <Ionicons name="call-outline" size={18} color={colors.primary} />
+                <Text style={styles.tripActionText}>اتصال</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.tripAction} onPress={() => navigation.navigate('Chat')}>
+                <Ionicons name="chatbubble-outline" size={18} color={colors.primary} />
+                <Text style={styles.tripActionText}>دردشة</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.tripAction} onPress={resetTrip}>
+                <Ionicons name="close-outline" size={18} color={colors.error} />
+                <Text style={[styles.tripActionText, { color: colors.error }]}>إنهاء</Text>
+              </TouchableOpacity>
+            </View>
+            </>
+          )}
+        </ScrollView>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1, backgroundColor: '#FBEFF2' },
+  map: { flex: 1 },
+  webFallback: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  mapContainer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  map: {
-    flex: 1,
-  },
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    backgroundColor: '#F6DDE3',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    zIndex: 1000,
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.white,
     justifyContent: 'center',
-    alignItems: 'center',
-    ...shadows.md,
+    padding: spacing.xl,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  overlayContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.md,
-    zIndex: 999,
-  },
-  overlayCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    ...shadows.lg,
-  },
-  locationContainer: {
-    maxHeight: SCREEN_HEIGHT * 0.5,
-  },
-  locationHeader: {
-    marginBottom: spacing.md,
-  },
-  locationTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  locationInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.grayLight,
-    borderRadius: borderRadius.xl,
-    paddingHorizontal: spacing.md,
-    height: 50,
-    marginBottom: spacing.md,
-  },
-  locationDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  locationInput: {
-    flex: 1,
-    fontSize: 16,
-    color: colors.text,
-    marginLeft: spacing.sm,
-  },
-  locationSuggestion: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
-  suggestionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.grayLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  suggestionInfo: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  suggestionName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  suggestionAddress: {
-    fontSize: 13,
-    color: colors.textTertiary,
-    marginTop: 2,
-  },
-  // Ride Selection
-  rideContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.md,
-    zIndex: 999,
-  },
-  rideCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    paddingBottom: spacing.md,
-    ...shadows.lg,
-  },
-  rideTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.md,
+  webFallbackText: {
+    color: colors.textSecondary,
     textAlign: 'center',
+    lineHeight: 24,
+    fontFamily: fonts.regular,
   },
-  rideSlider: {
-    gap: spacing.md,
-    paddingHorizontal: spacing.xs,
-  },
-  rideSliderCard: {
-    width: 140,
-    backgroundColor: colors.grayLight,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    alignItems: 'center',
-    position: 'relative',
-  },
-  rideSliderCardSelected: {
-    backgroundColor: colors.primary + '15',
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  rideSliderIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  rideSliderName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  rideSliderTime: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    marginBottom: 4,
-  },
-  rideSliderPrice: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: colors.primary,
-  },
-  rideSliderCheck: {
+  topBar: {
     position: 'absolute',
-    top: -8,
-    right: -8,
+    left: spacing.md,
+    right: spacing.md,
+    justifyContent: 'space-between',
   },
-  bookButton: {
-    backgroundColor: colors.text,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
+  topButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
-    marginTop: spacing.md,
+    justifyContent: 'center',
+    ...shadows.sm,
   },
-  bookButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
+  sheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: '30%',
+    backgroundColor: colors.card,
+    borderTopLeftRadius: 34,
+    borderTopRightRadius: 34,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    ...shadows.float,
   },
-  // Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+  sheetContent: {
+    paddingBottom: spacing.sm,
   },
-  modalContent: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.xl * 1.5,
-    borderTopRightRadius: borderRadius.xl * 1.5,
-    padding: spacing.md,
-    paddingBottom: spacing.xl,
-  },
-  modalHandle: {
-    width: 40,
-    height: 4,
-    backgroundColor: colors.gray,
-    borderRadius: 2,
+  sheetHandle: {
+    width: 48,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: colors.border,
     alignSelf: 'center',
     marginBottom: spacing.md,
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
+  sheetTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 28 },
+  sheetSubtitle: { color: colors.textSecondary, fontSize: 13, lineHeight: 20, marginTop: spacing.xs, marginBottom: spacing.md },
+  searchCard: { backgroundColor: colors.cardSecondary, borderRadius: 24, paddingHorizontal: spacing.md },
+  inputRow: { alignItems: 'center', minHeight: 56 },
+  pointDot: { width: 12, height: 12, borderRadius: 6, marginHorizontal: spacing.md },
+  pickupDot: { backgroundColor: colors.success },
+  destinationDot: { backgroundColor: colors.primary },
+  input: { flex: 1, color: colors.text, fontFamily: fonts.regular, fontSize: 15 },
+  inputDivider: { height: 1, backgroundColor: colors.border },
+  miniPlacesRow: { gap: spacing.sm, paddingTop: spacing.sm, paddingBottom: spacing.sm },
+  miniPlaceChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.cardSecondary,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
   },
-  selectedRideInfo: {
-    backgroundColor: colors.grayLight,
-    borderRadius: borderRadius.xl,
+  miniPlaceText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13 },
+  ridesRow: { gap: spacing.sm, paddingTop: spacing.xs, paddingBottom: spacing.sm },
+  rideCard: {
+    width: 116,
+    backgroundColor: colors.cardSecondary,
+    borderRadius: 18,
     padding: spacing.md,
-    marginBottom: spacing.md,
   },
-  selectedRideHeader: {
+  rideCardSelected: {
+    backgroundColor: colors.primary,
+  },
+  rideIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rideLabel: { marginTop: spacing.md, color: colors.text, fontFamily: fonts.bold, fontSize: 16 },
+  rideLabelSelected: { color: colors.white },
+  ridePriceWrap: { marginTop: spacing.sm, alignSelf: 'flex-end' },
+  footer: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+  },
+  footerTextWrap: { flex: 1 },
+  footerLabel: { color: colors.textSecondary, fontSize: 12 },
+  footerButton: {
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 15,
+  },
+  footerButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
+  tripHeader: { justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
+  tripBadge: { backgroundColor: colors.warningLight, borderRadius: borderRadius.full, paddingHorizontal: 12, paddingVertical: 8 },
+  tripBadgeActive: { backgroundColor: colors.successLight },
+  tripBadgeText: { color: colors.warning, fontFamily: fonts.semiBold, fontSize: 12 },
+  tripBadgeTextActive: { color: colors.success },
+  tripInfoCard: {
+    alignItems: 'center',
+    backgroundColor: colors.cardSecondary,
+    borderRadius: 22,
+    padding: spacing.md,
+  },
+  tripInfoText: { flex: 1, marginHorizontal: spacing.md },
+  tripInfoTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
+  tripInfoSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
+  tripIconWrap: { width: 44, height: 44, borderRadius: 16, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
+  tripActions: { gap: spacing.sm, marginTop: spacing.md },
+  tripAction: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    justifyContent: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.cardSecondary,
+    borderRadius: borderRadius.full,
+    paddingVertical: 12,
   },
-  selectedRideDetails: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  selectedRideName: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  selectedRideTime: {
-    fontSize: 13,
-    color: colors.textTertiary,
-    marginTop: 2,
-  },
-  selectedRidePrice: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: colors.primary,
-  },
-  selectedRideDescription: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  modalRoute: {
-    paddingVertical: spacing.md,
-    marginBottom: spacing.md,
-  },
-  modalRoutePoint: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  modalRouteDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  modalRouteText: {
-    fontSize: 14,
-    color: colors.text,
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  modalRouteLine: {
-    width: 2,
-    height: 20,
-    backgroundColor: colors.grayLight,
-    marginLeft: 5,
-    marginVertical: -spacing.sm,
-  },
-  modalPayment: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    marginBottom: spacing.md,
-  },
-  modalPaymentText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  modalBookButton: {
-    backgroundColor: colors.text,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  modalBookButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  modalCancelButton: {
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  modalCancelButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
+  tripActionText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13 },
 });
 
 export default TaxiScreen;

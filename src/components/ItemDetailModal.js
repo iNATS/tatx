@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 import ModalSheet from './ModalSheet';
+import PriceDisplay from './PriceDisplay';
 
 /**
  * Apple HIG Compliant Item Detail Modal
@@ -19,6 +21,7 @@ import ModalSheet from './ModalSheet';
  */
 const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
   const insets = useSafeAreaInsets();
+  const { formatCurrency } = useApp();
   const [quantity, setQuantity] = useState(1);
   const [selectedNotes, setSelectedNotes] = useState([]);
 
@@ -77,7 +80,7 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
               <Text style={styles.discountText}>{item.discount}% خصم</Text>
             </View>
           )}
-          <TouchableOpacity style={styles.wishlistButton} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.wishlistButton} activeOpacity={0.8} onPress={() => Alert.alert('المفضلة', 'تم حفظ العنصر في المفضلة.')}>
             <Ionicons name="heart-outline" size={24} color={colors.white} />
           </TouchableOpacity>
         </View>
@@ -107,17 +110,15 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
             {item.deliveryFee && (
               <View style={styles.metaItem}>
                 <Ionicons name="bicycle-outline" size={18} color={colors.textSecondary} />
-                <Text style={styles.metaText}>{item.deliveryFee} ر.س</Text>
+                <Text style={styles.metaText}>{formatCurrency(item.deliveryFee)}</Text>
               </View>
             )}
           </View>
 
           {/* Price */}
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>{item.price} ر.س</Text>
-            {item.oldPrice && (
-              <Text style={styles.oldPrice}>{item.oldPrice} ر.س</Text>
-            )}
+            <PriceDisplay value={item.price} color={colors.primary} size={28} iconSize={20} bold />
+            {item.oldPrice && <PriceDisplay value={item.oldPrice} muted strike size={18} iconSize={14} />}
           </View>
         </View>
 
@@ -197,7 +198,7 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
         <View style={styles.totalContainer}>
           <Text style={styles.totalLabel}>المجموع</Text>
-          <Text style={styles.totalPrice}>{totalPrice} ر.س</Text>
+          <PriceDisplay value={totalPrice} color={colors.text} size={20} iconSize={16} bold align="row-reverse" />
         </View>
         <TouchableOpacity 
           style={styles.addToCartButton}
@@ -205,8 +206,13 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
           activeOpacity={0.8}
         >
           <LinearGradient colors={colors.primaryGradient} style={styles.addToCartGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            <Ionicons name="cart" size={22} color={colors.white} />
-            <Text style={styles.addToCartText}>أضف للسلة</Text>
+            <View style={styles.addToCartMain}>
+              <Ionicons name="bag-add-outline" size={22} color={colors.white} />
+              <View>
+                <Text style={styles.addToCartText}>إضافة للسلة</Text>
+                <Text style={styles.addToCartSubtext}>سريعة مع التخصيص</Text>
+              </View>
+            </View>
             <View style={styles.quantityBadge}>
               <Text style={styles.quantityBadgeText}>x{quantity}</Text>
             </View>
@@ -294,19 +300,9 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   priceContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: spacing.md,
-  },
-  price: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.primary,
-  },
-  oldPrice: {
-    fontSize: 18,
-    color: colors.textTertiary,
-    textDecorationLine: 'line-through',
   },
   section: {
     paddingHorizontal: spacing.md,
@@ -417,12 +413,6 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     textAlign: 'right',
   },
-  totalPrice: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: colors.text,
-    textAlign: 'right',
-  },
   addToCartButton: {
     flex: 1.5,
     borderRadius: borderRadius.xl,
@@ -432,14 +422,26 @@ const styles = StyleSheet.create({
   addToCartGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
+  },
+  addToCartMain: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
     gap: spacing.sm,
   },
   addToCartText: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
     color: colors.white,
+    textAlign: 'right',
+  },
+  addToCartSubtext: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.78)',
+    marginTop: 2,
+    textAlign: 'right',
   },
   quantityBadge: {
     backgroundColor: 'rgba(255,255,255,0.2)',

@@ -1,38 +1,13 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
-import { colors, spacing, borderRadius } from '../constants/theme';
-
-// Shadow styles as plain objects (must be defined outside StyleSheet.create)
-const shadowStyles = {
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  buttonShadow: {
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-};
+import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
 
 const SplashScreen = ({ navigation }) => {
   const { setLanguage } = useApp();
   const insets = useSafeAreaInsets();
-
-  useEffect(() => {
-    // Auto-navigate after delay if needed
-    const timer = setTimeout(() => {
-      // Keep showing language selection
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleLanguageSelect = (lang) => {
     setLanguage(lang);
@@ -40,127 +15,135 @@ const SplashScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Top Section with Logo */}
-      <View style={[styles.topSection, { paddingTop: Math.max(insets.top, spacing.xl * 2) }]}>
-        <View style={styles.logoContainer}>
+    <LinearGradient colors={['#F8FBFF', '#EAF3FF']} style={styles.container}>
+      <View style={[styles.hero, { paddingTop: insets.top + spacing.xl }]}>
+        <View style={styles.logoShell}>
           <Image source={require('../../assets/logo.png')} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.appName}>TATX</Text>
-          <Text style={styles.tagline}>دائماً معك</Text>
         </View>
+        <Text style={styles.appName}>TATX</Text>
+        <Text style={styles.subtitle}>دائما معك</Text>
       </View>
 
-      {/* Bottom White Section */}
-      <View style={[styles.bottomSection, shadowStyles.shadow, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
+      <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
         <View style={styles.handle} />
-        <Text style={styles.selectTitle}>حدد اللغة</Text>
+        <Text style={styles.sheetTitle}>اختر لغة البداية</Text>
+        <Text style={styles.sheetSubtitle}>اختر اللغة المناسبة لك للبدء واستعراض الخدمات.</Text>
 
-        <TouchableOpacity
-          style={styles.arabicButton}
-          onPress={() => handleLanguageSelect('ar')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.arabicButtonText}>اللغة العربية</Text>
+        <TouchableOpacity style={styles.primaryButton} activeOpacity={0.9} onPress={() => handleLanguageSelect('ar')}>
+          <Text style={styles.primaryButtonText}>العربية</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.englishButton}
-          onPress={() => handleLanguageSelect('en')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.englishButtonText}>ENGLISH</Text>
+        <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.85} onPress={() => handleLanguageSelect('en')}>
+          <Text style={styles.secondaryButtonText}>English</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background,
   },
-  topSection: {
-    flex: 2,
-    backgroundColor: colors.primary,
+  hero: {
+    flex: 1.1,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
   },
-  logoContainer: {
+  heroBadge: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.cardSecondary,
+    marginBottom: spacing.lg,
+  },
+  heroBadgeText: {
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
+    fontSize: 13,
+  },
+  logoShell: {
+    width: 128,
+    height: 128,
+    borderRadius: 36,
+    backgroundColor: colors.white,
     alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.xl,
   },
   logo: {
-    width: 150,
-    height: 150,
-    marginBottom: spacing.lg,
+    width: 88,
+    height: 88,
   },
   appName: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: colors.white,
-    marginBottom: spacing.sm,
+    ...typography.display,
+    color: colors.text,
+    marginTop: spacing.lg,
   },
-  tagline: {
-    fontSize: 22,
-    color: colors.white,
-    opacity: 0.9,
+  subtitle: {
+    ...typography.body,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    maxWidth: 280,
   },
-  bottomSection: {
-    flex: 1,
-    backgroundColor: colors.white,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    padding: spacing.lg,
-    alignItems: 'center',
+  sheet: {
+    backgroundColor: colors.glass,
+    borderTopLeftRadius: 34,
+    borderTopRightRadius: 34,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
   },
   handle: {
-    width: 50,
-    height: 4,
-    backgroundColor: colors.gray,
-    borderRadius: 2,
-    marginBottom: spacing.xl,
-  },
-  selectTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
+    alignSelf: 'center',
+    width: 52,
+    height: 5,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.border,
     marginBottom: spacing.lg,
-    alignSelf: 'flex-start',
-    width: '100%',
-    paddingRight: spacing.md,
   },
-  arabicButton: {
+  sheetTitle: {
+    ...typography.h3,
+    color: colors.text,
+    textAlign: 'right',
+  },
+  sheetSubtitle: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
+    textAlign: 'right',
+  },
+  primaryButton: {
     backgroundColor: colors.primary,
-    width: '100%',
-    paddingVertical: spacing.lg,
-    borderRadius: borderRadius.xl,
+    borderRadius: borderRadius.lg,
+    paddingVertical: 18,
     alignItems: 'center',
-    marginBottom: spacing.md,
+    ...shadows.md,
   },
-  arabicButtonText: {
-    fontSize: 18,
-    fontWeight: '700',
+  primaryButtonText: {
     color: colors.white,
+    fontFamily: fonts.semiBold,
+    fontSize: 17,
   },
-  englishButton: {
+  secondaryButton: {
     backgroundColor: colors.white,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    width: '100%',
-    paddingVertical: spacing.lg,
-    borderRadius: borderRadius.xl,
+    borderRadius: borderRadius.lg,
+    paddingVertical: 18,
     alignItems: 'center',
+    marginTop: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  englishButtonText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.primary,
+  secondaryButtonText: {
+    color: colors.text,
+    fontFamily: fonts.semiBold,
+    fontSize: 17,
   },
 });
-
-// Apply shadows using Object.assign for Android compatibility
-if (Platform.OS === 'android') {
-  styles.arabicButton = Object.assign({}, styles.arabicButton, shadowStyles.buttonShadow);
-}
 
 export default SplashScreen;

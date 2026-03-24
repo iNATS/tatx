@@ -1,33 +1,44 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing } from '../constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
 const CartScreen = ({ navigation }) => {
-  const { cart, updateQuantity, removeFromCart, cartTotal, isRTL } = useApp();
-
-  const deliveryFee = 40;
+  const insets = useSafeAreaInsets();
+  const { cart, updateQuantity, removeFromCart, clearCart, cartTotal, formatCurrency, rowDirection, textAlignStart, isRTL } = useApp();
+  const deliveryFee = cart.length ? 12 : 0;
   const total = cartTotal + deliveryFee;
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const closeIcon = isRTL ? 'close' : 'close';
 
-  if (cart.length === 0) {
+  const handleClearCart = () => {
+    Alert.alert('تفريغ السلة', 'هل تريد حذف جميع العناصر من السلة؟', [
+      { text: 'إلغاء', style: 'cancel' },
+      { text: 'حذف', style: 'destructive', onPress: clearCart },
+    ]);
+  };
+
+  if (!cart.length) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="close" size={28} color={colors.text} />
+        <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+            <Ionicons name={closeIcon} size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.title}>السلة</Text>
-          <View style={{ width: 28 }} />
+          <Text style={styles.headerTitle}>السلة</Text>
+          <View style={styles.headerButton} />
         </View>
-        <View style={styles.emptyCart}>
-          <Ionicons name="cart-outline" size={80} color={colors.gray} />
-          <Text style={styles.emptyText}>السلة فارغة</Text>
-          <TouchableOpacity
-            style={styles.browseButton}
-            onPress={() => navigation.navigate('Home')}
-          >
-            <Text style={styles.browseButtonText}>تصفح المطاعم</Text>
+
+        <View style={styles.emptyState}>
+          <View style={styles.emptyIcon}>
+            <Ionicons name="bag-handle-outline" size={44} color={colors.primary} />
+          </View>
+          <Text style={styles.emptyTitle}>السلة فارغة</Text>
+          <Text style={styles.emptySubtitle}>أضف بعض المنتجات أو الوجبات للمتابعة إلى الدفع.</Text>
+          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.navigate('Shop')}>
+            <Text style={styles.primaryButtonText}>ابدأ التسوق</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -36,230 +47,154 @@ const CartScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="close" size={28} color={colors.text} />
+      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+          <Ionicons name={closeIcon} size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>السلة</Text>
-        <TouchableOpacity>
-          <Ionicons name="trash-outline" size={24} color={colors.primary} />
+        <Text style={styles.headerTitle}>السلة</Text>
+        <TouchableOpacity onPress={handleClearCart} style={styles.headerButton}>
+          <Ionicons name="trash-outline" size={22} color={colors.error} />
         </TouchableOpacity>
       </View>
 
-      {/* Delivery Info */}
-      <View style={styles.deliveryInfo}>
-        <View style={styles.deliveryInfoRow}>
-          <Ionicons name="cash-outline" size={20} color={colors.textSecondary} />
-          <Text style={styles.deliveryInfoText}>سعر التوصيل : {deliveryFee} ر.س</Text>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <View style={styles.summaryCard}>
+          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
+            <Text style={styles.summaryValue}>{totalItems} عناصر</Text>
+            <Text style={styles.summaryLabel}>عدد المنتجات</Text>
+          </View>
+          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
+            <Text style={styles.summaryValue}>{formatCurrency(deliveryFee)}</Text>
+            <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
+          </View>
+          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
+            <Text style={styles.summaryValue}>25 - 40 دقيقة</Text>
+            <Text style={styles.summaryLabel}>الوقت المتوقع</Text>
+          </View>
         </View>
-        <View style={styles.deliveryInfoRow}>
-          <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
-          <Text style={styles.deliveryInfoText}>وقت التوصيل : 60-40 دقيقة</Text>
-        </View>
-      </View>
 
-      {/* Cart Items */}
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.itemsContainer}>
         {cart.map((item) => (
-          <View key={item.id} style={styles.cartItem}>
-            <TouchableOpacity onPress={() => removeFromCart(item.id)}>
-              <Ionicons name="trash-outline" size={24} color={colors.primary} />
-            </TouchableOpacity>
-            <View style={styles.itemDetails}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemDescription}>{item.description}</Text>
-              <View style={styles.quantityContainer}>
-                <Text style={styles.quantityLabel}>الكمية :</Text>
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => updateQuantity(item.id, item.quantity - 1)}
-                >
-                  <Ionicons name="remove" size={16} color={colors.white} />
-                </TouchableOpacity>
-                <Text style={styles.quantityValue}>{item.quantity}</Text>
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => updateQuantity(item.id, item.quantity + 1)}
-                >
-                  <Ionicons name="add" size={16} color={colors.white} />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.itemPrice}>السعر : {item.price * item.quantity} ر.س</Text>
-            </View>
+          <View key={item.id} style={[styles.itemCard, { flexDirection: rowDirection }]}>
             <Image source={{ uri: item.image }} style={styles.itemImage} />
+            <View style={styles.itemInfo}>
+              <Text style={[styles.itemName, { textAlign: textAlignStart }]}>{item.name}</Text>
+              {!!item.description && <Text style={[styles.itemDescription, { textAlign: textAlignStart }]}>{item.description}</Text>}
+              <Text style={styles.itemPrice}>{formatCurrency((item.finalPrice || item.price) * item.quantity)}</Text>
+              <View style={[styles.actionsRow, { flexDirection: rowDirection }]}>
+                <TouchableOpacity style={styles.iconButton} onPress={() => removeFromCart(item.id)}>
+                  <Ionicons name="trash-outline" size={18} color={colors.error} />
+                </TouchableOpacity>
+                <View style={styles.quantityControl}>
+                  <TouchableOpacity style={styles.qtyButton} onPress={() => updateQuantity(item.id, item.quantity - 1)}>
+                    <Ionicons name="remove" size={16} color={colors.white} />
+                  </TouchableOpacity>
+                  <Text style={styles.qtyText}>{item.quantity}</Text>
+                  <TouchableOpacity style={styles.qtyButton} onPress={() => updateQuantity(item.id, item.quantity + 1)}>
+                    <Ionicons name="add" size={16} color={colors.white} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
           </View>
         ))}
+        <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Continue Button */}
-      <TouchableOpacity
-        style={styles.continueButton}
-        onPress={() => navigation.navigate('Checkout')}
-      >
-        <Text style={styles.continueButtonText}>أستمرار</Text>
-        <Text style={styles.continueTotal}>{total} ر.س</Text>
-        <Text style={styles.continueCount}>{cart.reduce((sum, i) => sum + i.quantity, 0)}</Text>
-      </TouchableOpacity>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md), flexDirection: rowDirection }]}>
+        <View>
+          <Text style={styles.footerLabel}>الإجمالي</Text>
+          <Text style={styles.footerTotal}>{formatCurrency(total)}</Text>
+        </View>
+        <TouchableOpacity style={styles.checkoutButton} onPress={() => navigation.navigate('Checkout')}>
+          <Text style={styles.checkoutButtonText}>متابعة الدفع</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
   header: {
+    backgroundColor: colors.card,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.md,
-    paddingTop: spacing.xl,
-    backgroundColor: colors.white,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  emptyCart: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  emptyText: {
-    fontSize: 18,
-    color: colors.textSecondary,
-    marginTop: spacing.lg,
-    marginBottom: spacing.xl,
-  },
-  browseButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
-    borderRadius: 25,
-  },
-  browseButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.white,
-  },
-  deliveryInfo: {
-    backgroundColor: colors.white,
-    margin: spacing.md,
-    padding: spacing.md,
-    borderRadius: 12,
-    gap: spacing.sm,
-  },
-  deliveryInfoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  deliveryInfoText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  itemsContainer: {
-    flex: 1,
-    padding: spacing.md,
-  },
-  cartItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    padding: spacing.md,
-    borderRadius: 12,
-    marginBottom: spacing.sm,
-    gap: spacing.md,
-  },
-  itemDetails: {
-    flex: 1,
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    textAlign: 'right',
-    marginBottom: 2,
-  },
-  itemDescription: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    textAlign: 'right',
-    marginBottom: spacing.sm,
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: spacing.sm,
-    marginBottom: spacing.xs,
-  },
-  quantityLabel: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  quantityButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  quantityValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    minWidth: 24,
-    textAlign: 'center',
-  },
-  itemPrice: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
-    textAlign: 'right',
-  },
-  itemImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: colors.grayLight,
-  },
-  continueButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    padding: spacing.md,
-    paddingBottom: spacing.lg,
-  },
-  continueButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.white,
-    flex: 1,
-    textAlign: 'center',
-  },
-  continueTotal: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.white,
-    marginHorizontal: spacing.md,
-  },
-  continueCount: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.white,
-    backgroundColor: 'rgba(255,255,255,0.2)',
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: 12,
+    paddingBottom: spacing.md,
   },
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.cardSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
+  content: { padding: spacing.md },
+  summaryCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  summaryRow: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
+  },
+  summaryLabel: { color: colors.textSecondary, fontFamily: fonts.regular, fontSize: 14 },
+  summaryValue: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14 },
+  itemCard: {
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    flexDirection: 'row-reverse',
+    ...shadows.sm,
+  },
+  itemImage: { width: 82, height: 82, borderRadius: 18, backgroundColor: colors.cardSecondary },
+  itemInfo: { flex: 1, marginRight: spacing.md, alignItems: 'flex-end' },
+  itemName: { fontSize: 16, fontFamily: fonts.semiBold, color: colors.text, textAlign: 'right' },
+  itemDescription: { fontSize: 12, color: colors.textSecondary, marginTop: 4, textAlign: 'right' },
+  itemPrice: { fontSize: 15, color: colors.primary, fontFamily: fonts.semiBold, marginTop: spacing.sm },
+  actionsRow: { width: '100%', marginTop: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
+  iconButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.errorLight, alignItems: 'center', justifyContent: 'center' },
+  quantityControl: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.sm },
+  qtyButton: { width: 30, height: 30, borderRadius: 15, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
+  qtyText: { minWidth: 20, textAlign: 'center', color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
+  footer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.card,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    ...shadows.float,
+  },
+  footerLabel: { color: colors.textSecondary, fontSize: 12, textAlign: 'right' },
+  footerTotal: { color: colors.text, fontSize: 20, fontFamily: fonts.bold, textAlign: 'right' },
+  checkoutButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 14,
+    borderRadius: borderRadius.full,
+  },
+  checkoutButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
+  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.xl },
+  emptyIcon: { width: 88, height: 88, borderRadius: 28, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
+  emptyTitle: { marginTop: spacing.lg, fontSize: 22, fontFamily: fonts.bold, color: colors.text },
+  emptySubtitle: { marginTop: spacing.sm, color: colors.textSecondary, textAlign: 'center', lineHeight: 22 },
+  primaryButton: { marginTop: spacing.lg, backgroundColor: colors.primary, paddingHorizontal: spacing.xl, paddingVertical: 14, borderRadius: borderRadius.full },
+  primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
 });
 
 export default CartScreen;

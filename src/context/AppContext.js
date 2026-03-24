@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-import { user as defaultUser } from '../data/staticData';
+import React, { createContext, useContext, useMemo, useState } from 'react';
+import { demoMarket, translations, user as defaultUser } from '../data/staticData';
 
 const AppContext = createContext();
 
@@ -10,22 +10,65 @@ export const AppProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
 
-  const t = (key) => {
-    // Simple translation helper
-    return key;
+  const isRTL = language === 'ar';
+  const locale = language === 'ar' ? 'ar-SA' : 'en-SA';
+  const currencySymbol = demoMarket.currency || '﷼';
+  const rowDirection = isRTL ? 'row-reverse' : 'row';
+  const textAlignStart = isRTL ? 'right' : 'left';
+  const textAlignEnd = isRTL ? 'left' : 'right';
+  const dictionary = translations[language] || translations.ar;
+
+  const t = (key) => dictionary[key] || translations.ar?.[key] || key;
+
+  const formatCurrency = (value, options = {}) => {
+    const numericValue = Number(value || 0);
+    const absoluteValue = Math.abs(numericValue);
+    const hasDecimals = absoluteValue % 1 !== 0;
+    const formattedNumber = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: hasDecimals ? 2 : 0,
+      maximumFractionDigits: hasDecimals ? 2 : 0,
+    }).format(absoluteValue);
+    const formattedAmount = isRTL
+      ? `${formattedNumber} ${currencySymbol}`
+      : `${currencySymbol} ${formattedNumber}`;
+
+    if (options.signed) {
+      const sign = numericValue > 0 ? '+' : numericValue < 0 ? '-' : '';
+      return `${sign}${formattedAmount}`;
+    }
+
+    return numericValue < 0 ? `- ${formattedAmount}` : formattedAmount;
   };
 
-  const isRTL = language === 'ar';
+  const getCartItemUnitPrice = (item) => Number(item?.finalPrice ?? item?.price ?? 0);
 
   const addToCart = (item) => {
     setCart((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      const nextQuantity = Math.max(Number(item?.quantity || 1), 1);
+      const itemNotes = JSON.stringify(item?.notes || []);
+      const existing = prev.find(
+        (i) => i.id === item.id && JSON.stringify(i?.notes || []) === itemNotes
+      );
+
       if (existing) {
         return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === existing.id && JSON.stringify(i?.notes || []) === itemNotes
+            ? {
+                ...i,
+                ...item,
+                quantity: i.quantity + nextQuantity,
+              }
+            : i
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+
+      return [
+        ...prev,
+        {
+          ...item,
+          quantity: nextQuantity,
+        },
+      ];
     });
   };
 
@@ -47,7 +90,10 @@ export const AppProvider = ({ children }) => {
     setCart([]);
   };
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cartTotal = useMemo(
+    () => cart.reduce((sum, item) => sum + getCartItemUnitPrice(item) * item.quantity, 0),
+    [cart]
+  );
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -69,7 +115,13 @@ export const AppProvider = ({ children }) => {
         currentOrder,
         setCurrentOrder,
         isRTL,
+        locale,
+        currencySymbol,
+        rowDirection,
+        textAlignStart,
+        textAlignEnd,
         t,
+        formatCurrency,
       }}
     >
       {children}

@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
-// Screens
 import SplashScreen from '../screens/SplashScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -28,33 +28,45 @@ import TaxiScreen from '../screens/TaxiScreen';
 import CategoryScreen from '../screens/CategoryScreen';
 import VendorSignupScreen from '../screens/VendorSignupScreen';
 import WholesaleScreen from '../screens/WholesaleScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
+import ServicesScreen from '../screens/ServicesScreen';
+import DoctorBookingScreen from '../screens/DoctorBookingScreen';
+import StayBookingScreen from '../screens/StayBookingScreen';
+import StayBookingDetailScreen from '../screens/StayBookingDetailScreen';
+import VendorAppScreen from '../screens/VendorAppScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Custom Floating Tab Bar
+const navTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: colors.background,
+    card: colors.card,
+    text: colors.text,
+    border: 'transparent',
+    primary: colors.primary,
+  },
+};
+
+const tabConfig = {
+  Home: { label: 'الرئيسية', active: 'home', inactive: 'home-outline' },
+  Taxi: { label: 'المشاوير', active: 'car', inactive: 'car-outline' },
+  Shop: { label: 'المتجر', active: 'bag', inactive: 'bag-outline' },
+  Orders: { label: 'طلباتي', active: 'receipt', inactive: 'receipt-outline' },
+  Account: { label: 'حسابي', active: 'person', inactive: 'person-outline' },
+};
+
 const FloatingTabBar = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.tabBarContainer, { paddingBottom: Math.max(insets.bottom, 10) }]}>
+    <View style={[styles.tabBarWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
       <View style={styles.tabBar}>
         {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
-          const label = options.tabBarLabel || route.name;
+          const config = tabConfig[route.name];
           const isFocused = state.index === index;
-          
-          const iconName = isFocused
-            ? route.name === 'Home' ? 'home' 
-              : route.name === 'Taxi' ? 'taxi'
-              : route.name === 'Shop' ? 'storefront'
-              : route.name === 'Orders' ? 'list'
-              : 'person'
-            : route.name === 'Home' ? 'home-outline'
-              : route.name === 'Taxi' ? 'taxi-outline'
-              : route.name === 'Shop' ? 'storefront-outline'
-              : route.name === 'Orders' ? 'list-outline'
-              : 'person-outline';
 
           const onPress = () => {
             const event = navigation.emit({
@@ -69,34 +81,16 @@ const FloatingTabBar = ({ state, descriptors, navigation }) => {
           };
 
           return (
-            <View key={route.key} style={styles.tabItem}>
-              <TouchableOpacity
-                onPress={onPress}
-                style={[
-                  styles.tabButton,
-                  isFocused && styles.tabButtonFocused,
-                ]}
-                activeOpacity={0.8}
-              >
-                <View style={styles.tabContent}>
-                  <Ionicons 
-                    name={iconName} 
-                    size={24} 
-                    color={isFocused ? colors.white : colors.textSecondary} 
-                  />
-                  <Text 
-                    style={[
-                      styles.tabLabel,
-                      isFocused && styles.tabLabelFocused,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {label}
-                  </Text>
-                </View>
-                {isFocused && <View style={styles.tabIndicator} />}
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity key={route.key} style={styles.tabItem} activeOpacity={0.9} onPress={onPress}>
+              <View style={[styles.tabPill, isFocused && styles.tabPillFocused]}>
+                <Ionicons
+                  name={isFocused ? config.active : config.inactive}
+                  size={20}
+                  color={isFocused ? colors.primary : colors.textSecondary}
+                />
+                <Text style={[styles.tabLabel, isFocused && styles.tabLabelFocused]}>{config.label}</Text>
+              </View>
+            </TouchableOpacity>
           );
         })}
       </View>
@@ -104,79 +98,54 @@ const FloatingTabBar = ({ state, descriptors, navigation }) => {
   );
 };
 
-// Bottom Tab Navigator
-const MainTabs = () => {
-  return (
-    <Tab.Navigator
-      tabBar={(props) => <FloatingTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ tabBarLabel: 'الرئيسية' }}
-      />
-      <Tab.Screen
-        name="Taxi"
-        component={TaxiScreen}
-        options={{ tabBarLabel: 'تاكسي' }}
-      />
-      <Tab.Screen
-        name="Shop"
-        component={ProductScreen}
-        options={{ tabBarLabel: 'المتجر' }}
-      />
-      <Tab.Screen
-        name="Orders"
-        component={OrdersScreen}
-        options={{ tabBarLabel: 'الطلبات' }}
-      />
-      <Tab.Screen
-        name="Account"
-        component={AccountScreen}
-        options={{ tabBarLabel: 'حسابي' }}
-      />
-    </Tab.Navigator>
-  );
-};
+const MainTabs = () => (
+  <Tab.Navigator tabBar={(props) => <FloatingTabBar {...props} />} screenOptions={{ headerShown: false }}>
+    <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: tabConfig.Home.label }} />
+    <Tab.Screen name="Taxi" component={TaxiScreen} options={{ tabBarLabel: tabConfig.Taxi.label }} />
+    <Tab.Screen name="Shop" component={ProductScreen} options={{ tabBarLabel: tabConfig.Shop.label }} />
+    <Tab.Screen name="Orders" component={OrdersScreen} options={{ tabBarLabel: tabConfig.Orders.label }} />
+    <Tab.Screen name="Account" component={AccountScreen} options={{ tabBarLabel: tabConfig.Account.label }} />
+  </Tab.Navigator>
+);
 
-// Main Stack Navigator
 const AppNavigator = () => {
+  const { isAuthenticated } = useApp();
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-        }}
-      >
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="OTP" component={OTPScreen} />
-        <Stack.Screen name="MainTabs" component={MainTabs} />
-        
-        {/* Stack screens accessible from tabs */}
-        <Stack.Screen 
-          name="Cart" 
-          component={CartScreen}
-          options={{ animation: 'slide_from_bottom' }}
-        />
-        <Stack.Screen name="Checkout" component={CheckoutScreen} />
-        <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
-        <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
-        <Stack.Screen name="Wallet" component={WalletScreen} />
-        <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="Location" component={LocationScreen} />
-        <Stack.Screen name="Payment" component={PaymentScreen} />
-        <Stack.Screen name="Wholesale" component={WholesaleScreen} />
-        <Stack.Screen name="Search" component={ProductScreen} />
-        <Stack.Screen name="RestaurantDetail" component={HomeScreen} />
-        <Stack.Screen name="Help" component={ChatScreen} />
-        <Stack.Screen name="Category" component={CategoryScreen} />
-        <Stack.Screen name="VendorSignup" component={VendorSignupScreen} />
+    <NavigationContainer theme={navTheme}>
+      <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+        {!isAuthenticated ? (
+          <>
+            <Stack.Screen name="Splash" component={SplashScreen} />
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="OTP" component={OTPScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="MainTabs" component={MainTabs} />
+            <Stack.Screen name="Cart" component={CartScreen} options={{ animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="Checkout" component={CheckoutScreen} />
+            <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
+            <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+            <Stack.Screen name="Wallet" component={WalletScreen} />
+            <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen name="Notifications" component={NotificationsScreen} />
+            <Stack.Screen name="Services" component={ServicesScreen} />
+            <Stack.Screen name="DoctorBooking" component={DoctorBookingScreen} />
+            <Stack.Screen name="StayBooking" component={StayBookingScreen} />
+            <Stack.Screen name="StayBookingDetail" component={StayBookingDetailScreen} />
+            <Stack.Screen name="Location" component={LocationScreen} />
+            <Stack.Screen name="Payment" component={PaymentScreen} />
+            <Stack.Screen name="Wholesale" component={WholesaleScreen} />
+            <Stack.Screen name="Search" component={ProductScreen} />
+            <Stack.Screen name="RestaurantDetail" component={HomeScreen} />
+            <Stack.Screen name="Help" component={ChatScreen} />
+            <Stack.Screen name="Category" component={CategoryScreen} />
+            <Stack.Screen name="VendorSignup" component={VendorSignupScreen} />
+            <Stack.Screen name="VendorApp" component={VendorAppScreen} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -185,65 +154,43 @@ const AppNavigator = () => {
 export default AppNavigator;
 
 const styles = StyleSheet.create({
-  tabBarContainer: {
+  tabBarWrap: {
     position: 'absolute',
-    bottom: 0,
     left: 0,
     right: 0,
+    bottom: 0,
     backgroundColor: 'transparent',
-    elevation: 0,
-    paddingBottom: 10,
   },
   tabBar: {
+    marginHorizontal: spacing.lg,
+    padding: spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderRadius: 28,
     flexDirection: 'row',
-    backgroundColor: colors.white,
-    marginHorizontal: spacing.md,
-    borderRadius: borderRadius.xl * 1.5,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xs,
-    ...shadows.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    ...shadows.float,
   },
   tabItem: {
     flex: 1,
-    alignItems: 'center',
   },
-  tabButton: {
+  tabPill: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    borderRadius: borderRadius.xl,
-    minWidth: 60,
+    borderRadius: 22,
+    paddingVertical: 10,
+    gap: 4,
   },
-  tabButtonFocused: {
-    backgroundColor: colors.primary,
-  },
-  tabContent: {
-    alignItems: 'center',
+  tabPillFocused: {
+    backgroundColor: colors.cardSecondary,
   },
   tabLabel: {
-    fontSize: 10,
+    fontSize: 11,
     color: colors.textSecondary,
-    fontWeight: '500',
-    marginTop: 2,
+    fontFamily: fonts.regular,
   },
   tabLabelFocused: {
-    color: colors.white,
-    fontWeight: '700',
-  },
-  tabIndicator: {
-    position: 'absolute',
-    bottom: -2,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.full,
-    opacity: 0.3,
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
   },
 });

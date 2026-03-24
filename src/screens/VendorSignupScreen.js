@@ -26,17 +26,18 @@ const VendorSignupScreen = ({ navigation }) => {
     accountNumber: '',
     iban: '',
   });
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const categories = [
     { id: 'restaurant', name: 'مطعم', icon: 'restaurant' },
-    { id: 'cafe', name: 'مقهى', icon: 'cafe' },
-    { id: 'market', name: 'سوبرماركت', icon: 'cart' },
+    { id: 'market', name: 'متجر', icon: 'cart' },
     { id: 'pharmacy', name: 'صيدلية', icon: 'medkit' },
-    { id: 'bakery', name: 'مخبز', icon: 'pizza' },
-    { id: 'grocery', name: 'بقالة', icon: 'basket' },
+    { id: 'wholesale', name: 'جملة', icon: 'layers' },
+    { id: 'hotel', name: 'فندق', icon: 'bed' },
+    { id: 'chalet', name: 'شاليه', icon: 'home' },
+    { id: 'hall', name: 'قاعة', icon: 'business' },
+    { id: 'doctor', name: 'عيادة', icon: 'pulse' },
     { id: 'flowers', name: 'ورود', icon: 'flower' },
-    { id: 'electronics', name: 'إلكترونيات', icon: 'phone-portrait' },
-    { id: 'fashion', name: 'أزياء', icon: 'shirt' },
     { id: 'other', name: 'أخرى', icon: 'apps' },
   ];
 
@@ -68,6 +69,10 @@ const VendorSignupScreen = ({ navigation }) => {
         Alert.alert('تنبيه', 'يرجى إدخال البيانات البنكية');
         return false;
       }
+      if (!acceptedTerms) {
+        Alert.alert('تنبيه', 'يرجى الموافقة على الشروط والأحكام');
+        return false;
+      }
     }
     return true;
   };
@@ -89,7 +94,12 @@ const VendorSignupScreen = ({ navigation }) => {
       [
         {
           text: 'حسناً',
-          onPress: () => navigation.goBack(),
+          onPress: () =>
+            navigation.replace('VendorApp', {
+              providerType: formData.category || 'restaurant',
+              providerName: formData.storeName || 'مقدم خدمة جديد',
+              onboarded: true,
+            }),
         },
       ]
     );
@@ -298,7 +308,7 @@ const VendorSignupScreen = ({ navigation }) => {
 
       <View style={styles.uploadSection}>
         <Text style={styles.label}>صورة السجل التجاري</Text>
-        <TouchableOpacity style={styles.uploadBox}>
+        <TouchableOpacity style={styles.uploadBox} onPress={() => Alert.alert('رفع الملف', 'تم اختيار صورة السجل التجاري.')}>
           <Ionicons name="cloud-upload" size={40} color={colors.textSecondary} />
           <Text style={styles.uploadText}>اضغط لرفع الصورة</Text>
         </TouchableOpacity>
@@ -306,7 +316,7 @@ const VendorSignupScreen = ({ navigation }) => {
 
       <View style={styles.uploadSection}>
         <Text style={styles.label}>صورة الهوية / الإقامة</Text>
-        <TouchableOpacity style={styles.uploadBox}>
+        <TouchableOpacity style={styles.uploadBox} onPress={() => Alert.alert('رفع الملف', 'تم اختيار صورة الهوية أو الإقامة.')}>
           <Ionicons name="cloud-upload" size={40} color={colors.textSecondary} />
           <Text style={styles.uploadText}>اضغط لرفع الصورة</Text>
         </TouchableOpacity>
@@ -369,8 +379,8 @@ const VendorSignupScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.termsContainer}>
-        <TouchableOpacity style={styles.checkbox}>
-          <Ionicons name="square-outline" size={22} color={colors.textSecondary} />
+        <TouchableOpacity style={styles.checkbox} onPress={() => setAcceptedTerms((prev) => !prev)}>
+          <Ionicons name={acceptedTerms ? 'checkbox' : 'square-outline'} size={22} color={acceptedTerms ? colors.primary : colors.textSecondary} />
         </TouchableOpacity>
         <Text style={styles.termsText}>
           أوافق على <Text style={styles.termsLink}>الشروط والأحكام</Text> و

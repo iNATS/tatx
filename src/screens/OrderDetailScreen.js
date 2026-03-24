@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const OrderDetailScreen = ({ route, navigation }) => {
   const { order } = route.params || {};
   const insets = useSafeAreaInsets();
+  const { addToCart, formatCurrency, rowDirection, textAlignStart, isRTL } = useApp();
+  const backIcon = isRTL ? 'arrow-forward' : 'arrow-back';
 
-  const [activeStep, setActiveStep] = useState(2);
+  const [activeStep] = useState(2);
 
-  // Order timeline steps
   const timelineSteps = [
     { id: 0, title: 'تم استلام الطلب', time: '10:30 ص', completed: true },
     { id: 1, title: 'قيد التحضير', time: '10:35 ص', completed: true },
@@ -32,7 +34,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
       <View style={styles.container}>
         <View style={styles.emptyState}>
           <Ionicons name="receipt-outline" size={64} color={colors.textTertiary} />
-          <Text style={styles.emptyTitle}>التطلب غير موجود</Text>
+          <Text style={styles.emptyTitle}>الطلب غير موجود</Text>
         </View>
       </View>
     );
@@ -43,10 +45,13 @@ const OrderDetailScreen = ({ route, navigation }) => {
       {/* Header */}
       <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
+          <Ionicons name={backIcon} size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>تفاصيل الطلب</Text>
-        <TouchableOpacity style={styles.headerButton}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => Share.share({ message: `تفاصيل الطلب ${order.id} - ${order.address}` })}
+        >
           <Ionicons name="share-outline" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
@@ -58,13 +63,13 @@ const OrderDetailScreen = ({ route, navigation }) => {
             <View style={styles.statusHeader}>
               <Text style={styles.statusTitle}>رقم الطلب: {order.id}</Text>
               <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>قيد التوصيل</Text>
+                <Text style={styles.statusText}>{order.statusAr || 'قيد التوصيل'}</Text>
               </View>
             </View>
             <Text style={styles.statusSubtitle}>
               {order.restaurantName} • {order.items.length} منتجات
             </Text>
-            <Text style={styles.statusTotal}>المجموع: {order.total} ر.س</Text>
+            <Text style={styles.statusTotal}>المجموع: {formatCurrency(order.total)}</Text>
           </LinearGradient>
         </View>
 
@@ -126,10 +131,10 @@ const OrderDetailScreen = ({ route, navigation }) => {
               </View>
             </View>
             <View style={styles.driverActions}>
-              <TouchableOpacity style={[styles.driverActionButton, { backgroundColor: colors.success }]}>
+              <TouchableOpacity style={[styles.driverActionButton, { backgroundColor: colors.success }]} onPress={() => Alert.alert('اتصال', `يمكنك التواصل مع السائق على ${driver.phone}`)}>
                 <Ionicons name="call" size={20} color={colors.white} />
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.driverActionButton, { backgroundColor: colors.primary }]}>
+              <TouchableOpacity style={[styles.driverActionButton, { backgroundColor: colors.primary }]} onPress={() => navigation.navigate('Chat')}>
                 <Ionicons name="chatbubble" size={20} color={colors.white} />
               </TouchableOpacity>
             </View>
@@ -150,7 +155,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
           <Text style={styles.cardTitle}>عنوان التوصيل</Text>
           <View style={styles.addressInfo}>
             <Ionicons name="location" size={20} color={colors.primary} />
-            <Text style={styles.addressText}>الدمام، شارع الملك عبد العزيز</Text>
+            <Text style={styles.addressText}>{order.address}</Text>
           </View>
         </View>
 
@@ -164,7 +169,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.itemName}>{item.name}</Text>
                 <Text style={styles.itemQuantity}>الكمية: {item.quantity}</Text>
               </View>
-              <Text style={styles.itemPrice}>{item.price * item.quantity} ر.س</Text>
+              <Text style={styles.itemPrice}>{formatCurrency(item.price * item.quantity)}</Text>
             </View>
           ))}
         </View>
@@ -174,29 +179,35 @@ const OrderDetailScreen = ({ route, navigation }) => {
           <Text style={styles.cardTitle}>ملخص الدفع</Text>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
-            <Text style={styles.summaryValue}>{order.total} ر.س</Text>
+            <Text style={styles.summaryValue}>{formatCurrency(order.subtotal || order.total)}</Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
-            <Text style={styles.summaryValue}>{order.deliveryFee || 0} ر.س</Text>
+            <Text style={styles.summaryValue}>{formatCurrency(order.deliveryFee || 0)}</Text>
           </View>
           <View style={[styles.summaryRow, styles.summaryTotal]}>
             <Text style={styles.summaryTotalLabel}>المجموع الكلي</Text>
-            <Text style={styles.summaryTotalValue}>{order.total} ر.س</Text>
+            <Text style={styles.summaryTotalValue}>{formatCurrency(order.total)}</Text>
           </View>
           <View style={styles.paymentMethod}>
             <Ionicons name="wallet" size={18} color={colors.textSecondary} />
-            <Text style={styles.paymentText}>الدفع نقداً</Text>
+            <Text style={styles.paymentText}>{order.paymentMethod || 'Apple Pay'}</Text>
           </View>
         </View>
 
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => {
+              order.items.forEach((item) => addToCart(item));
+              navigation.navigate('Cart');
+            }}
+          >
             <Ionicons name="refresh" size={18} color={colors.primary} />
             <Text style={styles.actionButtonText}>إعادة الطلب</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Chat')}>
             <Ionicons name="chatbubble-outline" size={18} color={colors.primary} />
             <Text style={styles.actionButtonText}>الدعم</Text>
           </TouchableOpacity>

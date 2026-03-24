@@ -1,378 +1,126 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import PageHeader from '../components/PageHeader';
+
+const quickServices = [
+  { id: 'services', title: 'تصفح جميع الخدمات', icon: 'grid-outline', screen: 'Services' },
+  { id: 'wholesale', title: 'خدمات الجملة', icon: 'layers-outline', screen: 'Wholesale' },
+  { id: 'doctor', title: 'حجز موعد دكتور', icon: 'medkit-outline', screen: 'DoctorBooking' },
+  { id: 'stay', title: 'فنادق وشاليهات وقاعات', icon: 'bed-outline', screen: 'StayBooking' },
+];
+
+const menuItems = [
+  { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', screen: 'Orders' },
+  { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', screen: 'Wallet' },
+  { id: 'payment', label: 'طرق الدفع', icon: 'card-outline', screen: 'Payment' },
+  { id: 'location', label: 'العناوين', icon: 'location-outline', screen: 'Location' },
+  { id: 'notifications', label: 'الإشعارات', icon: 'notifications-outline', screen: 'Notifications' },
+  { id: 'support', label: 'الدعم والمساعدة', icon: 'chatbubble-ellipses-outline', screen: 'Chat' },
+  { id: 'vendor', label: 'تطبيق مقدم الخدمة', icon: 'storefront-outline', screen: 'VendorApp' },
+];
 
 const AccountScreen = ({ navigation }) => {
-  const { user, isRTL, setIsAuthenticated } = useApp();
-  const insets = useSafeAreaInsets();
-
-  const menuSections = [
-    {
-      title: 'الحساب',
-      items: [
-        { id: 'profile', label: 'الملف الشخصي', icon: 'person', color: colors.primary, screen: null },
-        { id: 'wallet', label: 'المحفظة', icon: 'wallet', color: colors.success, screen: 'Wallet' },
-        { id: 'payment', label: 'طرق الدفع', icon: 'card', color: colors.info, screen: 'Payment' },
-        { id: 'addresses', label: 'عناويني', icon: 'location', color: colors.primary, screen: 'Location' },
-      ],
-    },
-    {
-      title: 'خدمات المتاجر',
-      items: [
-        { id: 'vendor', label: 'سجّل متجرك', icon: 'storefront', color: colors.success, screen: 'VendorSignup', badge: 'جديد' },
-        { id: 'orders', label: 'طلباتي', icon: 'bag', color: colors.primary, screen: 'Orders' },
-      ],
-    },
-    {
-      title: 'المساعدة',
-      items: [
-        { id: 'help', label: 'المساعدة', icon: 'help-circle', color: colors.accent, screen: 'Chat' },
-        { id: 'chat', label: 'تواصل معنا', icon: 'chatbubbles', color: colors.green, screen: 'Chat' },
-        { id: 'about', label: 'عن تاتكس', icon: 'information-circle', color: colors.secondary, screen: null },
-      ],
-    },
-    {
-      title: 'المزيد',
-      items: [
-        { id: 'share', label: 'مشاركة التطبيق', icon: 'share', color: colors.primary, screen: null },
-        { id: 'language', label: 'اللغة', icon: 'language', color: colors.info, screen: null },
-        { id: 'feedback', label: 'رأيك يهمنا', icon: 'star', color: colors.warning, screen: null },
-        { id: 'logout', label: 'تسجيل خروج', icon: 'log-out', color: colors.error, screen: null, action: 'logout' },
-      ],
-    },
-  ];
-
-  const userStats = [
-    { label: 'الرصيد', value: '0 ر.س', icon: 'wallet', color: colors.success },
-    { label: 'الطلبات', value: '0', icon: 'bag', color: colors.primary },
-    { label: 'النقاط', value: '0', icon: 'star', color: colors.warning },
-    { label: 'القسائم', value: '0', icon: 'pricetag', color: colors.info },
-  ];
-
-  const handleMenuItemPress = (item) => {
-    if (item.action === 'logout') {
-      setIsAuthenticated(false);
-    } else if (item.screen) {
-      navigation.navigate(item.screen);
-    }
-  };
+  const { user, setIsAuthenticated, language, setLanguage, rowDirection, textAlignStart, isRTL } = useApp();
+  const chevronIcon = isRTL ? 'chevron-back' : 'chevron-forward';
 
   return (
     <View style={styles.container}>
-      {/* Header with Safe Area */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-        <View style={styles.headerContent}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <Ionicons name="person" size={32} color={colors.white} />
-            </View>
-            <View style={styles.userInfo}>
-              <Text style={styles.userName}>مرحباً، زائر</Text>
-              <Text style={styles.userEmail}>أهلاً بك في تاتكس</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.settingsBtn} activeOpacity={0.7}>
-            <Ionicons name="settings" size={22} color={colors.white} />
+      <PageHeader
+        navigation={navigation}
+        showBack={false}
+        title="حسابي"
+        subtitle="إدارة الملف الشخصي، اللغة، والخدمات السريعة"
+        actionIcon="language-outline"
+        onActionPress={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+      />
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingBottom: 120 }]}>
+        <View style={styles.profileCard}>
+          <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('Payment')}>
+            <Ionicons name="settings-outline" size={20} color={colors.primary} />
           </TouchableOpacity>
-        </View>
-      </View>
 
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Add Store Banner */}
-        <TouchableOpacity 
-          style={styles.storeBanner}
-          activeOpacity={0.8}
-          onPress={() => navigation.navigate('VendorSignup')}
-        >
-          <View style={styles.bannerContent}>
-            <View style={styles.bannerIcon}>
-              <Ionicons name="storefront" size={32} color={colors.white} />
-              <View style={styles.bannerPlus}>
-                <Ionicons name="add" size={14} color={colors.primary} />
-              </View>
-            </View>
-            <View style={styles.bannerText}>
-              <Text style={styles.bannerTitle}>اضف متجرك</Text>
-              <Text style={styles.bannerSubtitle}>زد مبيعاتك و ضاعف اموالك</Text>
-            </View>
+          <Image source={require('../../assets/logo.png')} style={styles.logo} resizeMode="contain" />
+          <Text style={[styles.name, { textAlign: textAlignStart }]}>{user?.name || 'ضيفنا'}</Text>
+          <Text style={[styles.subtitle, { textAlign: textAlignStart }]}>{user?.phone || '+966 55 500 0001'}</Text>
+          <Text style={styles.tagline}>دائما معك</Text>
+
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}><Text style={styles.statValue}>12</Text><Text style={styles.statLabel}>طلبات</Text></View>
+            <View style={styles.statCard}><Text style={styles.statValue}>300</Text><Text style={styles.statLabel}>الرصيد</Text></View>
+            <View style={styles.statCard}><Text style={styles.statValue}>4.9</Text><Text style={styles.statLabel}>التقييم</Text></View>
           </View>
-          <Ionicons name="arrow-forward" size={24} color={colors.white} />
-        </TouchableOpacity>
+        </View>
 
-        {/* User Stats */}
-        <View style={styles.statsContainer}>
-          {userStats.map((stat, index) => (
-            <View key={index} style={styles.statItem}>
-              <View style={[styles.statIcon, { backgroundColor: stat.color + '15' }]}>
-                <Ionicons name={stat.icon} size={20} color={stat.color} />
-              </View>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
-            </View>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>خدماتك السريعة</Text>
+        </View>
+        <View style={[styles.quickGrid, { flexDirection: rowDirection }]}>
+          {quickServices.map((service) => (
+            <TouchableOpacity key={service.id} style={styles.quickCard} onPress={() => navigation.navigate(service.screen)}>
+              <View style={styles.quickIcon}><Ionicons name={service.icon} size={24} color={colors.primary} /></View>
+              <Text style={styles.quickText}>{service.title}</Text>
+            </TouchableOpacity>
           ))}
         </View>
 
-        {/* Menu Sections */}
-        {menuSections.map((section, sectionIndex) => (
-          <View key={sectionIndex} style={styles.menuSection}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={[styles.menuContainer, shadows.sm]}>
-              {section.items.map((item, itemIndex) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={[
-                    styles.menuItem,
-                    itemIndex < section.items.length - 1 && styles.menuItemBorder,
-                  ]}
-                  onPress={() => handleMenuItemPress(item)}
-                  activeOpacity={0.7}
-                >
-                  <View style={[styles.menuIcon, { backgroundColor: item.color + '15' }]}>
-                    <Ionicons name={item.icon} size={22} color={item.color} />
-                  </View>
-                  <Text style={styles.menuLabel}>{item.label}</Text>
-                  {item.badge && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>{item.badge}</Text>
-                    </View>
-                  )}
-                  {!item.badge && (item.id === 'logout' ? (
-                    <Ionicons name="arrow-forward" size={18} color={colors.error} />
-                  ) : (
-                    <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
-                  ))}
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        ))}
-
-        {/* App Version */}
-        <View style={styles.versionContainer}>
-          <View style={styles.versionBadge}>
-            <Ionicons name="shield-checkmark" size={16} color={colors.success} />
-            <Text style={styles.versionText}>الإصدار 1.1.0</Text>
-          </View>
-          <Text style={styles.copyrightText}>© 2026 تاتكس. جميع الحقوق محفوظة.</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>الحساب</Text>
         </View>
+        <View style={styles.menuCard}>
+          {menuItems.map((item, index) => (
+            <TouchableOpacity
+              key={item.id}
+              style={[styles.menuItem, { flexDirection: rowDirection }, index < menuItems.length - 1 && styles.menuItemBorder]}
+              onPress={() => navigation.navigate(item.screen)}
+            >
+              <Ionicons name={chevronIcon} size={18} color={colors.textTertiary} />
+              <Text style={[styles.menuLabel, { textAlign: textAlignStart }]}>{item.label}</Text>
+              <View style={styles.menuIconWrap}>
+                <Ionicons name={item.icon} size={20} color={colors.primary} />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={() => setIsAuthenticated(false)}>
+          <Ionicons name="log-out-outline" size={18} color={colors.error} />
+          <Text style={styles.logoutText}>تسجيل الخروج</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    backgroundColor: colors.primary,
-    paddingBottom: spacing.lg,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-  },
-  avatarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  userInfo: {
-    marginLeft: spacing.md,
-    flex: 1,
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  userEmail: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 2,
-  },
-  settingsBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollContent: {
-    padding: spacing.md,
-    paddingBottom: 100,
-  },
-  // Store Banner
-  storeBanner: {
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    ...shadows.md,
-  },
-  bannerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  bannerIcon: {
-    position: 'relative',
-    marginLeft: spacing.md,
-  },
-  bannerPlus: {
-    position: 'absolute',
-    bottom: -4,
-    right: -4,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bannerText: {
-    flex: 1,
-  },
-  bannerTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  bannerSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 2,
-  },
-  // Stats Container
-  statsContainer: {
-    flexDirection: 'row',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  statIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  // Menu Sections
-  menuSection: {
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-    marginRight: spacing.sm,
-  },
-  menuContainer: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-  },
-  menuItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.grayLight,
-  },
-  menuIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: spacing.md,
-  },
-  menuLabel: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '500',
-    color: colors.text,
-    marginRight: spacing.md,
-  },
-  badge: {
-    backgroundColor: colors.error,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.full,
-    marginLeft: spacing.sm,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  // Version
-  versionContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-  },
-  versionBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.success + '15',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    gap: spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  versionText: {
-    fontSize: 13,
-    color: colors.success,
-    fontWeight: '600',
-  },
-  copyrightText: {
-    fontSize: 11,
-    color: colors.gray,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { paddingHorizontal: spacing.md },
+  profileCard: { backgroundColor: colors.card, borderRadius: 30, padding: spacing.lg, alignItems: 'center', ...shadows.md },
+  settingsButton: { alignSelf: 'flex-start', width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
+  logo: { width: 88, height: 88, marginTop: spacing.sm },
+  name: { color: colors.text, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.md },
+  subtitle: { color: colors.textSecondary, marginTop: spacing.xs, fontSize: 13 },
+  tagline: { color: colors.primary, marginTop: spacing.sm, fontFamily: fonts.semiBold, fontSize: 15 },
+  statsRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg },
+  statCard: { flex: 1, backgroundColor: colors.cardSecondary, borderRadius: 20, paddingVertical: spacing.md, alignItems: 'center' },
+  statValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 18 },
+  statLabel: { color: colors.textSecondary, marginTop: 4, fontSize: 12 },
+  sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md },
+  sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 18, textAlign: 'right' },
+  quickGrid: { flexWrap: 'wrap', justifyContent: 'space-between', gap: spacing.sm },
+  quickCard: { width: '48%', backgroundColor: colors.card, borderRadius: 22, padding: spacing.md, alignItems: 'center', ...shadows.sm },
+  quickIcon: { width: 52, height: 52, borderRadius: 18, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
+  quickText: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'center', lineHeight: 20 },
+  menuCard: { backgroundColor: colors.card, borderRadius: 24, paddingHorizontal: spacing.md, ...shadows.sm },
+  menuItem: { alignItems: 'center', paddingVertical: spacing.md },
+  menuItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.borderLight },
+  menuLabel: { flex: 1, color: colors.text, fontFamily: fonts.semiBold, textAlign: 'right' },
+  menuIconWrap: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center', marginHorizontal: spacing.md },
+  logoutButton: { marginTop: spacing.xl, backgroundColor: colors.card, borderRadius: borderRadius.full, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row-reverse', gap: spacing.sm, ...shadows.sm },
+  logoutText: { color: colors.error, fontFamily: fonts.semiBold, fontSize: 15 },
 });
 
 export default AccountScreen;

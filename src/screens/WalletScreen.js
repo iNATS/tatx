@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const WalletScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const { formatCurrency } = useApp();
   const [activeTab, setActiveTab] = useState('all');
 
   const balance = 2450.00;
@@ -35,7 +37,7 @@ const WalletScreen = ({ navigation }) => {
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>المحفظة</Text>
-        <TouchableOpacity style={styles.headerButton}>
+        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('Payment')}>
           <Ionicons name="settings-outline" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
@@ -46,14 +48,18 @@ const WalletScreen = ({ navigation }) => {
           <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.balanceGradient}>
             <View style={styles.balanceHeader}>
               <Text style={styles.balanceLabel}>الرصيد الحالي</Text>
-              <TouchableOpacity style={styles.infoButton}>
+              <TouchableOpacity style={styles.infoButton} onPress={() => Alert.alert('المحفظة', 'يمكنك استخدام الرصيد في الطلبات أو استرداده وفق السياسة المعتمدة.')}>
                 <Ionicons name="information-circle-outline" size={20} color="rgba(255,255,255,0.8)" />
               </TouchableOpacity>
             </View>
-            <Text style={styles.balanceAmount}>{balance.toLocaleString()} ر.س</Text>
+            <Text style={styles.balanceAmount}>{formatCurrency(balance)}</Text>
             <View style={styles.balanceActions}>
               {quickActions.map((action) => (
-                <TouchableOpacity key={action.id} style={styles.balanceAction}>
+                <TouchableOpacity
+                  key={action.id}
+                  style={styles.balanceAction}
+                  onPress={() => action.id === 'history' ? setActiveTab('all') : Alert.alert(action.title, `تم فتح خيار ${action.title}.`)}
+                >
                   <View style={[styles.balanceActionIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
                     <Ionicons name={action.icon} size={22} color={colors.white} />
                   </View>
@@ -74,7 +80,7 @@ const WalletScreen = ({ navigation }) => {
               <Text style={styles.pointsLabel}>نقاط المكافآت</Text>
               <Text style={styles.pointsAmount}>{points} نقطة</Text>
             </View>
-            <TouchableOpacity style={styles.pointsButton}>
+            <TouchableOpacity style={styles.pointsButton} onPress={() => Alert.alert('استبدال النقاط', 'سيتم إتاحة استبدال النقاط على الطلب القادم.')}>
               <Text style={styles.pointsButtonText}>استبدال</Text>
             </TouchableOpacity>
           </View>
@@ -87,21 +93,21 @@ const WalletScreen = ({ navigation }) => {
               <Ionicons name="arrow-down" size={20} color={colors.success} />
             </View>
             <Text style={styles.statLabel}>إيداع</Text>
-            <Text style={styles.statValue}>500 ر.س</Text>
+            <Text style={styles.statValue}>{formatCurrency(500)}</Text>
           </View>
           <View style={styles.statCard}>
             <View style={[styles.statIcon, { backgroundColor: colors.error + '15' }]}>
               <Ionicons name="arrow-up" size={20} color={colors.error} />
             </View>
             <Text style={styles.statLabel}>سحب</Text>
-            <Text style={styles.statValue}>270 ر.س</Text>
+            <Text style={styles.statValue}>{formatCurrency(270)}</Text>
           </View>
           <View style={styles.statCard}>
             <View style={[styles.statIcon, { backgroundColor: colors.info + '15' }]}>
               <Ionicons name="repeat" size={20} color={colors.info} />
             </View>
             <Text style={styles.statLabel}>تحويل</Text>
-            <Text style={styles.statValue}>150 ر.س</Text>
+            <Text style={styles.statValue}>{formatCurrency(150)}</Text>
           </View>
         </View>
 
@@ -109,7 +115,7 @@ const WalletScreen = ({ navigation }) => {
         <View style={styles.transactionsCard}>
           <View style={styles.transactionsHeader}>
             <Text style={styles.cardTitle}>المعاملات</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setActiveTab('all')}>
               <Text style={styles.seeAll}>عرض الكل</Text>
             </TouchableOpacity>
           </View>
@@ -141,7 +147,7 @@ const WalletScreen = ({ navigation }) => {
             {transactions
               .filter((t) => activeTab === 'all' || t.type === activeTab)
               .map((transaction) => (
-                <TouchableOpacity key={transaction.id} style={styles.transactionItem}>
+                <TouchableOpacity key={transaction.id} style={styles.transactionItem} onPress={() => Alert.alert(transaction.title, `${transaction.date}\n${formatCurrency(transaction.amount)}`)}>
                   <View
                     style={[
                       styles.transactionIcon,
@@ -167,8 +173,7 @@ const WalletScreen = ({ navigation }) => {
                       { color: transaction.type === 'credit' ? colors.success : colors.error },
                     ]}
                   >
-                    {transaction.amount > 0 ? '+' : ''}
-                    {transaction.amount} ر.س
+                    {formatCurrency(transaction.amount, { signed: true })}
                   </Text>
                 </TouchableOpacity>
               ))}

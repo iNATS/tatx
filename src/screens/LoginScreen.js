@@ -1,143 +1,304 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
-import { colors, typography, spacing } from '../constants/theme';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useApp } from '../context/AppContext';
+import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
+import { demoAccounts, demoMarket } from '../data/staticData';
 
-const LoginScreen = ({ navigation }) => {
-  const [phoneNumber, setPhoneNumber] = useState('');
+const roles = [
+  { id: 'user', label: 'عميل', subtitle: 'تصفح واطلب من المتاجر', icon: 'person-outline' },
+  { id: 'vendor', label: 'تاجر', subtitle: 'تابع الطلبات والعروض', icon: 'storefront-outline' },
+  { id: 'admin', label: 'إدارة', subtitle: 'نسخة مراجعة تشغيلية', icon: 'shield-checkmark-outline' },
+];
 
-  const handleSendCode = () => {
-    navigation.navigate('OTP', { phoneNumber });
+const LoginScreen = () => {
+  const insets = useSafeAreaInsets();
+  const { setIsAuthenticated, setUser } = useApp();
+  const [selectedRole, setSelectedRole] = useState('user');
+  const [phone, setPhone] = useState(demoAccounts.user.phone);
+  const [loading, setLoading] = useState(false);
+
+  const activeAccount = demoAccounts[selectedRole];
+
+  const handleRolePress = (role) => {
+    setSelectedRole(role);
+    setPhone(demoAccounts[role].phone);
+  };
+
+  const handleLogin = () => {
+    setLoading(true);
+
+    setTimeout(() => {
+      setUser({
+        name: activeAccount.name,
+        phone: activeAccount.phone,
+        role: selectedRole,
+        city: activeAccount.city,
+        walletBalance: 300,
+      });
+      setIsAuthenticated(true);
+      setLoading(false);
+    }, 700);
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>تسجيل الدخول</Text>
-        <Text style={styles.subtitle}>أدخل رقم هاتفك للمتابعة</Text>
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1512428559087-560fa5ce7d25?w=300' }}
-            style={styles.image}
-          />
+    <LinearGradient colors={['#FBF6F8', '#FFF9FA']} style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + spacing.lg }]}>
+        <View style={styles.hero}>
+          <View style={styles.logoWrap}>
+            <LinearGradient colors={['#FCE2E7', '#FFF7F8']} style={styles.logoShell}>
+              <Image source={require('../../assets/logo.png')} style={styles.heroLogo} resizeMode="contain" />
+            </LinearGradient>
+          </View>
+          <Text style={styles.heroBrand}>دائما معك</Text>
+          <Text style={styles.heroTitle}>تسجيل سريع للتجربة</Text>
+          <Text style={styles.heroSubtitle}>اختر نوع الحساب وأدخل رقم الجوال للمتابعة داخل خدمات {demoMarket.city}.</Text>
         </View>
 
-        <View style={styles.form}>
-          <Text style={styles.label}>رقم الهاتف</Text>
-          <View style={styles.phoneInputContainer}>
-            <Text style={styles.countryCode}>+966</Text>
-            <TextInput
-              style={styles.phoneInput}
-              placeholder="5xxxxxxxx"
-              placeholderTextColor={colors.gray}
-              keyboardType="phone-pad"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              maxLength={9}
-            />
+        <View style={styles.card}>
+          <View style={styles.roleList}>
+            {roles.map((role) => {
+              const isSelected = selectedRole === role.id;
+              return (
+                <TouchableOpacity
+                  key={role.id}
+                  style={[styles.roleCard, isSelected && styles.roleCardSelected]}
+                  activeOpacity={0.9}
+                  onPress={() => handleRolePress(role.id)}
+                >
+                  <View style={[styles.roleIcon, isSelected && styles.roleIconSelected]}>
+                    <Ionicons name={role.icon} size={20} color={isSelected ? colors.white : colors.primary} />
+                  </View>
+                  <View style={styles.roleTextBlock}>
+                    <Text style={[styles.roleTitle, isSelected && styles.roleTitleSelected]}>{role.label}</Text>
+                    <Text style={styles.roleSubtitle}>{role.subtitle}</Text>
+                  </View>
+                  {isSelected && <Ionicons name="checkmark-circle" size={22} color={colors.primary} />}
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          <TouchableOpacity
-            style={[styles.button, phoneNumber.length === 9 && styles.buttonActive]}
-            onPress={handleSendCode}
-            disabled={phoneNumber.length !== 9}
-          >
-            <Text style={[styles.buttonText, phoneNumber.length === 9 && styles.buttonTextActive]}>
-              إرسال الرمز
-            </Text>
+          <View style={styles.fieldGroup}>
+            <Text style={styles.fieldLabel}>رقم الجوال</Text>
+            <View style={styles.inputShell}>
+              <TextInput
+                style={styles.input}
+                placeholder="05XXXXXXXX"
+                placeholderTextColor={colors.textTertiary}
+                keyboardType="phone-pad"
+                value={phone}
+                onChangeText={setPhone}
+              />
+              <Text style={styles.countryCode}>+966</Text>
+            </View>
+            <Text style={styles.helperText}>الحساب المختار: {activeAccount.name}</Text>
+          </View>
+
+          <TouchableOpacity style={styles.primaryButton} onPress={handleLogin} activeOpacity={0.9} disabled={loading}>
+            <LinearGradient colors={colors.primaryGradient} style={styles.primaryButtonGradient}>
+              {loading ? <ActivityIndicator color={colors.white} /> : <Text style={styles.primaryButtonText}>تسجيل الدخول</Text>}
+            </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
-    </View>
+
+        <View style={styles.infoCard}>
+          <View style={styles.infoRow}>
+            <Ionicons name="location-outline" size={18} color={colors.primary} />
+            <Text style={styles.infoText}>الخدمات المتاحة حالياً في {demoMarket.city}، {demoMarket.country}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="card-outline" size={18} color={colors.primary} />
+            <Text style={styles.infoText}>طرق الدفع المعروضة: Apple Pay، مدى، بطاقات</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
   },
-  header: {
-    padding: spacing.lg,
-    paddingTop: spacing.xxl,
+  scrollContent: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxxl,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+  hero: {
+    marginBottom: spacing.xl,
+    alignItems: 'flex-end',
+  },
+  logoWrap: {
+    alignSelf: 'center',
+    marginBottom: spacing.md,
+  },
+  logoShell: {
+    width: 78,
+    height: 78,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroLogo: {
+    width: 48,
+    height: 48,
+  },
+  heroBrand: {
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
+    fontSize: 15,
+    textAlign: 'right',
+    marginBottom: spacing.xs,
+  },
+  heroPill: {
+    backgroundColor: colors.cardSecondary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    marginBottom: spacing.md,
+  },
+  heroPillText: {
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
+    fontSize: 13,
+  },
+  heroTitle: {
+    ...typography.display,
     color: colors.text,
-    marginBottom: spacing.sm,
     textAlign: 'right',
   },
-  subtitle: {
-    fontSize: 16,
+  heroSubtitle: {
+    ...typography.body,
     color: colors.textSecondary,
     textAlign: 'right',
+    marginTop: spacing.sm,
   },
-  content: {
-    flex: 1,
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 32,
     padding: spacing.lg,
+    ...shadows.xl,
   },
-  imageContainer: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    overflow: 'hidden',
-    alignSelf: 'center',
-    marginBottom: spacing.xl,
+  roleList: {
+    gap: spacing.sm,
   },
-  image: {
-    width: '100%',
-    height: '100%',
+  roleCard: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.cardSecondary,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
-  form: {
-    gap: spacing.md,
+  roleCardSelected: {
+    backgroundColor: colors.cardSecondary,
+    borderColor: 'rgba(218,60,87,0.18)',
   },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
+  roleIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: colors.cardSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roleIconSelected: {
+    backgroundColor: colors.primary,
+  },
+  roleTextBlock: {
+    flex: 1,
+    marginHorizontal: spacing.md,
+    alignItems: 'flex-end',
+  },
+  roleTitle: {
+    ...typography.label,
     color: colors.text,
+  },
+  roleTitleSelected: {
+    color: colors.primary,
+  },
+  roleSubtitle: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 2,
     textAlign: 'right',
   },
-  phoneInputContainer: {
+  fieldGroup: {
+    marginTop: spacing.lg,
+  },
+  fieldLabel: {
+    ...typography.label,
+    color: colors.text,
+    textAlign: 'right',
+    marginBottom: spacing.sm,
+  },
+  inputShell: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: borderRadius.lg,
+    backgroundColor: colors.cardSecondary,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
+    borderColor: colors.borderLight,
     paddingHorizontal: spacing.md,
     height: 56,
   },
-  countryCode: {
-    fontSize: 18,
-    color: colors.text,
-    fontWeight: '600',
-    marginLeft: spacing.sm,
-  },
-  phoneInput: {
+  input: {
     flex: 1,
-    fontSize: 18,
     color: colors.text,
+    fontFamily: fonts.semiBold,
+    fontSize: 16,
     textAlign: 'right',
   },
-  button: {
-    backgroundColor: colors.grayLight,
-    paddingVertical: spacing.md,
-    borderRadius: 12,
-    alignItems: 'center',
+  countryCode: {
+    color: colors.textSecondary,
+    fontFamily: fonts.semiBold,
+    fontSize: 15,
+    marginLeft: spacing.sm,
+  },
+  helperText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    textAlign: 'right',
+    marginTop: spacing.sm,
+  },
+  primaryButton: {
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
     marginTop: spacing.lg,
+    ...shadows.md,
   },
-  buttonActive: {
-    backgroundColor: colors.primary,
+  primaryButtonGradient: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
   },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.gray,
-  },
-  buttonTextActive: {
+  primaryButtonText: {
     color: colors.white,
+    fontFamily: fonts.semiBold,
+    fontSize: 17,
+  },
+  infoCard: {
+    marginTop: spacing.lg,
+    backgroundColor: 'rgba(255,255,255,0.78)',
+    borderRadius: 24,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+  },
+  infoRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  infoText: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    textAlign: 'right',
+    flex: 1,
   },
 });
 
