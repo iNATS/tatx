@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -17,6 +17,12 @@ const suggestedPlaces = [
   { id: '1', title: 'المنزل', address: 'حي الياسمين، الرياض', lat: 24.8396, lng: 46.6437, icon: 'home-outline' },
   { id: '2', title: 'العمل', address: 'مركز الملك عبدالله المالي', lat: 24.7667, lng: 46.6436, icon: 'briefcase-outline' },
   { id: '3', title: 'المطار', address: 'مطار الملك خالد الدولي', lat: 24.9576, lng: 46.6988, icon: 'airplane-outline' },
+];
+
+const driverOffers = [
+  { id: 'd1', name: 'سامي', car: 'هيونداي سوناتا', plate: 'ح ر س 4821', price: 24, eta: '2 دقيقة' },
+  { id: 'd2', name: 'ناصر', car: 'تويوتا كامري', plate: 'ل س م 1932', price: 22, eta: '4 دقائق' },
+  { id: 'd3', name: 'وليد', car: 'كيا K5', plate: 'ص ب د 7714', price: 26, eta: '3 دقائق' },
 ];
 
 const mapHTML = `
@@ -150,8 +156,9 @@ const TaxiScreen = ({ navigation }) => {
   const [selectedRide, setSelectedRide] = useState(rideTypes[0].id);
   const [tripPhase, setTripPhase] = useState('idle');
   const [bookingStep, setBookingStep] = useState(1);
+  const [showDriverOffers, setShowDriverOffers] = useState(false);
+  const [acceptedDriver, setAcceptedDriver] = useState(null);
   const backIcon = isRTL ? 'arrow-forward' : 'arrow-back';
-  const driver = { name: 'الكابتن سامي', car: 'هيونداي سوناتا', plate: 'ح ر س 4821' };
 
   const selectedRideData = useMemo(
     () => rideTypes.find((ride) => ride.id === selectedRide) || rideTypes[0],
@@ -159,10 +166,12 @@ const TaxiScreen = ({ navigation }) => {
   );
 
   useEffect(() => {
+    navigation.setOptions({ tabBarStyle: { display: 'none' } });
     return () => {
       timersRef.current.forEach(clearTimeout);
+      navigation.setOptions({ tabBarStyle: undefined });
     };
-  }, []);
+  }, [navigation]);
 
   const handleMapMessage = (event) => {
     try {
@@ -172,11 +181,11 @@ const TaxiScreen = ({ navigation }) => {
       }
       if (data.type === 'pickup-set') {
         setPickup(data.label);
-        setBookingStep((prev) => Math.max(prev, 2));
+        setBookingStep((prev) => Math.max(prev, 1));
       }
       if (data.type === 'destination-set') {
         setDestination(data.label);
-        setBookingStep(3);
+        setBookingStep(2);
       }
     } catch (error) {
       console.warn('Taxi map message error', error);
@@ -186,7 +195,7 @@ const TaxiScreen = ({ navigation }) => {
   const searchPickup = (value) => {
     setPickup(value);
     if (value?.trim()) {
-      setBookingStep((prev) => Math.max(prev, 2));
+      setBookingStep((prev) => Math.max(prev, 1));
     }
     webViewRef.current?.postMessage(JSON.stringify({ type: 'pickup-search', query: value }));
   };
@@ -194,14 +203,14 @@ const TaxiScreen = ({ navigation }) => {
   const searchDestination = (value) => {
     setDestination(value);
     if (value?.trim()) {
-      setBookingStep(3);
+      setBookingStep(2);
     }
     webViewRef.current?.postMessage(JSON.stringify({ type: 'destination-search', query: value }));
   };
 
   const chooseSuggestedPlace = (place) => {
     setDestination(place.title);
-    setBookingStep(3);
+    setBookingStep(2);
     webViewRef.current?.postMessage(
       JSON.stringify({ type: 'destination-coords', lat: place.lat, lng: place.lng, label: place.title })
     );
@@ -212,18 +221,27 @@ const TaxiScreen = ({ navigation }) => {
       Alert.alert('الوجهة مطلوبة', 'أدخل وجهتك أو اختر مكانًا سريعًا أولاً.');
       return;
     }
+    setShowDriverOffers(true);
+  };
+
+  const acceptDriverOffer = (driverOffer) => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
-    setTripPhase('searching');
-    timersRef.current.push(setTimeout(() => setTripPhase('arriving'), 1800));
-    timersRef.current.push(setTimeout(() => setTripPhase('on_trip'), 4200));
+    setAcceptedDriver(driverOffer);
+    setShowDriverOffers(false);
+    setTripPhase('arriving');
+    setBookingStep(3);
+    timersRef.current.push(setTimeout(() => setTripPhase('on_trip'), 4500));
+    timersRef.current.push(setTimeout(() => setTripPhase('completed'), 11000));
   };
 
   const resetTrip = () => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
     setTripPhase('idle');
-    setBookingStep(destination ? 3 : pickup ? 2 : 1);
+    setShowDriverOffers(false);
+    setAcceptedDriver(null);
+    setBookingStep(destination ? 2 : pickup ? 1 : 1);
   };
 
   return (
@@ -253,13 +271,37 @@ const TaxiScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.sheet, { bottom: Math.max(insets.bottom + 84, 96) }]}>
+      <View style={[styles.routeCard, { top: insets.top + 68 }]}>
+        <View style={[styles.routeRow, { flexDirection: rowDirection }]}>
+          <View style={[styles.pointDot, styles.pickupDot]} />
+          <TextInput
+            value={pickup}
+            onChangeText={searchPickup}
+            placeholder="من"
+            placeholderTextColor={colors.textTertiary}
+            style={[styles.routeInput, { textAlign: textAlignStart }]}
+          />
+        </View>
+        <View style={styles.inputDivider} />
+        <View style={[styles.routeRow, { flexDirection: rowDirection }]}>
+          <View style={[styles.pointDot, styles.destinationDot]} />
+          <TextInput
+            value={destination}
+            onChangeText={searchDestination}
+            placeholder="إلى"
+            placeholderTextColor={colors.textTertiary}
+            style={[styles.routeInput, { textAlign: textAlignStart }]}
+          />
+        </View>
+      </View>
+
+      <View style={[styles.sheet, { bottom: Math.max(insets.bottom, 10) }]}>
         <View style={styles.sheetHandle} />
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
+        <View style={styles.sheetContent}>
           {tripPhase === 'idle' ? (
             <>
             <View style={[styles.stepperRow, { flexDirection: rowDirection }]}>
-              {[{ id: 1, label: 'الانطلاق' }, { id: 2, label: 'الوجهة' }, { id: 3, label: 'الرحلة' }].map((step) => {
+              {[{ id: 1, label: 'من' }, { id: 2, label: 'إلى' }, { id: 3, label: 'تأكيد' }].map((step) => {
                 const active = bookingStep >= step.id;
                 return (
                   <View key={step.id} style={styles.stepItem}>
@@ -271,44 +313,17 @@ const TaxiScreen = ({ navigation }) => {
                 );
               })}
             </View>
-            <Text style={[styles.sheetTitle, { textAlign: textAlignStart }]}>إلى أين؟</Text>
-            <Text style={[styles.sheetSubtitle, { textAlign: textAlignStart }]}>
-              الخريطة تبقى ظاهرة طوال الوقت، وحدد الانطلاق والوجهة من البطاقة السفلية فقط.
-            </Text>
-            <View style={styles.searchCard}>
-              <View style={[styles.inputRow, { flexDirection: rowDirection }]}>
-                <View style={[styles.pointDot, styles.pickupDot]} />
-                <TextInput
-                  value={pickup}
-                  onChangeText={searchPickup}
-                  placeholder="نقطة الانطلاق"
-                  placeholderTextColor={colors.textTertiary}
-                  style={[styles.input, { textAlign: textAlignStart }]}
-                />
-              </View>
-              <View style={styles.inputDivider} />
-              <View style={[styles.inputRow, { flexDirection: rowDirection }]}>
-                <View style={[styles.pointDot, styles.destinationDot]} />
-                <TextInput
-                  value={destination}
-                  onChangeText={searchDestination}
-                  placeholder="أضف الوجهة"
-                  placeholderTextColor={colors.textTertiary}
-                  style={[styles.input, { textAlign: textAlignStart }]}
-                />
-              </View>
-            </View>
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.miniPlacesRow, { flexDirection: rowDirection }]}>
+            <Text style={[styles.sheetTitle, { textAlign: textAlignStart }]}>اختر نوع الرحلة</Text>
+            <View style={[styles.miniPlacesRow, { flexDirection: rowDirection }]}>
               {suggestedPlaces.map((place) => (
                 <TouchableOpacity key={place.id} style={styles.miniPlaceChip} onPress={() => chooseSuggestedPlace(place)}>
                   <Ionicons name={place.icon} size={16} color={colors.primary} />
                   <Text style={styles.miniPlaceText}>{place.title}</Text>
                 </TouchableOpacity>
               ))}
-            </ScrollView>
+            </View>
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.ridesRow, { flexDirection: rowDirection }]}>
+            <View style={[styles.ridesRow, { flexDirection: rowDirection }]}>
               {rideTypes.map((ride) => {
                 const isSelected = selectedRide === ride.id;
                 return (
@@ -334,7 +349,7 @@ const TaxiScreen = ({ navigation }) => {
                   </TouchableOpacity>
                 );
               })}
-            </ScrollView>
+            </View>
 
             <View style={[styles.footer, { flexDirection: rowDirection }]}>
               <View style={styles.footerTextWrap}>
@@ -346,26 +361,37 @@ const TaxiScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
             </>
+          ) : tripPhase === 'completed' ? (
+            <>
+            <Text style={[styles.sheetTitle, { textAlign: textAlignStart }]}>انتهت الرحلة</Text>
+            <View style={styles.tripInfoCard}>
+              <Text style={[styles.tripInfoTitle, { textAlign: textAlignStart }]}>تم الوصول إلى {destination}</Text>
+              <Text style={[styles.tripInfoSubtitle, { textAlign: textAlignStart }]}>شكرًا لاستخدامك الخدمة. يمكنك حجز رحلة جديدة الآن.</Text>
+            </View>
+            <TouchableOpacity style={styles.footerButton} onPress={resetTrip}>
+              <Text style={styles.footerButtonText}>رحلة جديدة</Text>
+            </TouchableOpacity>
+            </>
           ) : (
             <>
             <View style={[styles.tripHeader, { flexDirection: rowDirection }]}>
               <View style={[styles.tripBadge, tripPhase === 'on_trip' && styles.tripBadgeActive]}>
                 <Text style={[styles.tripBadgeText, tripPhase === 'on_trip' && styles.tripBadgeTextActive]}>
-                  {tripPhase === 'searching' ? 'جاري البحث' : tripPhase === 'arriving' ? 'الكابتن في الطريق' : 'الرحلة جارية'}
+                  {tripPhase === 'arriving' ? 'السائق في الطريق' : 'الرحلة جارية'}
                 </Text>
               </View>
               <Text style={[styles.sheetTitle, { textAlign: textAlignStart }]}>
-                {tripPhase === 'searching' ? 'جارٍ تجهيز رحلتك' : driver.name}
+                {acceptedDriver?.name || 'الكابتن'}
               </Text>
             </View>
 
             <View style={[styles.tripInfoCard, { flexDirection: rowDirection }]}>
               <View style={styles.tripInfoText}>
                 <Text style={[styles.tripInfoTitle, { textAlign: textAlignStart }]}>
-                  {tripPhase === 'searching' ? 'جاري مطابقة السائق الأقرب' : `${driver.car} • ${driver.plate}`}
+                  {acceptedDriver ? `${acceptedDriver.car} • ${acceptedDriver.plate}` : 'جاري تجهيز الرحلة'}
                 </Text>
                 <Text style={[styles.tripInfoSubtitle, { textAlign: textAlignStart }]}>
-                  {tripPhase === 'searching' ? `الوجهة: ${destination}` : `من ${pickup} إلى ${destination}`}
+                  {tripPhase === 'arriving' ? `السائق قادم إلى ${pickup}` : `من ${pickup} إلى ${destination}`}
                 </Text>
               </View>
               <View style={styles.tripIconWrap}>
@@ -374,7 +400,7 @@ const TaxiScreen = ({ navigation }) => {
             </View>
 
             <View style={[styles.tripActions, { flexDirection: rowDirection }]}>
-              <TouchableOpacity style={styles.tripAction} onPress={() => Alert.alert('اتصال', `التواصل مع ${driver.name}`)}>
+              <TouchableOpacity style={styles.tripAction} onPress={() => Alert.alert('اتصال', `التواصل مع ${acceptedDriver?.name || 'السائق'}`)}>
                 <Ionicons name="call-outline" size={18} color={colors.primary} />
                 <Text style={styles.tripActionText}>اتصال</Text>
               </TouchableOpacity>
@@ -389,8 +415,36 @@ const TaxiScreen = ({ navigation }) => {
             </View>
             </>
           )}
-        </ScrollView>
+        </View>
       </View>
+
+      {showDriverOffers && (
+        <View style={styles.driverSheetOverlay}>
+          <View style={styles.driverSheet}>
+            <Text style={styles.driverSheetTitle}>عروض السائقين</Text>
+            {driverOffers.map((offer) => (
+              <TouchableOpacity
+                key={offer.id}
+                style={[styles.driverOfferCard, { flexDirection: rowDirection }]}
+                onPress={() => acceptDriverOffer(offer)}
+                activeOpacity={0.92}
+              >
+                <View style={styles.driverOfferSide}>
+                  <PriceDisplay value={offer.price} color={colors.primary} size={16} iconSize={13} bold align="row-reverse" />
+                  <Text style={styles.driverEta}>{offer.eta}</Text>
+                </View>
+                <View style={styles.driverOfferInfo}>
+                  <Text style={[styles.driverName, { textAlign: textAlignStart }]}>{offer.name}</Text>
+                  <Text style={[styles.driverCar, { textAlign: textAlignStart }]}>{offer.car} • {offer.plate}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity style={styles.driverSheetClose} onPress={() => setShowDriverOffers(false)}>
+              <Text style={styles.driverSheetCloseText}>إغلاق</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -426,6 +480,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...shadows.sm,
   },
+  routeCard: {
+    position: 'absolute',
+    left: spacing.md,
+    right: spacing.md,
+    backgroundColor: 'rgba(255,255,255,0.96)',
+    borderRadius: 24,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    ...shadows.float,
+  },
+  routeRow: { alignItems: 'center', minHeight: 48 },
+  routeInput: { flex: 1, color: colors.text, fontFamily: fonts.regular, fontSize: 15 },
   sheet: {
     position: 'absolute',
     left: 0,
@@ -438,9 +504,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     ...shadows.float,
   },
-  sheetContent: {
-    paddingBottom: spacing.sm,
-  },
+  sheetContent: { flex: 1, justifyContent: 'space-between', paddingBottom: spacing.xs },
   sheetHandle: {
     width: 48,
     height: 5,
@@ -449,7 +513,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: spacing.md,
   },
-  stepperRow: { justifyContent: 'space-between', marginBottom: spacing.md },
+  stepperRow: { justifyContent: 'space-between', marginBottom: spacing.sm },
   stepItem: { alignItems: 'center', flex: 1 },
   stepCircle: {
     width: 32,
@@ -464,40 +528,37 @@ const styles = StyleSheet.create({
   stepCircleTextActive: { color: colors.white },
   stepLabel: { marginTop: 6, color: colors.textSecondary, fontSize: 11 },
   stepLabelActive: { color: colors.text, fontFamily: fonts.semiBold },
-  sheetTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 28 },
-  sheetSubtitle: { color: colors.textSecondary, fontSize: 13, lineHeight: 20, marginTop: spacing.xs, marginBottom: spacing.md },
-  searchCard: { backgroundColor: colors.cardSecondary, borderRadius: 24, paddingHorizontal: spacing.md },
-  inputRow: { alignItems: 'center', minHeight: 56 },
+  sheetTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 24 },
+  sheetSubtitle: { color: colors.textSecondary, fontSize: 12, lineHeight: 18, marginTop: 2, marginBottom: spacing.sm },
   pointDot: { width: 12, height: 12, borderRadius: 6, marginHorizontal: spacing.md },
   pickupDot: { backgroundColor: colors.success },
   destinationDot: { backgroundColor: colors.primary },
-  input: { flex: 1, color: colors.text, fontFamily: fonts.regular, fontSize: 15 },
   inputDivider: { height: 1, backgroundColor: colors.border },
-  miniPlacesRow: { gap: spacing.sm, paddingTop: spacing.sm, paddingBottom: spacing.sm },
+  miniPlacesRow: { gap: spacing.xs, paddingTop: spacing.xs, paddingBottom: spacing.xs, flexWrap: 'wrap' },
   miniPlaceChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
     backgroundColor: colors.cardSecondary,
     borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
-  miniPlaceText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13 },
-  ridesRow: { gap: spacing.sm, paddingTop: spacing.xs, paddingBottom: spacing.sm },
+  miniPlaceText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 12 },
+  ridesRow: { gap: spacing.xs, paddingTop: spacing.xs, paddingBottom: spacing.xs },
   rideCard: {
-    width: 116,
+    flex: 1,
     backgroundColor: colors.cardSecondary,
-    borderRadius: 18,
-    padding: spacing.md,
+    borderRadius: 16,
+    padding: spacing.sm,
   },
   rideCardSelected: {
     backgroundColor: colors.primary,
   },
   rideIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.16)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -505,15 +566,15 @@ const styles = StyleSheet.create({
   rideIconWrapSelected: {
     backgroundColor: 'rgba(255,255,255,0.16)',
   },
-  rideLabel: { marginTop: spacing.md, color: colors.text, fontFamily: fonts.bold, fontSize: 16 },
+  rideLabel: { marginTop: spacing.sm, color: colors.text, fontFamily: fonts.bold, fontSize: 14 },
   rideLabelSelected: { color: colors.white },
-  rideMeta: { marginTop: 6, color: colors.textSecondary, fontSize: 11, lineHeight: 17 },
+  rideMeta: { marginTop: 4, color: colors.textSecondary, fontSize: 10, lineHeight: 14 },
   rideMetaSelected: { color: 'rgba(255,255,255,0.82)' },
-  ridePriceWrap: { marginTop: spacing.sm, alignSelf: 'flex-end' },
+  ridePriceWrap: { marginTop: 6, alignSelf: 'flex-end' },
   footer: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
   },
   footerTextWrap: { flex: 1 },
   footerLabel: { color: colors.textSecondary, fontSize: 12 },
@@ -521,10 +582,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: borderRadius.full,
     paddingHorizontal: spacing.lg,
-    paddingVertical: 15,
+    paddingVertical: 13,
   },
-  footerButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
-  tripHeader: { justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
+  footerButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14 },
+  tripHeader: { justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   tripBadge: { backgroundColor: colors.warningLight, borderRadius: borderRadius.full, paddingHorizontal: 12, paddingVertical: 8 },
   tripBadgeActive: { backgroundColor: colors.successLight },
   tripBadgeText: { color: colors.warning, fontFamily: fonts.semiBold, fontSize: 12 },
@@ -532,14 +593,14 @@ const styles = StyleSheet.create({
   tripInfoCard: {
     alignItems: 'center',
     backgroundColor: colors.cardSecondary,
-    borderRadius: 22,
-    padding: spacing.md,
+    borderRadius: 20,
+    padding: spacing.sm,
   },
   tripInfoText: { flex: 1, marginHorizontal: spacing.md },
-  tripInfoTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
-  tripInfoSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
-  tripIconWrap: { width: 44, height: 44, borderRadius: 16, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
-  tripActions: { gap: spacing.sm, marginTop: spacing.md },
+  tripInfoTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14 },
+  tripInfoSubtitle: { color: colors.textSecondary, fontSize: 11, marginTop: 4 },
+  tripIconWrap: { width: 40, height: 40, borderRadius: 14, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
+  tripActions: { gap: spacing.xs, marginTop: spacing.sm },
   tripAction: {
     flex: 1,
     flexDirection: 'row',
@@ -548,9 +609,36 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     backgroundColor: colors.cardSecondary,
     borderRadius: borderRadius.full,
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
-  tripActionText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13 },
+  tripActionText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 12 },
+  driverSheetOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(17,16,17,0.26)',
+    justifyContent: 'flex-end',
+  },
+  driverSheet: {
+    backgroundColor: colors.card,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: spacing.lg,
+    ...shadows.float,
+  },
+  driverSheetTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right', marginBottom: spacing.md },
+  driverOfferCard: {
+    backgroundColor: colors.cardSecondary,
+    borderRadius: 22,
+    padding: spacing.md,
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  driverOfferSide: { alignItems: 'flex-start' },
+  driverEta: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
+  driverOfferInfo: { flex: 1, marginHorizontal: spacing.md },
+  driverName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
+  driverCar: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
+  driverSheetClose: { marginTop: spacing.sm, alignItems: 'center', paddingVertical: 14 },
+  driverSheetCloseText: { color: colors.textSecondary, fontFamily: fonts.semiBold, fontSize: 14 },
 });
 
 export default TaxiScreen;

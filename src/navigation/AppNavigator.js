@@ -64,6 +64,12 @@ const tabConfig = {
 
 const FloatingTabBar = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
+  const focusedRoute = state.routes[state.index];
+  const focusedOptions = descriptors[focusedRoute.key]?.options || {};
+
+  if (focusedOptions.tabBarStyle?.display === 'none') {
+    return null;
+  }
 
   return (
     <View style={[styles.tabBarWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
