@@ -5,16 +5,8 @@ import { colors, spacing, borderRadius, shadows, fonts } from '../constants/them
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 
-const quickServices = [
-  { id: 'services', title: 'تصفح جميع الخدمات', icon: 'grid-outline', screen: 'Services' },
-  { id: 'wholesale', title: 'خدمات الجملة', icon: 'layers-outline', screen: 'Wholesale' },
-  { id: 'doctor', title: 'حجز موعد دكتور', icon: 'medkit-outline', screen: 'DoctorBooking' },
-  { id: 'stay', title: 'فنادق وشاليهات وقاعات', icon: 'bed-outline', screen: 'StayBooking' },
-];
-
 const menuItems = [
   { id: 'orders', label: 'طلباتي', icon: 'receipt-outline', screen: 'Orders' },
-  { id: 'wallet', label: 'المحفظة', icon: 'wallet-outline', screen: 'Wallet' },
   { id: 'payment', label: 'طرق الدفع', icon: 'card-outline', screen: 'Payment' },
   { id: 'location', label: 'العناوين', icon: 'location-outline', screen: 'Location' },
   { id: 'notifications', label: 'الإشعارات', icon: 'notifications-outline', screen: 'Notifications' },
@@ -32,12 +24,12 @@ const AccountScreen = ({ navigation }) => {
         navigation={navigation}
         showBack={false}
         title="حسابي"
-        subtitle="إدارة الملف الشخصي، اللغة، والخدمات السريعة"
+        subtitle="بياناتك، اللغة، وإدارة خدماتك من مكان واحد"
         actionIcon="language-outline"
         onActionPress={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
       />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingBottom: 120 }]}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.profileCard}>
           <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('Payment')}>
             <Ionicons name="settings-outline" size={20} color={colors.primary} />
@@ -48,23 +40,17 @@ const AccountScreen = ({ navigation }) => {
           <Text style={[styles.subtitle, { textAlign: textAlignStart }]}>{user?.phone || '+966 55 500 0001'}</Text>
           <Text style={styles.tagline}>دائما معك</Text>
 
-          <View style={styles.statsRow}>
-            <View style={styles.statCard}><Text style={styles.statValue}>12</Text><Text style={styles.statLabel}>طلبات</Text></View>
-            <View style={styles.statCard}><Text style={styles.statValue}>300</Text><Text style={styles.statLabel}>الرصيد</Text></View>
-            <View style={styles.statCard}><Text style={styles.statValue}>4.9</Text><Text style={styles.statLabel}>التقييم</Text></View>
+          <View style={[styles.identityCard, { flexDirection: rowDirection }]}>
+            <View style={styles.identityIcon}>
+              <Ionicons name="shield-checkmark-outline" size={20} color={colors.primary} />
+            </View>
+            <View style={styles.identityBody}>
+              <Text style={[styles.identityTitle, { textAlign: textAlignStart }]}>حساب موثق وجاهز للطلب</Text>
+              <Text style={[styles.identitySubtitle, { textAlign: textAlignStart }]}>
+                يمكنك إدارة العناوين والدفع والإشعارات ومتابعة الطلبات من هنا.
+              </Text>
+            </View>
           </View>
-        </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>خدماتك السريعة</Text>
-        </View>
-        <View style={[styles.quickGrid, { flexDirection: rowDirection }]}>
-          {quickServices.map((service) => (
-            <TouchableOpacity key={service.id} style={styles.quickCard} onPress={() => navigation.navigate(service.screen)}>
-              <View style={styles.quickIcon}><Ionicons name={service.icon} size={24} color={colors.primary} /></View>
-              <Text style={styles.quickText}>{service.title}</Text>
-            </TouchableOpacity>
-          ))}
         </View>
 
         <View style={styles.sectionHeader}>
@@ -97,23 +83,34 @@ const AccountScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { paddingHorizontal: spacing.md },
+  content: { paddingHorizontal: spacing.md, paddingBottom: 120 },
   profileCard: { backgroundColor: colors.card, borderRadius: 30, padding: spacing.lg, alignItems: 'center', ...shadows.md },
   settingsButton: { alignSelf: 'flex-start', width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   logo: { width: 88, height: 88, marginTop: spacing.sm },
   name: { color: colors.text, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.md },
   subtitle: { color: colors.textSecondary, marginTop: spacing.xs, fontSize: 13 },
   tagline: { color: colors.primary, marginTop: spacing.sm, fontFamily: fonts.semiBold, fontSize: 15 },
-  statsRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg },
-  statCard: { flex: 1, backgroundColor: colors.cardSecondary, borderRadius: 20, paddingVertical: spacing.md, alignItems: 'center' },
-  statValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 18 },
-  statLabel: { color: colors.textSecondary, marginTop: 4, fontSize: 12 },
+  identityCard: {
+    width: '100%',
+    backgroundColor: '#FFF4F6',
+    borderRadius: 22,
+    padding: spacing.md,
+    alignItems: 'center',
+    marginTop: spacing.lg,
+  },
+  identityIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 18,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  identityBody: { flex: 1, marginHorizontal: spacing.md },
+  identityTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
+  identitySubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 20 },
   sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md },
   sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 18, textAlign: 'right' },
-  quickGrid: { flexWrap: 'wrap', justifyContent: 'space-between', gap: spacing.sm },
-  quickCard: { width: '48%', backgroundColor: colors.card, borderRadius: 22, padding: spacing.md, alignItems: 'center', ...shadows.sm },
-  quickIcon: { width: 52, height: 52, borderRadius: 18, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
-  quickText: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'center', lineHeight: 20 },
   menuCard: { backgroundColor: colors.card, borderRadius: 24, paddingHorizontal: spacing.md, ...shadows.sm },
   menuItem: { alignItems: 'center', paddingVertical: spacing.md },
   menuItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.borderLight },

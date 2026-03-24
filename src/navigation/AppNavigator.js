@@ -31,9 +31,13 @@ import WholesaleScreen from '../screens/WholesaleScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ServicesScreen from '../screens/ServicesScreen';
 import DoctorBookingScreen from '../screens/DoctorBookingScreen';
+import DoctorBookingScheduleScreen from '../screens/DoctorBookingScheduleScreen';
+import DoctorBookingPatientScreen from '../screens/DoctorBookingPatientScreen';
+import DoctorBookingConfirmScreen from '../screens/DoctorBookingConfirmScreen';
 import StayBookingScreen from '../screens/StayBookingScreen';
 import StayBookingDetailScreen from '../screens/StayBookingDetailScreen';
 import VendorAppScreen from '../screens/VendorAppScreen';
+import CategoryVendorDetailScreen from '../screens/CategoryVendorDetailScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -133,6 +137,9 @@ const AppNavigator = () => {
             <Stack.Screen name="Notifications" component={NotificationsScreen} />
             <Stack.Screen name="Services" component={ServicesScreen} />
             <Stack.Screen name="DoctorBooking" component={DoctorBookingScreen} />
+            <Stack.Screen name="DoctorBookingSchedule" component={DoctorBookingScheduleScreen} />
+            <Stack.Screen name="DoctorBookingPatient" component={DoctorBookingPatientScreen} />
+            <Stack.Screen name="DoctorBookingConfirm" component={DoctorBookingConfirmScreen} />
             <Stack.Screen name="StayBooking" component={StayBookingScreen} />
             <Stack.Screen name="StayBookingDetail" component={StayBookingDetailScreen} />
             <Stack.Screen name="Location" component={LocationScreen} />
@@ -142,6 +149,7 @@ const AppNavigator = () => {
             <Stack.Screen name="RestaurantDetail" component={HomeScreen} />
             <Stack.Screen name="Help" component={ChatScreen} />
             <Stack.Screen name="Category" component={CategoryScreen} />
+            <Stack.Screen name="CategoryVendorDetail" component={CategoryVendorDetailScreen} />
             <Stack.Screen name="VendorSignup" component={VendorSignupScreen} />
             <Stack.Screen name="VendorApp" component={VendorAppScreen} />
           </>

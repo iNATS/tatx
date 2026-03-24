@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput,
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
-import { products, restaurants } from '../data/staticData';
+import { products } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
 import PriceDisplay from '../components/PriceDisplay';
@@ -26,7 +26,7 @@ const ProductScreen = ({ navigation }) => {
   const backIcon = isRTL ? 'arrow-forward' : 'arrow-back';
 
   const featuredDeals = useMemo(
-    () => products.filter((product) => product.oldPrice).concat(products.filter((product) => !product.oldPrice)).slice(0, 4),
+    () => products.filter((product) => product.oldPrice).concat(products.filter((product) => !product.oldPrice)).slice(0, 6),
     []
   );
 
@@ -54,7 +54,7 @@ const ProductScreen = ({ navigation }) => {
 
         <View style={styles.headerCenter}>
           <Text style={[styles.headerTitle, { textAlign: textAlignStart }]}>المتجر</Text>
-          <Text style={[styles.headerSubtitle, { textAlign: textAlignStart }]}>تسوق الاحتياجات اليومية والعروض من نفس التطبيق</Text>
+          <Text style={[styles.headerSubtitle, { textAlign: textAlignStart }]}>منتجات المنصة اليومية في مكان واحد</Text>
         </View>
 
         <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.cartButton}>
@@ -76,7 +76,7 @@ const ProductScreen = ({ navigation }) => {
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={[styles.searchInput, { textAlign: textAlignStart }]}
-            placeholder="ابحث عن منتج، قسم، أو متجر"
+            placeholder="ابحث عن منتج أو نوع المنتج"
             placeholderTextColor={colors.textTertiary}
           />
           <Ionicons name="search-outline" size={20} color={colors.textTertiary} />
@@ -94,48 +94,21 @@ const ProductScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <TouchableOpacity onPress={() => navigation.navigate('Services')}>
-            <Text style={styles.sectionLink}>كل الخدمات</Text>
-          </TouchableOpacity>
-          <Text style={styles.sectionTitle}>أقسام المتجر</Text>
-        </View>
-        <View style={[styles.categoryGrid, { flexDirection: rowDirection }]}>
-          {productFilters.filter((item) => item.id !== 'all').slice(0, 4).map((filter) => (
-            <TouchableOpacity
-              key={`quick-${filter.id}`}
-              style={styles.categoryTile}
-              onPress={() => setSelectedFilter(filter.id)}
-            >
-              <Text style={styles.categoryTileTitle}>{filter.label}</Text>
-              <Text style={styles.categoryTileSubtitle}>استعرض أفضل منتجات القسم</Text>
-            </TouchableOpacity>
-          ))}
+        <View style={[styles.heroCard, { flexDirection: rowDirection }]}>
+          <View style={styles.heroBadge}>
+            <Ionicons name="sparkles-outline" size={18} color={colors.primary} />
+          </View>
+          <View style={styles.heroBody}>
+            <Text style={[styles.heroTitle, { textAlign: textAlignStart }]}>منتجات مختارة يوميًا</Text>
+            <Text style={[styles.heroSubtitle, { textAlign: textAlignStart }]}>
+              تصفح منتجات المنصة مباشرة بدون متاجر أو صفحات بائعين داخل هذه الشاشة.
+            </Text>
+          </View>
         </View>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <TouchableOpacity onPress={() => navigation.navigate('Category', { name: 'طعام' })}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-          <Text style={styles.sectionTitle}>متاجر موصى بها</Text>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalRow, { flexDirection: rowDirection }]}>
-          {restaurants.map((restaurant) => (
-            <TouchableOpacity
-              key={restaurant.id}
-              style={styles.storeCard}
-              onPress={() => navigation.navigate('Category', { name: restaurant.category })}
-            >
-              <Image source={{ uri: restaurant.logo }} style={styles.storeLogo} />
-              <Text style={[styles.storeName, { textAlign: textAlignStart }]} numberOfLines={1}>{restaurant.name}</Text>
-              <Text style={[styles.storeMeta, { textAlign: textAlignStart }]}>{restaurant.category}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <TouchableOpacity onPress={() => navigation.navigate('Services')}>
-            <Text style={styles.sectionLink}>تصفح الخدمات</Text>
+          <TouchableOpacity onPress={() => setSelectedFilter('all')}>
+            <Text style={styles.sectionLink}>إعادة ضبط</Text>
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>عروض اليوم</Text>
         </View>
@@ -150,6 +123,7 @@ const ProductScreen = ({ navigation }) => {
               <Image source={{ uri: product.image }} style={styles.dealImage} />
               <View style={styles.dealContent}>
                 <Text style={[styles.dealName, { textAlign: textAlignStart }]} numberOfLines={2}>{product.name}</Text>
+                <Text style={[styles.dealMeta, { textAlign: textAlignStart }]}>{product.category}</Text>
                 <View style={[styles.dealFooter, { flexDirection: rowDirection }]}>
                   <TouchableOpacity style={styles.dealButton} onPress={() => setSelectedProduct(product)}>
                     <Ionicons name="bag-add-outline" size={16} color={colors.white} />
@@ -166,9 +140,9 @@ const ProductScreen = ({ navigation }) => {
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
           <TouchableOpacity onPress={() => setSelectedFilter('all')}>
-            <Text style={styles.sectionLink}>إعادة ضبط</Text>
+            <Text style={styles.sectionLink}>كل المنتجات</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>كل المنتجات</Text>
+          <Text style={styles.sectionTitle}>منتجات المنصة</Text>
         </View>
         {filteredProducts.map((product) => (
           <TouchableOpacity
@@ -185,13 +159,15 @@ const ProductScreen = ({ navigation }) => {
                 </TouchableOpacity>
                 <View style={styles.productInfo}>
                   <Text style={[styles.productName, { textAlign: textAlignStart }]}>{product.name}</Text>
-                  <Text style={[styles.productCategory, { textAlign: textAlignStart }]}>{product.category}</Text>
+                  <Text style={[styles.productCategory, { textAlign: textAlignStart }]}>
+                    {product.category} • {product.unit}
+                  </Text>
                 </View>
               </View>
               <View style={[styles.productBottom, { flexDirection: rowDirection }]}>
                 <TouchableOpacity style={styles.addButton} onPress={() => setSelectedProduct(product)}>
                   <Ionicons name="bag-add-outline" size={18} color={colors.white} />
-                  <Text style={styles.addButtonText}>أضف</Text>
+                  <Text style={styles.addButtonText}>عرض وإضافة</Text>
                 </TouchableOpacity>
                 <View style={styles.priceWrap}>
                   {!!product.oldPrice && <PriceDisplay value={product.oldPrice} muted strike size={12} iconSize={10} />}
@@ -295,22 +271,34 @@ const styles = StyleSheet.create({
   filterChipActive: { backgroundColor: colors.primary },
   filterText: { color: colors.textSecondary, fontFamily: fonts.semiBold, fontSize: 13 },
   filterTextActive: { color: colors.white },
+  heroCard: {
+    backgroundColor: colors.card,
+    borderRadius: 26,
+    padding: spacing.md,
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  heroBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    backgroundColor: '#FFF1F4',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroBody: { flex: 1, marginHorizontal: spacing.md },
+  heroTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17 },
+  heroSubtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 4, lineHeight: 21 },
   sectionHeader: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md, marginBottom: spacing.md },
   sectionTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18 },
   sectionLink: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13 },
-  categoryGrid: { flexWrap: 'wrap', justifyContent: 'space-between', gap: spacing.sm, marginBottom: spacing.sm },
-  categoryTile: { width: '48%', backgroundColor: colors.card, borderRadius: 22, padding: spacing.md, ...shadows.sm },
-  categoryTileTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
-  categoryTileSubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', marginTop: 4, lineHeight: 18 },
   horizontalRow: { gap: spacing.md, paddingBottom: spacing.sm },
-  storeCard: { width: 132, backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, ...shadows.sm },
-  storeLogo: { width: '100%', height: 88, borderRadius: 18, backgroundColor: colors.cardSecondary, marginBottom: spacing.sm },
-  storeName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14 },
-  storeMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
   dealCard: { width: 220, backgroundColor: colors.card, borderRadius: 24, overflow: 'hidden', ...shadows.sm },
   dealImage: { width: '100%', height: 130, backgroundColor: colors.cardSecondary },
   dealContent: { padding: spacing.md },
   dealName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, lineHeight: 22 },
+  dealMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
   dealFooter: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
   dealButton: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   dealPriceWrap: { alignItems: 'flex-end' },

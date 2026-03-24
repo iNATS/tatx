@@ -23,6 +23,23 @@ const wholesaleProducts = [
   { id: 'w4', name: 'منظف أرضيات 5 لتر', category: 'cleaning', image: 'https://images.unsplash.com/photo-1585837575652-2c90698b7f1f?w=400', minOrder: 6, price: 25, bulkPrice: 20, bulkMin: 24, unit: 'جركن', stock: 200 },
 ];
 
+const wholesaleOffers = [
+  {
+    id: 'offer-1',
+    title: 'خصومات الجملة',
+    subtitle: 'أسعار أفضل للطلبات الكبيرة والعقود الشهرية',
+    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=900',
+    overlay: ['rgba(218,60,87,0.9)', 'rgba(255,141,160,0.42)'],
+  },
+  {
+    id: 'offer-2',
+    title: 'توريد أعمال',
+    subtitle: 'حلول للمكاتب والمطاعم والمتاجر داخل المملكة',
+    image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=900',
+    overlay: ['rgba(17,24,39,0.82)', 'rgba(76,95,122,0.32)'],
+  },
+];
+
 const WholesaleScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { addToCart, cartCount, cartTotal, formatCurrency, rowDirection, textAlignStart, isRTL } = useApp();
@@ -63,6 +80,9 @@ const WholesaleScreen = ({ navigation }) => {
 
       <View style={styles.searchWrap}>
         <View style={[styles.searchBar, { flexDirection: rowDirection }]}>
+          <TouchableOpacity style={styles.searchAction}>
+            <Ionicons name="options-outline" size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
           <Ionicons name="search-outline" size={20} color={colors.textTertiary} />
           <TextInput
             value={searchQuery}
@@ -81,11 +101,13 @@ const WholesaleScreen = ({ navigation }) => {
             style={[styles.filterChip, selectedFilter === filter.id && styles.filterChipActive]}
             onPress={() => setSelectedFilter(filter.id)}
           >
-            <Ionicons
-              name={filter.icon}
-              size={16}
-              color={selectedFilter === filter.id ? colors.white : colors.textSecondary}
-            />
+            <View style={[styles.filterIconWrap, selectedFilter === filter.id && styles.filterIconWrapActive]}>
+              <Ionicons
+                name={filter.icon}
+                size={16}
+                color={selectedFilter === filter.id ? colors.white : colors.textSecondary}
+              />
+            </View>
             <Text style={[styles.filterChipText, selectedFilter === filter.id && styles.filterChipTextActive]}>{filter.name}</Text>
           </TouchableOpacity>
         ))}
@@ -100,6 +122,18 @@ const WholesaleScreen = ({ navigation }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.offersRow, { flexDirection: rowDirection }]}>
+          {wholesaleOffers.map((offer) => (
+            <TouchableOpacity key={offer.id} style={styles.offerCard} activeOpacity={0.9}>
+              <Image source={{ uri: offer.image }} style={styles.offerImage} />
+              <View style={[styles.offerOverlay, { backgroundColor: 'transparent' }]}>
+                <Text style={styles.offerTitle}>{offer.title}</Text>
+                <Text style={styles.offerSubtitle}>{offer.subtitle}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
         {filteredProducts.map((product) => (
           <TouchableOpacity key={product.id} style={[styles.productRow, { flexDirection: rowDirection }]} onPress={() => setSelectedProduct(product)}>
             <Image source={{ uri: product.image }} style={styles.productImage} />
@@ -165,10 +199,30 @@ const styles = StyleSheet.create({
   cartBadgeText: { color: colors.white, fontSize: 10, fontFamily: fonts.bold },
   searchWrap: { paddingHorizontal: spacing.md, paddingTop: spacing.md },
   searchBar: { backgroundColor: colors.card, borderRadius: 22, paddingHorizontal: spacing.md, minHeight: 52, flexDirection: 'row-reverse', alignItems: 'center', ...shadows.sm },
+  searchAction: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.cardSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: spacing.sm,
+  },
   searchInput: { flex: 1, textAlign: 'right', color: colors.text, marginHorizontal: spacing.sm },
   filtersRow: { gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.md },
-  filterChip: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.xs, backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: spacing.md, paddingVertical: 10, ...shadows.sm },
+  filterChip: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.xs, backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: 10, paddingVertical: 8, ...shadows.sm },
   filterChipActive: { backgroundColor: colors.primary },
+  filterIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.cardSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterIconWrapActive: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
+  },
   filterChipText: { color: colors.textSecondary, fontFamily: fonts.semiBold, fontSize: 13 },
   filterChipTextActive: { color: colors.white },
   infoBanner: { marginHorizontal: spacing.md, backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, flexDirection: 'row-reverse', alignItems: 'center', ...shadows.sm },
@@ -177,6 +231,12 @@ const styles = StyleSheet.create({
   infoBannerTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
   infoBannerSubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', marginTop: 4, lineHeight: 18 },
   content: { paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: spacing.xl },
+  offersRow: { gap: spacing.md, paddingBottom: spacing.md },
+  offerCard: { width: 260, height: 148, borderRadius: 26, overflow: 'hidden', ...shadows.sm },
+  offerImage: { width: '100%', height: '100%' },
+  offerOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'flex-end', padding: spacing.md, backgroundColor: 'rgba(17,16,17,0.28)' },
+  offerTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 22, textAlign: 'right' },
+  offerSubtitle: { color: 'rgba(255,255,255,0.88)', fontSize: 12, marginTop: 4, textAlign: 'right', lineHeight: 18 },
   productRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, flexDirection: 'row-reverse', ...shadows.sm },
   productImage: { width: 96, height: 96, borderRadius: 20, backgroundColor: colors.cardSecondary },
   productBody: { flex: 1, marginRight: spacing.md, justifyContent: 'space-between' },

@@ -149,6 +149,7 @@ const TaxiScreen = ({ navigation }) => {
   const [destination, setDestination] = useState('');
   const [selectedRide, setSelectedRide] = useState(rideTypes[0].id);
   const [tripPhase, setTripPhase] = useState('idle');
+  const [bookingStep, setBookingStep] = useState(1);
   const backIcon = isRTL ? 'arrow-forward' : 'arrow-back';
   const driver = { name: 'الكابتن سامي', car: 'هيونداي سوناتا', plate: 'ح ر س 4821' };
 
@@ -171,9 +172,11 @@ const TaxiScreen = ({ navigation }) => {
       }
       if (data.type === 'pickup-set') {
         setPickup(data.label);
+        setBookingStep((prev) => Math.max(prev, 2));
       }
       if (data.type === 'destination-set') {
         setDestination(data.label);
+        setBookingStep(3);
       }
     } catch (error) {
       console.warn('Taxi map message error', error);
@@ -182,16 +185,23 @@ const TaxiScreen = ({ navigation }) => {
 
   const searchPickup = (value) => {
     setPickup(value);
+    if (value?.trim()) {
+      setBookingStep((prev) => Math.max(prev, 2));
+    }
     webViewRef.current?.postMessage(JSON.stringify({ type: 'pickup-search', query: value }));
   };
 
   const searchDestination = (value) => {
     setDestination(value);
+    if (value?.trim()) {
+      setBookingStep(3);
+    }
     webViewRef.current?.postMessage(JSON.stringify({ type: 'destination-search', query: value }));
   };
 
   const chooseSuggestedPlace = (place) => {
     setDestination(place.title);
+    setBookingStep(3);
     webViewRef.current?.postMessage(
       JSON.stringify({ type: 'destination-coords', lat: place.lat, lng: place.lng, label: place.title })
     );
@@ -213,6 +223,7 @@ const TaxiScreen = ({ navigation }) => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
     setTripPhase('idle');
+    setBookingStep(destination ? 3 : pickup ? 2 : 1);
   };
 
   return (
@@ -247,7 +258,23 @@ const TaxiScreen = ({ navigation }) => {
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
           {tripPhase === 'idle' ? (
             <>
+            <View style={[styles.stepperRow, { flexDirection: rowDirection }]}>
+              {[{ id: 1, label: 'الانطلاق' }, { id: 2, label: 'الوجهة' }, { id: 3, label: 'الرحلة' }].map((step) => {
+                const active = bookingStep >= step.id;
+                return (
+                  <View key={step.id} style={styles.stepItem}>
+                    <View style={[styles.stepCircle, active && styles.stepCircleActive]}>
+                      <Text style={[styles.stepCircleText, active && styles.stepCircleTextActive]}>{step.id}</Text>
+                    </View>
+                    <Text style={[styles.stepLabel, active && styles.stepLabelActive]}>{step.label}</Text>
+                  </View>
+                );
+              })}
+            </View>
             <Text style={[styles.sheetTitle, { textAlign: textAlignStart }]}>إلى أين؟</Text>
+            <Text style={[styles.sheetSubtitle, { textAlign: textAlignStart }]}>
+              الخريطة تبقى ظاهرة طوال الوقت، وحدد الانطلاق والوجهة من البطاقة السفلية فقط.
+            </Text>
             <View style={styles.searchCard}>
               <View style={[styles.inputRow, { flexDirection: rowDirection }]}>
                 <View style={[styles.pointDot, styles.pickupDot]} />
@@ -290,7 +317,11 @@ const TaxiScreen = ({ navigation }) => {
                     style={[styles.rideCard, isSelected && styles.rideCardSelected]}
                     onPress={() => setSelectedRide(ride.id)}
                   >
+                    <View style={[styles.rideIconWrap, isSelected && styles.rideIconWrapSelected]}>
+                      <Ionicons name={ride.icon} size={18} color={isSelected ? colors.white : colors.primary} />
+                    </View>
                     <Text style={[styles.rideLabel, isSelected && styles.rideLabelSelected]}>{ride.label}</Text>
+                    <Text style={[styles.rideMeta, isSelected && styles.rideMetaSelected]}>{ride.note}</Text>
                     <PriceDisplay
                       value={ride.price}
                       color={isSelected ? colors.white : colors.primary}
@@ -418,6 +449,21 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: spacing.md,
   },
+  stepperRow: { justifyContent: 'space-between', marginBottom: spacing.md },
+  stepItem: { alignItems: 'center', flex: 1 },
+  stepCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.cardSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepCircleActive: { backgroundColor: colors.primary },
+  stepCircleText: { color: colors.textSecondary, fontFamily: fonts.bold, fontSize: 12 },
+  stepCircleTextActive: { color: colors.white },
+  stepLabel: { marginTop: 6, color: colors.textSecondary, fontSize: 11 },
+  stepLabelActive: { color: colors.text, fontFamily: fonts.semiBold },
   sheetTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 28 },
   sheetSubtitle: { color: colors.textSecondary, fontSize: 13, lineHeight: 20, marginTop: spacing.xs, marginBottom: spacing.md },
   searchCard: { backgroundColor: colors.cardSecondary, borderRadius: 24, paddingHorizontal: spacing.md },
@@ -456,8 +502,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  rideIconWrapSelected: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
+  },
   rideLabel: { marginTop: spacing.md, color: colors.text, fontFamily: fonts.bold, fontSize: 16 },
   rideLabelSelected: { color: colors.white },
+  rideMeta: { marginTop: 6, color: colors.textSecondary, fontSize: 11, lineHeight: 17 },
+  rideMetaSelected: { color: 'rgba(255,255,255,0.82)' },
   ridePriceWrap: { marginTop: spacing.sm, alignSelf: 'flex-end' },
   footer: {
     alignItems: 'center',

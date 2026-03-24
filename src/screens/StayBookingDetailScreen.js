@@ -6,8 +6,7 @@ import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 import PriceDisplay from '../components/PriceDisplay';
 
-const checkInOptions = ['20 مارس', '21 مارس', '22 مارس', 'حسب الطلب'];
-const checkOutOptions = ['21 مارس', '22 مارس', '24 مارس', 'حسب الطلب'];
+const dateOptions = ['20 مارس', '21 مارس', '22 مارس', '23 مارس', '24 مارس', '25 مارس'];
 const guestOptions = ['2 ضيوف', '4 ضيوف', '8 ضيوف', '12+'];
 const contactOptions = ['واتساب', 'اتصال', 'داخل التطبيق'];
 
@@ -26,15 +25,34 @@ const packageMap = {
   ],
 };
 
+const termsByType = {
+  hotel: [
+    'يتم تثبيت الحجز بعد تأكيد التوفر من الفندق.',
+    'قد يتم طلب دفعة أولى لبعض المواسم أو الغرف الخاصة.',
+    'سياسة الإلغاء تختلف حسب الباقة المختارة ووقت الوصول.',
+  ],
+  chalet: [
+    'إثبات الهوية مطلوب عند الاستلام.',
+    'يتم الالتزام بوقت الدخول والخروج المحدد داخل الحجز.',
+    'أي تلفيات أو استخدام إضافي يتم احتسابه بعد المعاينة.',
+  ],
+  hall: [
+    'يتم تأكيد القاعة بعد مراجعة التاريخ والطاقة الاستيعابية.',
+    'الخدمات الإضافية مثل الضيافة والتنسيق تحسب بشكل منفصل إن وجدت.',
+    'يتم تحديد العربون النهائي حسب نوع المناسبة وتجهيزاتها.',
+  ],
+};
+
 const StayBookingDetailScreen = ({ route, navigation }) => {
   const { booking } = route.params || {};
-  const { formatCurrency, rowDirection, textAlignStart } = useApp();
-  const [selectedCheckIn, setSelectedCheckIn] = useState(checkInOptions[0]);
-  const [selectedCheckOut, setSelectedCheckOut] = useState(checkOutOptions[1]);
+  const { rowDirection, textAlignStart } = useApp();
+  const [selectedCheckIn, setSelectedCheckIn] = useState(dateOptions[0]);
+  const [selectedCheckOut, setSelectedCheckOut] = useState(dateOptions[2]);
   const [selectedGuests, setSelectedGuests] = useState(guestOptions[0]);
   const [selectedContact, setSelectedContact] = useState(contactOptions[0]);
 
   const packages = useMemo(() => packageMap[booking?.type] || packageMap.hotel, [booking]);
+  const terms = useMemo(() => termsByType[booking?.type] || termsByType.hotel, [booking]);
   const [selectedPackage, setSelectedPackage] = useState(packages[0]?.id || 'standard');
 
   if (!booking) {
@@ -50,7 +68,7 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
 
   const confirmBooking = () => {
     Alert.alert(
-      'تم تأكيد طلب الحجز',
+      'تم إرسال طلب الحجز',
       `تم استلام طلب ${booking.title} من ${selectedCheckIn} إلى ${selectedCheckOut} لعدد ${selectedGuests}.`
     );
   };
@@ -68,9 +86,8 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
 
         <View style={styles.card}>
           <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
-            <View style={styles.ratingPill}>
-              <Ionicons name="star" size={14} color={colors.warning} />
-              <Text style={styles.ratingText}>{booking.rating}</Text>
+            <View style={styles.iconBadge}>
+              <Ionicons name={booking.type === 'hall' ? 'business-outline' : booking.type === 'chalet' ? 'home-outline' : 'bed-outline'} size={20} color={colors.primary} />
             </View>
             <View style={styles.titleWrap}>
               <Text style={[styles.title, { textAlign: textAlignStart }]}>{booking.title}</Text>
@@ -90,11 +107,12 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
         </View>
 
         <View style={styles.card}>
-          <Text style={[styles.sectionTitle, { textAlign: textAlignStart }]}>تاريخ الوصول</Text>
+          <Text style={[styles.sectionTitle, { textAlign: textAlignStart }]}>اختر فترة الحجز</Text>
+          <Text style={[styles.dateLabel, { textAlign: textAlignStart }]}>من</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.chipsRow, { flexDirection: rowDirection }]}>
-            {checkInOptions.map((date) => (
+            {dateOptions.map((date) => (
               <TouchableOpacity
-                key={date}
+                key={`in-${date}`}
                 style={[styles.selectChip, selectedCheckIn === date && styles.selectChipActive]}
                 onPress={() => setSelectedCheckIn(date)}
               >
@@ -103,11 +121,11 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
             ))}
           </ScrollView>
 
-          <Text style={[styles.sectionTitle, { textAlign: textAlignStart, marginTop: spacing.md }]}>تاريخ المغادرة / نهاية الحجز</Text>
+          <Text style={[styles.dateLabel, { textAlign: textAlignStart }]}>إلى</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.chipsRow, { flexDirection: rowDirection }]}>
-            {checkOutOptions.map((date) => (
+            {dateOptions.map((date) => (
               <TouchableOpacity
-                key={date}
+                key={`out-${date}`}
                 style={[styles.selectChip, selectedCheckOut === date && styles.selectChipActive]}
                 onPress={() => setSelectedCheckOut(date)}
               >
@@ -168,14 +186,14 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
         </View>
 
         <View style={styles.card}>
-          <Text style={[styles.sectionTitle, { textAlign: textAlignStart }]}>آلية الحجز والتأكيد</Text>
+          <Text style={[styles.sectionTitle, { textAlign: textAlignStart }]}>تفاصيل الطلب</Text>
           <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
             <Text style={styles.summaryValue}>{selectedCheckIn}</Text>
-            <Text style={styles.summaryLabel}>الوصول / بداية الحجز</Text>
+            <Text style={styles.summaryLabel}>بداية الحجز</Text>
           </View>
           <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
             <Text style={styles.summaryValue}>{selectedCheckOut}</Text>
-            <Text style={styles.summaryLabel}>المغادرة / نهاية الحجز</Text>
+            <Text style={styles.summaryLabel}>نهاية الحجز</Text>
           </View>
           <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
             <Text style={styles.summaryValue}>{selectedGuests}</Text>
@@ -185,14 +203,16 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
             <Text style={styles.summaryValue}>{selectedContact}</Text>
             <Text style={styles.summaryLabel}>طريقة التأكيد</Text>
           </View>
-          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
-            <Text style={styles.summaryValue}>خلال 15 - 30 دقيقة</Text>
-            <Text style={styles.summaryLabel}>زمن مراجعة الطلب</Text>
-          </View>
-          <View style={[styles.summaryRow, styles.summaryRowLast, { flexDirection: rowDirection }]}>
-            <Text style={styles.summaryValue}>قد يُطلب عربون لتثبيت الموعد</Text>
-            <Text style={styles.summaryLabel}>سياسة التثبيت</Text>
-          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={[styles.sectionTitle, { textAlign: textAlignStart }]}>الشروط والأحكام</Text>
+          {terms.map((term) => (
+            <View key={term} style={[styles.termRow, { flexDirection: rowDirection }]}>
+              <Ionicons name="document-text-outline" size={18} color={colors.primary} />
+              <Text style={[styles.termText, { textAlign: textAlignStart }]}>{term}</Text>
+            </View>
+          ))}
         </View>
       </ScrollView>
 
@@ -227,23 +247,22 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   titleRow: { alignItems: 'center' },
+  iconBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    backgroundColor: '#FFF1F4',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   titleWrap: { flex: 1, marginHorizontal: spacing.md },
   title: { color: colors.text, fontFamily: fonts.bold, fontSize: 20 },
   subtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 4 },
-  ratingPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.warningLight,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: borderRadius.full,
-  },
-  ratingText: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 12 },
   featuresRow: { flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.md },
   featureChip: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.full, paddingHorizontal: 12, paddingVertical: 8 },
   featureText: { color: colors.textSecondary, fontSize: 12, fontFamily: fonts.semiBold },
   sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, marginBottom: spacing.sm },
+  dateLabel: { color: colors.textSecondary, fontSize: 13, marginBottom: spacing.sm, marginTop: spacing.xs },
   chipsRow: { gap: spacing.sm },
   selectChip: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.full, paddingHorizontal: spacing.md, paddingVertical: 10 },
   selectChipActive: { backgroundColor: colors.primary },
@@ -270,12 +289,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
   },
-  summaryRowLast: {
-    borderBottomWidth: 0,
-    paddingBottom: 0,
-  },
   summaryLabel: { color: colors.textSecondary, fontSize: 13 },
   summaryValue: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, maxWidth: '58%', textAlign: 'left' },
+  termRow: {
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  termText: { flex: 1, color: colors.textSecondary, fontSize: 13, lineHeight: 21 },
   footer: {
     position: 'absolute',
     left: 0,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
@@ -18,6 +18,21 @@ const CartScreen = ({ navigation }) => {
       { text: 'إلغاء', style: 'cancel' },
       { text: 'حذف', style: 'destructive', onPress: clearCart },
     ]);
+  };
+
+  const handleShareCart = async () => {
+    const encodedItems = encodeURIComponent(
+      cart.map((item) => `${item.name} x${item.quantity}`).join(' | ')
+    );
+    const shareUrl = `https://tatx.app/pay/cart?items=${encodedItems}&total=${encodeURIComponent(formatCurrency(total))}`;
+    try {
+      await Share.share({
+        message: `رابط سداد السلة عبر تطبيق دائما معك:\n${shareUrl}`,
+        url: shareUrl,
+      });
+    } catch (error) {
+      Alert.alert('تعذر المشاركة', 'حدثت مشكلة أثناء إنشاء رابط مشاركة السلة.');
+    }
   };
 
   if (!cart.length) {
@@ -52,13 +67,25 @@ const CartScreen = ({ navigation }) => {
           <Ionicons name={closeIcon} size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>السلة</Text>
-        <TouchableOpacity onPress={handleClearCart} style={styles.headerButton}>
-          <Ionicons name="trash-outline" size={22} color={colors.error} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity onPress={handleShareCart} style={styles.headerButton}>
+            <Ionicons name="share-social-outline" size={20} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleClearCart} style={styles.headerButton}>
+            <Ionicons name="trash-outline" size={22} color={colors.error} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.summaryCard}>
+          <TouchableOpacity style={styles.sharePaymentCard} activeOpacity={0.9} onPress={handleShareCart}>
+            <View>
+              <Text style={styles.sharePaymentTitle}>مشاركة رابط الدفع</Text>
+              <Text style={styles.sharePaymentSubtitle}>أرسل رابط السلة لشخص آخر ليدفع الطلب عنك.</Text>
+            </View>
+            <Ionicons name="share-social-outline" size={20} color={colors.primary} />
+          </TouchableOpacity>
           <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
             <Text style={styles.summaryValue}>{totalItems} عناصر</Text>
             <Text style={styles.summaryLabel}>عدد المنتجات</Text>
@@ -131,6 +158,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  headerActions: { flexDirection: 'row-reverse', gap: spacing.xs },
   headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md },
   summaryCard: {
@@ -140,6 +168,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     ...shadows.sm,
   },
+  sharePaymentCard: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFF3F6',
+    borderRadius: 20,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  sharePaymentTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right' },
+  sharePaymentSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', lineHeight: 18 },
   summaryRow: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',

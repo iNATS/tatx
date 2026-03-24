@@ -4,18 +4,73 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
-import {
-  homeServices,
-  homeOffers,
-  restaurants,
-  featuredProducts,
-  products,
-  demoMarket,
-  stayBookingOptions,
-} from '../data/staticData';
+import { homeServices, homeOffers, products, demoMarket, stayBookingOptions, restaurants } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
 import PriceDisplay from '../components/PriceDisplay';
+
+const doctorHighlights = [
+  { id: 'd1', name: 'طب أسرة', subtitle: 'حجز ومتابعة', icon: 'medkit-outline', image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=900' },
+  { id: 'd2', name: 'باطنية', subtitle: 'استشارات وفحوصات', icon: 'pulse-outline', image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=900' },
+  { id: 'd3', name: 'جلدية', subtitle: 'عناية وعلاج', icon: 'sparkles-outline', image: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=900' },
+  { id: 'd4', name: 'أسنان', subtitle: 'كشف وعلاج', icon: 'fitness-outline', image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=900' },
+  { id: 'd5', name: 'أطفال', subtitle: 'مواعيد قريبة', icon: 'happy-outline', image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=900' },
+  { id: 'd6', name: 'أونلاين', subtitle: 'استشارة فورية', icon: 'videocam-outline', image: 'https://images.unsplash.com/photo-1584516150909-c43483ee7938?w=900' },
+];
+
+const wholesaleHighlights = [
+  { id: 'w1', name: 'مواد غذائية', subtitle: 'للمطاعم والأعمال', icon: 'cube-outline' },
+  { id: 'w2', name: 'مشروبات', subtitle: 'طلبات دورية', icon: 'water-outline' },
+  { id: 'w3', name: 'مستهلكات', subtitle: 'تشغيل يومي', icon: 'layers-outline' },
+  { id: 'w4', name: 'منظفات', subtitle: 'للمنشآت', icon: 'sparkles-outline' },
+  { id: 'w5', name: 'ضيافة', subtitle: 'قهوة وتمور', icon: 'cafe-outline' },
+  { id: 'w6', name: 'عقود', subtitle: 'أسعار خاصة', icon: 'calendar-outline' },
+];
+
+const pharmacyHighlights = [
+  { id: 'ph1', name: 'مسكنات', subtitle: 'احتياجات سريعة', icon: 'medkit-outline', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=900' },
+  { id: 'ph2', name: 'فيتامينات', subtitle: 'صحة يومية', icon: 'leaf-outline', image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=900' },
+  { id: 'ph3', name: 'عناية', subtitle: 'منتجات مختارة', icon: 'sparkles-outline', image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=900' },
+  { id: 'ph4', name: 'أطفال', subtitle: 'احتياجات منزلية', icon: 'happy-outline', image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=900' },
+  { id: 'ph5', name: 'أجهزة', subtitle: 'قياس ومتابعة', icon: 'pulse-outline', image: 'https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=900' },
+  { id: 'ph6', name: 'موسمي', subtitle: 'حساسية وسعال', icon: 'thermometer-outline', image: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=900' },
+];
+
+const marketHighlights = [...products.slice(0, 6)];
+
+const bookingHighlights = [
+  ...stayBookingOptions,
+  {
+    id: 'stay-4',
+    title: 'فندق أعمال في العليا',
+    area: 'العليا',
+    guests: 2,
+    price: 420,
+    type: 'hotel',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900',
+    features: ['مركز أعمال', 'إفطار', 'موقف سيارات'],
+  },
+  {
+    id: 'stay-5',
+    title: 'شاليه جلسات خارجية',
+    area: 'بنبان',
+    guests: 10,
+    price: 760,
+    type: 'chalet',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=900',
+    features: ['جلسات', 'مسبح', 'خصوصية'],
+  },
+  {
+    id: 'stay-6',
+    title: 'قاعة مناسبات صغيرة',
+    area: 'الملقا',
+    guests: 120,
+    price: 3200,
+    type: 'hall',
+    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=900',
+    features: ['ضيافة', 'صوتيات', 'مواقف'],
+  },
+];
 
 const HomeScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -26,7 +81,7 @@ const HomeScreen = ({ navigation }) => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    setTimeout(() => setRefreshing(false), 900);
   }, []);
 
   const handleServicePress = (service) => {
@@ -34,7 +89,6 @@ const HomeScreen = ({ navigation }) => {
       navigation.navigate('Shop');
       return;
     }
-
     navigation.navigate(service.screen, service.params);
   };
 
@@ -43,36 +97,66 @@ const HomeScreen = ({ navigation }) => {
     setShowItemModal(true);
   };
 
-  const bookingShowcase = stayBookingOptions.slice(0, 3);
-  const marketHighlights = products.slice(0, 3);
-  const pharmacyHighlights = [
-    { id: 'ph1', name: 'مسكن ألم سريع', subtitle: 'توصيل خلال نفس اليوم', screen: 'Category', params: { name: 'صيدلية' } },
-    { id: 'ph2', name: 'فيتامينات يومية', subtitle: 'منتجات عناية وصحة', screen: 'Category', params: { name: 'صيدلية' } },
-  ];
-  const doctorHighlights = [
-    { id: 'd1', name: 'طب أسرة', subtitle: 'حجز كشف ومتابعة', action: () => navigation.navigate('DoctorBooking') },
-    { id: 'd2', name: 'جلدية', subtitle: 'مواعيد حضوري وأونلاين', action: () => navigation.navigate('DoctorBooking') },
-  ];
-  const wholesaleHighlights = [
-    { id: 'w1', name: 'مواد غذائية', subtitle: 'كميات للمطاعم والمكاتب', action: () => navigation.navigate('Wholesale') },
-    { id: 'w2', name: 'مستهلكات وعناية', subtitle: 'توريد شهري ومنتظم', action: () => navigation.navigate('Wholesale') },
-  ];
-  const businessServices = [
-    {
-      id: 'vendor-app',
-      title: 'تطبيق مقدم الخدمة',
-      subtitle: 'واجهة واحدة تتبدل حسب نشاط المطعم، الفندق، الشاليه، القاعة، أو العيادة.',
-      icon: 'storefront-outline',
-      action: () => navigation.navigate('VendorApp'),
-    },
-    {
-      id: 'wholesale-flow',
-      title: 'حلول الجملة والأعمال',
-      subtitle: 'طلب كميات كبيرة، متابعة العروض، وإدارة الاحتياجات التجارية اليومية.',
-      icon: 'layers-outline',
-      action: () => navigation.navigate('Wholesale'),
-    },
-  ];
+  const handleOfferPress = (offer) => {
+    if (offer.vendor.includes('ورد')) {
+      navigation.navigate('Category', { name: 'هدايا' });
+      return;
+    }
+    if (offer.vendor.includes('سلة')) {
+      navigation.navigate('Shop');
+      return;
+    }
+    navigation.navigate('Category', { name: 'مطاعم' });
+  };
+
+  const hotels = bookingHighlights.filter((item) => item.type === 'hotel').slice(0, 6);
+  const chalets = bookingHighlights.filter((item) => item.type === 'chalet').slice(0, 6);
+  const halls = bookingHighlights.filter((item) => item.type === 'hall').slice(0, 6);
+  const marketBackgroundCards = marketHighlights.slice(0, 4);
+
+  const renderMiniScroller = (items, onPress, type = 'icon') => (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
+      {items.map((item) => (
+        <TouchableOpacity
+          key={item.id}
+          style={
+            type === 'product'
+              ? styles.productRailCard
+              : type === 'booking'
+                ? styles.bookingRailCard
+                : styles.miniRailCard
+          }
+          activeOpacity={0.9}
+          onPress={() => onPress(item)}
+        >
+          {type === 'product' ? (
+            <>
+              <Image source={{ uri: item.image }} style={styles.productRailImage} />
+              <Text style={styles.productRailTitle} numberOfLines={2}>{item.name}</Text>
+              <PriceDisplay value={item.price} color={colors.primary} size={14} iconSize={12} bold align="row-reverse" />
+            </>
+          ) : type === 'booking' ? (
+            <>
+              <Image source={{ uri: item.image }} style={styles.bookingMiniImage} />
+              <View style={styles.bookingMiniContentCard}>
+                <Text style={styles.bookingMiniTitle}>{item.title}</Text>
+                <Text style={styles.bookingMiniMeta}>{item.area}</Text>
+                <PriceDisplay value={item.price} color={colors.primary} size={14} iconSize={11} bold align="row-reverse" />
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={styles.miniRailIcon}>
+                <Ionicons name={item.icon} size={20} color={colors.primary} />
+              </View>
+              <Text style={styles.miniRailTitle}>{item.name}</Text>
+              <Text style={styles.miniRailSubtitle}>{item.subtitle}</Text>
+            </>
+          )}
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
 
   return (
     <View style={styles.container}>
@@ -94,17 +178,34 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.searchCard} activeOpacity={0.85} onPress={() => navigation.navigate('Shop')}>
-          <Ionicons name="search-outline" size={20} color={colors.textTertiary} />
-          <Text style={styles.searchPlaceholder}>ابحث عن مطعم، منتج، أو خدمة</Text>
-          <View style={styles.searchChip}>
-            <Text style={styles.searchChipText}>Apple Pay</Text>
-          </View>
+        <TouchableOpacity style={styles.searchCard} activeOpacity={0.9} onPress={() => navigation.navigate('Shop')}>
+          <LinearGradient colors={['#FFF6F8', '#FFFFFF']} style={styles.searchGradient}>
+            <View style={styles.searchMain}>
+              <View style={styles.searchTextWrap}>
+                <Text style={styles.searchTitle}>ابحث</Text>
+                <Text style={styles.searchPlaceholder}>منتجات، مطاعم، صيدلية، دكتور، أو حجوزات</Text>
+              </View>
+              <View style={styles.searchIconWrap}>
+                <Ionicons name="search-outline" size={21} color={colors.primary} />
+              </View>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.heroOfferCard} activeOpacity={0.9} onPress={() => handleOfferPress(homeOffers[0])}>
+          <Image source={{ uri: homeOffers[0].image }} style={styles.offerImage} />
+          <LinearGradient colors={['rgba(12,10,11,0.06)', 'rgba(12,10,11,0.68)']} style={styles.offerGradient}>
+            <Text style={styles.offerVendor}>{homeOffers[0].vendor}</Text>
+            <Text style={styles.offerTitle}>{homeOffers[0].title}</Text>
+            <Text style={styles.offerSubtitle}>{homeOffers[0].subtitle}</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
+            <Text style={styles.sectionLink}>عرض الكل</Text>
+          </TouchableOpacity>
           <Text style={styles.sectionTitle}>الخدمات</Text>
-          <Text style={styles.sectionLink}>اختصارات سريعة</Text>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.servicesRow, { flexDirection: rowDirection }]}>
           {homeServices.map((service) => (
@@ -118,95 +219,114 @@ const HomeScreen = ({ navigation }) => {
         </ScrollView>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>عروض مختارة</Text>
-          <Text style={styles.sectionLink}>مخصصة للرياض</Text>
+          <Text style={styles.sectionTitle}>قسم العروض</Text>
+          <Text style={styles.sectionLink}>مختارة لك</Text>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
           {homeOffers.map((offer) => (
-            <TouchableOpacity key={offer.id} style={styles.offerCard} activeOpacity={0.88} onPress={() => navigation.navigate('Category', { name: 'طعام' })}>
+            <TouchableOpacity key={offer.id} style={styles.offerCard} activeOpacity={0.88} onPress={() => handleOfferPress(offer)}>
               <Image source={{ uri: offer.image }} style={styles.offerImage} />
-              <LinearGradient colors={offer.overlay} style={styles.offerOverlay}>
+              <LinearGradient colors={['rgba(12,10,11,0.06)', 'rgba(12,10,11,0.68)']} style={styles.offerGradient}>
                 <Text style={styles.offerVendor}>{offer.vendor}</Text>
                 <Text style={styles.offerTitle}>{offer.title}</Text>
                 <Text style={styles.offerSubtitle}>{offer.subtitle}</Text>
-                <Text style={styles.offerValid}>{offer.valid}</Text>
               </LinearGradient>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking')}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>قسم الحجوزات والإقامة</Text>
+          <Text style={styles.sectionTitle}>مطاعم</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
-          {bookingShowcase.map((booking) => (
+        <View style={styles.hotList}>
+          {restaurants.slice(0, 6).map((restaurant, index) => (
             <TouchableOpacity
-              key={booking.id}
-              style={styles.bookingCard}
-              activeOpacity={0.88}
-              onPress={() => navigation.navigate('StayBookingDetail', { booking })}
+              key={restaurant.id}
+              style={[styles.hotRestaurantCard, index === 0 && styles.hotRestaurantCardFeatured, { flexDirection: rowDirection }]}
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}
             >
-              <Image source={{ uri: booking.image }} style={styles.bookingImage} />
-              <View style={styles.bookingOverlay}>
-                <Text style={styles.bookingArea}>{booking.area}</Text>
-                <Text style={styles.bookingTitle}>{booking.title}</Text>
-                <PriceDisplay value={booking.price} color={colors.white} size={14} iconSize={12} bold align="row-reverse" style={styles.bookingPriceWrap} />
+              <Image source={{ uri: restaurant.logo }} style={styles.hotRestaurantImage} />
+              <View style={styles.hotRestaurantBody}>
+                <View style={[styles.hotRestaurantTop, { flexDirection: rowDirection }]}>
+                  <View style={styles.hotMetaPill}>
+                    <Ionicons name="flame-outline" size={13} color={colors.primary} />
+                    <Text style={styles.hotMetaPillText}>Hot</Text>
+                  </View>
+                  <View style={styles.hotRestaurantInfo}>
+                    <Text style={[styles.hotRestaurantName, { textAlign: textAlignStart }]}>{restaurant.name}</Text>
+                    <Text style={[styles.hotRestaurantCategory, { textAlign: textAlignStart }]}>{restaurant.category}</Text>
+                  </View>
+                </View>
+                <View style={[styles.hotRestaurantBottom, { flexDirection: rowDirection }]}>
+                  <View style={styles.hotDeliveryPill}>
+                    <Text style={styles.hotDeliveryText}>{restaurant.deliveryTime} دقيقة</Text>
+                  </View>
+                  <View style={[styles.hotTagsRow, { flexDirection: rowDirection }]}>
+                    {restaurant.tags.slice(0, 2).map((tag) => (
+                      <View key={tag} style={styles.hotTagChip}>
+                        <Text style={styles.hotTagText}>{tag}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
               </View>
             </TouchableOpacity>
           ))}
-        </ScrollView>
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('DoctorBooking')}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-          <Text style={styles.sectionTitle}>قسم الدكتور</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
-          {doctorHighlights.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.quickSectionCard} onPress={item.action}>
-              <View style={styles.quickSectionIcon}>
-                <Ionicons name="medkit-outline" size={22} color={colors.primary} />
-              </View>
-              <Text style={styles.quickSectionTitle}>{item.name}</Text>
-              <Text style={styles.quickSectionSubtitle}>{item.subtitle}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Wholesale')}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-          <Text style={styles.sectionTitle}>قسم الجملة</Text>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
-          {wholesaleHighlights.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.quickSectionCard} onPress={item.action}>
-              <View style={styles.quickSectionIcon}>
-                <Ionicons name="layers-outline" size={22} color={colors.primary} />
-              </View>
-              <Text style={styles.quickSectionTitle}>{item.name}</Text>
-              <Text style={styles.quickSectionSubtitle}>{item.subtitle}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Shop')}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>قسم الماركت</Text>
+          <Text style={styles.sectionTitle}>الماركت</Text>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
-          {marketHighlights.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.marketCard} onPress={() => handleProductPress(item)}>
-              <Image source={{ uri: item.image }} style={styles.marketCardImage} />
-              <Text style={styles.marketCardTitle} numberOfLines={2}>{item.name}</Text>
-              <Text style={styles.marketCardSubtitle}>{item.category}</Text>
+          {marketBackgroundCards.map((item) => (
+            <TouchableOpacity key={item.id} style={styles.marketLuxuryCard} activeOpacity={0.9} onPress={() => handleProductPress(item)}>
+              <Image source={{ uri: item.image }} style={styles.marketLuxuryImage} />
+              <View style={styles.marketLuxuryInfo}>
+                <Text style={styles.marketLuxuryEyebrow}>{item.category}</Text>
+                <Text style={styles.marketLuxuryTitle} numberOfLines={2}>{item.name}</Text>
+                <PriceDisplay value={item.price} color={colors.primary} size={16} iconSize={13} bold align="row-reverse" />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        <TouchableOpacity style={styles.taxiPromoCard} activeOpacity={0.9} onPress={() => navigation.navigate('Taxi')}>
+          <Image source={{ uri: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1200' }} style={styles.taxiPromoImage} />
+          <View style={styles.taxiPromoContentCard}>
+            <View style={styles.taxiPromoBadge}>
+              <Ionicons name="car-sport-outline" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.taxiPromoText}>
+              <Text style={styles.taxiPromoTitle}>احجز مشوارك الآن</Text>
+              <Text style={styles.taxiPromoSubtitle}>انطلاق سريع، مسار واضح، وتجربة أقرب لتطبيقات النقل الحديثة.</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('DoctorBooking')}>
+            <Text style={styles.sectionLink}>عرض الكل</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>عروض الأطباء</Text>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
+          {doctorHighlights.map((item) => (
+            <TouchableOpacity key={item.id} style={styles.specialtyLuxuryCard} activeOpacity={0.9} onPress={() => navigation.navigate('DoctorBooking')}>
+              <Image source={{ uri: item.image }} style={styles.specialtyLuxuryImage} />
+              <View style={styles.specialtyLuxuryInfo}>
+                <View style={styles.specialtyLuxuryBadge}>
+                  <Ionicons name={item.icon} size={16} color={colors.primary} />
+                </View>
+                <Text style={styles.specialtyLuxuryTitle}>{item.name}</Text>
+                <Text style={styles.specialtyLuxurySubtitle}>{item.subtitle}</Text>
+              </View>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -215,87 +335,54 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'صيدلية' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>قسم الصيدلية</Text>
+          <Text style={styles.sectionTitle}>تصنيفات الصيدلية</Text>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
           {pharmacyHighlights.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.quickSectionCard} onPress={() => navigation.navigate(item.screen, item.params)}>
-              <View style={styles.quickSectionIcon}>
-                <Ionicons name="medkit-outline" size={22} color={colors.primary} />
-              </View>
-              <Text style={styles.quickSectionTitle}>{item.name}</Text>
-              <Text style={styles.quickSectionSubtitle}>{item.subtitle}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>متاجر موصى بها</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Shop')}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-        </View>
-        {restaurants.map((restaurant) => (
-          <TouchableOpacity key={restaurant.id} style={[styles.restaurantCard, { flexDirection: rowDirection }]} activeOpacity={0.85} onPress={() => navigation.navigate('Category', { name: restaurant.category })}>
-            <Image source={{ uri: restaurant.logo }} style={styles.restaurantLogo} />
-            <View style={styles.restaurantText}>
-              <Text style={[styles.restaurantName, { textAlign: textAlignStart }]}>{restaurant.name}</Text>
-              <Text style={[styles.restaurantMeta, { textAlign: textAlignStart }]}>{restaurant.category}</Text>
-              <View style={[styles.tagRow, { flexDirection: rowDirection }]}>
-                {restaurant.tags.slice(0, 2).map((tag) => (
-                  <View key={tag} style={styles.tagPill}>
-                    <Text style={styles.tagPillText}>{tag}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('VendorApp')}>
-            <Text style={styles.sectionLink}>لوحة المزود</Text>
-          </TouchableOpacity>
-          <Text style={styles.sectionTitle}>قسم الأعمال والمزودين</Text>
-        </View>
-        {businessServices.map((service) => (
-          <TouchableOpacity
-            key={service.id}
-            style={[styles.businessCard, { flexDirection: rowDirection }]}
-            activeOpacity={0.9}
-            onPress={service.action}
-          >
-            <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-            <View style={styles.businessText}>
-              <Text style={[styles.businessTitle, { textAlign: textAlignStart }]}>{service.title}</Text>
-              <Text style={[styles.businessSubtitle, { textAlign: textAlignStart }]}>{service.subtitle}</Text>
-            </View>
-            <View style={styles.businessIconWrap}>
-              <Ionicons name={service.icon} size={22} color={colors.primary} />
-            </View>
-          </TouchableOpacity>
-        ))}
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>قسم المتجر</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Shop')}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
-          {featuredProducts.map((product) => (
-            <TouchableOpacity key={product.id} style={styles.productCard} activeOpacity={0.88} onPress={() => handleProductPress(product)}>
-              <Image source={{ uri: product.image }} style={styles.productImage} />
-              <View style={styles.productContent}>
-                <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
-                <TouchableOpacity style={styles.productButton} activeOpacity={0.85} onPress={() => handleProductPress(product)}>
-                  <PriceDisplay value={product.price} color={colors.primary} size={14} iconSize={12} bold align="row-reverse" />
-                  <Ionicons name="add-circle" size={18} color={colors.primary} />
-                </TouchableOpacity>
+            <TouchableOpacity key={item.id} style={styles.specialtyLuxuryCard} activeOpacity={0.9} onPress={() => navigation.navigate('Category', { name: 'صيدلية' })}>
+              <Image source={{ uri: item.image }} style={styles.specialtyLuxuryImage} />
+              <View style={styles.specialtyLuxuryInfo}>
+                <View style={styles.specialtyLuxuryBadge}>
+                  <Ionicons name={item.icon} size={16} color={colors.primary} />
+                </View>
+                <Text style={styles.specialtyLuxuryTitle}>{item.name}</Text>
+                <Text style={styles.specialtyLuxurySubtitle}>{item.subtitle}</Text>
               </View>
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        <TouchableOpacity style={styles.hotelPromoCard} activeOpacity={0.9} onPress={() => navigation.navigate('StayBooking', { bookingType: 'hotel' })}>
+          <Image source={{ uri: hotels[0]?.image }} style={styles.hotelPromoImage} />
+          <View style={styles.hotelPromoContentCard}>
+            <Text style={styles.hotelPromoTitle}>احجز الفنادق من داخل التطبيق</Text>
+            <Text style={styles.hotelPromoSubtitle}>خيارات إقامة مختارة داخل المملكة مع متابعة سهلة للحجز.</Text>
+          </View>
+        </TouchableOpacity>
+
+        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'hotel' })}>
+            <Text style={styles.sectionLink}>عرض الكل</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>الفنادق</Text>
+        </View>
+        {renderMiniScroller(hotels, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
+
+        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'chalet' })}>
+            <Text style={styles.sectionLink}>عرض الكل</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>الشاليهات</Text>
+        </View>
+        {renderMiniScroller(chalets, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
+
+        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'hall' })}>
+            <Text style={styles.sectionLink}>عرض الكل</Text>
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>القاعات</Text>
+        </View>
+        {renderMiniScroller(halls, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
       </ScrollView>
 
       {cartCount > 0 && (
@@ -319,492 +406,177 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    paddingHorizontal: spacing.lg,
-  },
-  topBar: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  avatarShell: {
-    width: 44,
-    height: 44,
-    borderRadius: 16,
-    backgroundColor: '#FFF0F3',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: spacing.sm,
-  },
-  avatarLogo: {
-    width: 28,
-    height: 28,
-  },
-  topBarText: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  welcomeText: {
-    ...typography.h3,
-    color: colors.text,
-  },
-  locationText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  notificationButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 16,
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { paddingHorizontal: spacing.lg },
+  topBar: { alignItems: 'center', marginBottom: spacing.lg },
+  avatarShell: { width: 44, height: 44, borderRadius: 16, backgroundColor: '#FFF0F3', alignItems: 'center', justifyContent: 'center', marginLeft: spacing.sm },
+  avatarLogo: { width: 28, height: 28 },
+  topBarText: { flex: 1, alignItems: 'flex-end' },
+  welcomeText: { ...typography.h3, color: colors.text },
+  locationText: { ...typography.caption, color: colors.textSecondary },
+  notificationButton: { width: 44, height: 44, borderRadius: 16, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', ...shadows.sm },
+  searchCard: { marginBottom: spacing.md, borderRadius: 28, overflow: 'hidden', ...shadows.md },
+  searchGradient: { padding: spacing.md },
+  searchMain: { flexDirection: 'row-reverse', alignItems: 'center' },
+  searchTextWrap: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
+  searchTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right' },
+  searchPlaceholder: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', lineHeight: 18 },
+  searchIconWrap: { width: 54, height: 54, borderRadius: 20, backgroundColor: '#FFE8EE', alignItems: 'center', justifyContent: 'center' },
+  heroOfferCard: { marginBottom: spacing.md, width: '100%', height: 238, borderRadius: 30, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
+  sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md, justifyContent: 'space-between', alignItems: 'center' },
+  sectionTitle: { ...typography.h3, color: colors.text },
+  sectionLink: { ...typography.caption, color: colors.primary },
+  servicesRow: { gap: spacing.sm, paddingBottom: spacing.xs },
+  serviceChip: { backgroundColor: colors.card, borderRadius: 22, paddingHorizontal: spacing.md, paddingVertical: spacing.md, alignItems: 'center', minWidth: 88, ...shadows.sm },
+  serviceIcon: { width: 44, height: 44, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
+  serviceName: { ...typography.bodySmall, color: colors.text, fontFamily: fonts.semiBold },
+  horizontalList: { gap: spacing.md, paddingBottom: spacing.xs },
+  offerCard: { width: 270, height: 220, borderRadius: 28, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
+  offerImage: { width: '100%', height: '100%' },
+  offerGradient: { ...StyleSheet.absoluteFillObject, justifyContent: 'flex-end', padding: spacing.lg },
+  offerVendor: { color: 'rgba(255,255,255,0.86)', fontFamily: fonts.semiBold, fontSize: 12, textAlign: 'right' },
+  offerTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.xs, textAlign: 'right' },
+  offerSubtitle: { color: 'rgba(255,255,255,0.88)', fontSize: 12, lineHeight: 18, marginTop: spacing.xs, textAlign: 'right' },
+  hotList: { gap: spacing.md, marginBottom: spacing.sm },
+  hotRestaurantCard: {
     backgroundColor: colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.sm,
-  },
-  heroCard: {
-    borderRadius: 32,
-    padding: spacing.lg,
-    ...shadows.xl,
-  },
-  heroHeader: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  heroEyebrow: {
-    color: 'rgba(255,255,255,0.88)',
-    fontFamily: fonts.semiBold,
-    fontSize: 13,
-  },
-  heroBadge: {
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 6,
-  },
-  heroBadgeText: {
-    color: colors.white,
-    fontFamily: fonts.semiBold,
-    fontSize: 12,
-  },
-  heroTitle: {
-    fontFamily: fonts.bold,
-    fontSize: 28,
-    lineHeight: 38,
-    color: colors.white,
-    textAlign: 'right',
-    marginTop: spacing.lg,
-  },
-  heroSubtitle: {
-    ...typography.body,
-    color: 'rgba(255,255,255,0.88)',
-    textAlign: 'right',
-    marginTop: spacing.sm,
-  },
-  heroAction: {
-    marginTop: spacing.lg,
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.full,
-    alignSelf: 'flex-end',
-    paddingVertical: 12,
-    paddingHorizontal: spacing.md,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  heroActionText: {
-    color: colors.primary,
-    fontFamily: fonts.semiBold,
-    fontSize: 15,
-  },
-  searchCard: {
-    marginTop: spacing.lg,
-    backgroundColor: colors.card,
-    borderRadius: 24,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 16,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    ...shadows.sm,
-  },
-  searchPlaceholder: {
-    flex: 1,
-    ...typography.bodySmall,
-    color: colors.textTertiary,
-    textAlign: 'right',
-    marginHorizontal: spacing.sm,
-  },
-  searchChip: {
-    backgroundColor: colors.cardSecondary,
-    borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-  },
-  searchChipText: {
-    color: colors.primary,
-    fontFamily: fonts.semiBold,
-    fontSize: 11,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.lg,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: colors.card,
-    borderRadius: 22,
-    padding: spacing.md,
-    ...shadows.sm,
-  },
-  statValue: {
-    ...typography.h3,
-    color: colors.text,
-    textAlign: 'right',
-  },
-  statLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    textAlign: 'right',
-    marginTop: spacing.xs,
-  },
-  statNote: {
-    ...typography.caption,
-    color: colors.primary,
-    textAlign: 'right',
-    marginTop: spacing.sm,
-  },
-  sectionHeader: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.md,
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    ...typography.h3,
-    color: colors.text,
-  },
-  sectionLink: {
-    ...typography.caption,
-    color: colors.primary,
-  },
-  servicesRow: {
-    gap: spacing.sm,
-    paddingBottom: spacing.xs,
-  },
-  serviceChip: {
-    backgroundColor: colors.card,
-    borderRadius: 22,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    minWidth: 88,
-    ...shadows.sm,
-  },
-  serviceIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-  },
-  serviceName: {
-    ...typography.bodySmall,
-    color: colors.text,
-    fontFamily: fonts.semiBold,
-  },
-  horizontalList: {
-    gap: spacing.md,
-    paddingLeft: spacing.xs,
-  },
-  offerCard: {
-    width: 280,
-    height: 176,
     borderRadius: 28,
-    overflow: 'hidden',
-    ...shadows.lg,
-  },
-  offerImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-  },
-  offerOverlay: {
-    flex: 1,
-    padding: spacing.lg,
-    justifyContent: 'flex-end',
-  },
-  offerVendor: {
-    color: 'rgba(255,255,255,0.86)',
-    fontFamily: fonts.semiBold,
-    fontSize: 13,
-    textAlign: 'right',
-  },
-  offerTitle: {
-    fontFamily: fonts.bold,
-    fontSize: 26,
-    color: colors.white,
-    textAlign: 'right',
-    marginTop: spacing.sm,
-  },
-  offerSubtitle: {
-    ...typography.bodySmall,
-    color: 'rgba(255,255,255,0.88)',
-    textAlign: 'right',
-    marginTop: spacing.xs,
-  },
-  offerValid: {
-    ...typography.caption,
-    color: colors.white,
-    textAlign: 'right',
-    marginTop: spacing.md,
-  },
-  bookingCard: {
-    width: 250,
-    height: 190,
-    borderRadius: 28,
-    overflow: 'hidden',
-    ...shadows.lg,
-  },
-  bookingImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-  },
-  bookingOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    padding: spacing.lg,
-    backgroundColor: 'rgba(17,24,39,0.18)',
-  },
-  bookingArea: {
-    color: 'rgba(255,255,255,0.84)',
-    fontFamily: fonts.semiBold,
-    fontSize: 12,
-    textAlign: 'right',
-  },
-  bookingTitle: {
-    color: colors.white,
-    fontFamily: fonts.bold,
-    fontSize: 22,
-    textAlign: 'right',
-    marginTop: spacing.sm,
-  },
-  bookingPriceWrap: { marginTop: spacing.sm, alignSelf: 'flex-end' },
-  quickSectionCard: {
-    width: 190,
-    backgroundColor: colors.card,
-    borderRadius: 24,
     padding: spacing.md,
-    ...shadows.sm,
-  },
-  quickSectionIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 16,
-    backgroundColor: colors.cardSecondary,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  quickSectionTitle: {
-    color: colors.text,
-    fontFamily: fonts.semiBold,
-    fontSize: 15,
-    textAlign: 'right',
-  },
-  quickSectionSubtitle: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    textAlign: 'right',
-    lineHeight: 19,
-    marginTop: 4,
-  },
-  marketCard: {
-    width: 170,
-    backgroundColor: colors.card,
-    borderRadius: 24,
-    overflow: 'hidden',
     ...shadows.sm,
   },
-  marketCardImage: {
-    width: '100%',
-    height: 110,
+  hotRestaurantCardFeatured: {
+    backgroundColor: '#FFF4F6',
+  },
+  hotRestaurantImage: {
+    width: 96,
+    height: 96,
+    borderRadius: 22,
     backgroundColor: colors.cardSecondary,
   },
-  marketCardTitle: {
-    color: colors.text,
-    fontFamily: fonts.semiBold,
-    fontSize: 14,
-    textAlign: 'right',
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-  },
-  marketCardSubtitle: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    textAlign: 'right',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    marginTop: 4,
-  },
-  restaurantCard: {
-    backgroundColor: colors.card,
-    borderRadius: 24,
-    padding: spacing.md,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-    ...shadows.sm,
-  },
-  restaurantLogo: {
-    width: 68,
-    height: 68,
-    borderRadius: 20,
-  },
-  restaurantText: {
+  hotRestaurantBody: {
     flex: 1,
     marginHorizontal: spacing.md,
-    alignItems: 'flex-end',
+    justifyContent: 'space-between',
   },
-  restaurantName: {
-    ...typography.label,
-    color: colors.text,
+  hotRestaurantTop: {
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  restaurantMeta: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-    textAlign: 'right',
-  },
-  tagRow: {
-    flexDirection: 'row-reverse',
-    gap: spacing.xs,
-    marginTop: spacing.sm,
-  },
-  tagPill: {
-    backgroundColor: colors.cardSecondary,
-    borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-  },
-  tagPillText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  ratingShell: {
-    flexDirection: 'row-reverse',
+  hotMetaPill: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#FFF5E6',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
+    backgroundColor: colors.white,
     borderRadius: borderRadius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
-  ratingText: {
-    ...typography.caption,
+  hotMetaPillText: {
+    color: colors.primary,
+    fontFamily: fonts.bold,
+    fontSize: 11,
+  },
+  hotRestaurantInfo: {
+    flex: 1,
+    marginHorizontal: spacing.sm,
+  },
+  hotRestaurantName: {
     color: colors.text,
+    fontFamily: fonts.bold,
+    fontSize: 17,
+  },
+  hotRestaurantCategory: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    marginTop: 4,
+  },
+  hotRestaurantBottom: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.md,
+  },
+  hotDeliveryPill: {
+    backgroundColor: '#FFE8EE',
+    borderRadius: borderRadius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  hotDeliveryText: {
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
+    fontSize: 12,
+  },
+  hotTagsRow: {
+    gap: spacing.xs,
+  },
+  hotTagChip: {
+    backgroundColor: colors.cardSecondary,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  hotTagText: {
+    color: colors.textSecondary,
+    fontSize: 11,
     fontFamily: fonts.semiBold,
   },
-  businessCard: {
+  miniRailCard: {
+    width: 158,
     backgroundColor: colors.card,
-    borderRadius: 24,
+    borderRadius: 26,
     padding: spacing.md,
-    alignItems: 'center',
-    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: '#F7E2E7',
     ...shadows.sm,
   },
-  businessText: { flex: 1, marginHorizontal: spacing.md },
-  businessTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16 },
-  businessSubtitle: { color: colors.textSecondary, fontSize: 13, lineHeight: 20, marginTop: 4 },
-  businessIconWrap: {
-    width: 48,
-    height: 48,
+  miniRailIcon: {
+    width: 50,
+    height: 50,
     borderRadius: 18,
-    backgroundColor: colors.cardSecondary,
+    backgroundColor: '#FFF1F4',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: '#F7D6DE',
   },
-  productCard: {
-    width: 220,
-    backgroundColor: colors.card,
-    borderRadius: 28,
-    overflow: 'hidden',
-    ...shadows.md,
-  },
-  productImage: {
-    width: '100%',
-    height: 140,
-  },
-  productContent: {
-    padding: spacing.md,
-  },
-  productName: {
-    ...typography.label,
-    color: colors.text,
-    textAlign: 'right',
-  },
-  productMeta: {
-    marginTop: spacing.sm,
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  productTime: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  ratingInline: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingInlineText: {
-    ...typography.caption,
-    color: colors.text,
-  },
-  productButton: {
-    marginTop: spacing.md,
-    backgroundColor: colors.cardSecondary,
-    borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 10,
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cartBar: {
-    position: 'absolute',
-    left: spacing.lg,
-    right: spacing.lg,
-    backgroundColor: colors.text,
-    borderRadius: 24,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    ...shadows.float,
-  },
-  cartBarTitle: {
-    color: colors.white,
-    fontFamily: fonts.semiBold,
-    fontSize: 16,
-    textAlign: 'right',
-  },
-  cartBarSubtitle: {
-    color: 'rgba(255,255,255,0.75)',
-    fontFamily: fonts.regular,
-    fontSize: 12,
-    textAlign: 'right',
-    marginTop: 2,
-  },
+  miniRailTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 15, textAlign: 'right' },
+  miniRailSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 6, textAlign: 'right', lineHeight: 18 },
+  productRailCard: { width: 176, backgroundColor: colors.card, borderRadius: 26, padding: spacing.sm, borderWidth: 1, borderColor: '#F7E2E7', ...shadows.sm },
+  productRailImage: { width: '100%', height: 116, borderRadius: 18, backgroundColor: colors.cardSecondary, marginBottom: spacing.sm },
+  productRailTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, lineHeight: 20, textAlign: 'right', marginBottom: spacing.xs },
+  marketLuxuryCard: { width: 220, backgroundColor: colors.card, borderRadius: 28, overflow: 'hidden', ...shadows.md },
+  marketLuxuryImage: { width: '100%', height: 154, backgroundColor: colors.cardSecondary },
+  marketLuxuryInfo: { padding: spacing.md, alignItems: 'flex-end' },
+  marketLuxuryEyebrow: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 12, textAlign: 'right' },
+  marketLuxuryTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right', marginTop: 6, marginBottom: spacing.xs, lineHeight: 24 },
+  taxiPromoCard: { marginTop: spacing.xl, borderRadius: 28, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
+  taxiPromoImage: { width: '100%', height: 168 },
+  taxiPromoContentCard: { margin: spacing.md, marginTop: -26, backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: 24, padding: spacing.md, flexDirection: 'row-reverse', alignItems: 'center', ...shadows.sm },
+  taxiPromoBadge: { width: 56, height: 56, borderRadius: 20, backgroundColor: '#FFF1F4', alignItems: 'center', justifyContent: 'center' },
+  taxiPromoText: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
+  taxiPromoTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 20, textAlign: 'right' },
+  taxiPromoSubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', lineHeight: 18, marginTop: 4 },
+  specialtyLuxuryCard: { width: 210, backgroundColor: colors.card, borderRadius: 28, overflow: 'hidden', ...shadows.md },
+  specialtyLuxuryImage: { width: '100%', height: 142, backgroundColor: colors.cardSecondary },
+  specialtyLuxuryInfo: { padding: spacing.md, alignItems: 'flex-end' },
+  specialtyLuxuryBadge: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#FFF1F4', alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
+  specialtyLuxuryTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17, textAlign: 'right' },
+  specialtyLuxurySubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', marginTop: 4, lineHeight: 18 },
+  hotelPromoCard: { marginTop: spacing.xl, height: 230, borderRadius: 30, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
+  hotelPromoImage: { width: '100%', height: '100%' },
+  hotelPromoContentCard: { position: 'absolute', left: spacing.md, right: spacing.md, bottom: spacing.md, backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 24, padding: spacing.md, alignItems: 'flex-end', ...shadows.sm },
+  hotelPromoTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 22, textAlign: 'right' },
+  hotelPromoSubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', lineHeight: 18, marginTop: 4 },
+  bookingRailCard: { width: 220, height: 238, borderRadius: 28, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
+  bookingMiniImage: { width: '100%', height: 150, backgroundColor: colors.cardSecondary },
+  bookingMiniContentCard: { margin: spacing.md, marginTop: spacing.md, backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: 20, padding: spacing.md, alignItems: 'flex-end', ...shadows.sm },
+  bookingMiniTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 16, textAlign: 'right' },
+  bookingMiniMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4, marginBottom: spacing.xs, textAlign: 'right' },
+  cartBar: { position: 'absolute', left: spacing.md, right: spacing.md, backgroundColor: colors.text, borderRadius: 24, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', ...shadows.float },
+  cartBarTitle: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
+  cartBarSubtitle: { color: 'rgba(255,255,255,0.72)', fontSize: 12, marginTop: 2, textAlign: 'right' },
 });
 
 export default HomeScreen;
