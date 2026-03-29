@@ -8,10 +8,6 @@ import AppListCard from '../components/AppListCard';
 
 const providerFilters = [
   { id: 'restaurant', label: 'مطاعم', icon: 'restaurant-outline' },
-  { id: 'hotel', label: 'فنادق', icon: 'bed-outline' },
-  { id: 'chalet', label: 'شاليهات', icon: 'home-outline' },
-  { id: 'hall', label: 'قاعات', icon: 'business-outline' },
-  { id: 'doctor', label: 'عيادات', icon: 'medkit-outline' },
   { id: 'wholesale', label: 'جملة', icon: 'layers-outline' },
 ];
 
@@ -28,66 +24,6 @@ const providerConfigs = {
     actions: [
       { id: 'orders', label: 'إدارة الطلبات', icon: 'receipt-outline', screen: 'Orders' },
       { id: 'menu', label: 'عرض المتجر', icon: 'storefront-outline', screen: 'Shop' },
-      { id: 'support', label: 'الدعم', icon: 'chatbubble-ellipses-outline', screen: 'Chat' },
-    ],
-  },
-  hotel: {
-    title: 'لوحة الفندق',
-    subtitle: 'الحجوزات، الإشغال، والأسعار الموسمية',
-    stats: [
-      { label: 'الحجوزات النشطة', value: '14' },
-      { label: 'نسبة الإشغال', value: '76%' },
-      { label: 'طلبات الوصول', value: '5' },
-    ],
-    tasks: ['3 حجوزات تحتاج تأكيد اليوم', 'تحديث أسعار نهاية الأسبوع', 'إضافة صور الغرف الجديدة'],
-    actions: [
-      { id: 'stay', label: 'عرض صفحة الفندق', icon: 'bed-outline', screen: 'StayBooking', params: { bookingType: 'hotel' } },
-      { id: 'calendar', label: 'جدول الحجوزات', icon: 'calendar-outline', screen: 'Notifications' },
-      { id: 'support', label: 'الدعم', icon: 'chatbubble-ellipses-outline', screen: 'Chat' },
-    ],
-  },
-  chalet: {
-    title: 'لوحة الشاليه',
-    subtitle: 'الجداول، أوقات الدخول، والحجوزات الخاصة',
-    stats: [
-      { label: 'حجوزات الأسبوع', value: '9' },
-      { label: 'الليالي المتاحة', value: '12' },
-      { label: 'طلبات خاصة', value: '3' },
-    ],
-    tasks: ['تأكيد حجز الجمعة', 'تحديث شروط الدخول', 'إضافة باقة إقامة كاملة'],
-    actions: [
-      { id: 'stay', label: 'عرض الشاليه', icon: 'home-outline', screen: 'StayBooking', params: { bookingType: 'chalet' } },
-      { id: 'calendar', label: 'مواعيد الحجز', icon: 'calendar-outline', screen: 'Notifications' },
-      { id: 'support', label: 'الدعم', icon: 'chatbubble-ellipses-outline', screen: 'Chat' },
-    ],
-  },
-  hall: {
-    title: 'لوحة القاعة',
-    subtitle: 'إدارة المناسبات، السعات، والعروض',
-    stats: [
-      { label: 'فعاليات هذا الشهر', value: '11' },
-      { label: 'الطلبات الجديدة', value: '6' },
-      { label: 'القاعة المتاحة', value: '2' },
-    ],
-    tasks: ['مراجعة طلب زفاف يوم الخميس', 'تحديث قائمة الضيافة', 'إضافة عرض الشركات'],
-    actions: [
-      { id: 'stay', label: 'عرض القاعات', icon: 'business-outline', screen: 'StayBooking', params: { bookingType: 'hall' } },
-      { id: 'calendar', label: 'تقويم الفعاليات', icon: 'calendar-outline', screen: 'Notifications' },
-      { id: 'support', label: 'الدعم', icon: 'chatbubble-ellipses-outline', screen: 'Chat' },
-    ],
-  },
-  doctor: {
-    title: 'لوحة العيادة',
-    subtitle: 'المواعيد، الجداول، وإدارة الحجوزات',
-    stats: [
-      { label: 'مواعيد اليوم', value: '18' },
-      { label: 'المرضى الجدد', value: '7' },
-      { label: 'جلسات أونلاين', value: '4' },
-    ],
-    tasks: ['اعتماد 5 مواعيد جديدة', 'تحديث أوقات الخميس', 'تجهيز كشف متابعة الساعة 8 م'],
-    actions: [
-      { id: 'doctor', label: 'عرض صفحة الحجز', icon: 'medkit-outline', screen: 'DoctorBooking' },
-      { id: 'calendar', label: 'جدول العيادة', icon: 'calendar-outline', screen: 'Notifications' },
       { id: 'support', label: 'الدعم', icon: 'chatbubble-ellipses-outline', screen: 'Chat' },
     ],
   },

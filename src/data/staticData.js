@@ -36,10 +36,6 @@ export const categories = [
   { id: '6', name: 'العاب اطفال', nameEn: 'Kids Toys', icon: 'game-controller-outline', color: '#5E5CE6' },
   { id: '7', name: 'عطور وهدايا', nameEn: 'Perfumes & Gifts', icon: 'gift-outline', color: '#AF52DE' },
   { id: '8', name: 'صيدلية', nameEn: 'Pharmacy', icon: 'medkit-outline', color: '#FF453A' },
-  { id: '9', name: 'دكتور', nameEn: 'Doctor', icon: 'medical-outline', color: '#E85D75' },
-  { id: '10', name: 'شالية', nameEn: 'Chalet', icon: 'home-outline', color: '#FF8A5B' },
-  { id: '11', name: 'قاعة', nameEn: 'Hall', icon: 'business-outline', color: '#0EA5A4' },
-  { id: '12', name: 'فندق', nameEn: 'Hotel', icon: 'bed-outline', color: '#7A5AF8' },
 ];
 
 export const homeServices = [
@@ -51,10 +47,6 @@ export const homeServices = [
   { id: 'kids', name: 'العاب اطفال', icon: 'game-controller-outline', screen: 'Shop', color: '#5E5CE6' },
   { id: 'gifts', name: 'عطور وهدايا', icon: 'gift-outline', screen: 'Category', params: { name: 'عطور وهدايا' }, color: '#C45586' },
   { id: 'pharmacy', name: 'صيدلية', icon: 'medkit-outline', screen: 'Category', params: { name: 'صيدلية' }, color: '#FF453A' },
-  { id: 'doctor', name: 'دكتور', icon: 'medical-outline', screen: 'DoctorBooking', color: '#E85D75' },
-  { id: 'chalet', name: 'شالية', icon: 'home-outline', screen: 'StayBooking', params: { bookingType: 'chalet' }, color: '#FF8A5B' },
-  { id: 'hall', name: 'قاعة', icon: 'business-outline', screen: 'StayBooking', params: { bookingType: 'hall' }, color: '#0EA5A4' },
-  { id: 'hotel', name: 'فندق', icon: 'bed-outline', screen: 'StayBooking', params: { bookingType: 'hotel' }, color: '#7A5AF8' },
 ];
 
 export const homeQuickStats = [

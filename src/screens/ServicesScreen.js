@@ -10,7 +10,6 @@ const serviceFilters = [
   { id: 'all', label: 'الكل', icon: 'apps-outline' },
   { id: 'mobility', label: 'التنقل', icon: 'car-outline' },
   { id: 'shopping', label: 'التسوق', icon: 'bag-outline' },
-  { id: 'booking', label: 'الحجوزات', icon: 'calendar-outline' },
   { id: 'business', label: 'الأعمال', icon: 'briefcase-outline' },
   { id: 'support', label: 'الدعم', icon: 'help-buoy-outline' },
 ];
@@ -19,7 +18,6 @@ const serviceGroupLabels = {
   all: 'جميع الأقسام',
   mobility: 'التنقل',
   shopping: 'التسوق',
-  booking: 'الحجوزات',
   business: 'الأعمال',
   support: 'الدعم',
 };
@@ -39,10 +37,6 @@ const serviceGroups = {
   pharmacy: 'shopping',
   gifts: 'shopping',
   wholesale: 'business',
-  doctor: 'booking',
-  hotel: 'booking',
-  chalet: 'booking',
-  hall: 'booking',
   'all-services': 'all',
 };
 
@@ -55,10 +49,6 @@ const serviceSubtitles = {
   pharmacy: 'أدوية ومنتجات عناية موثوقة',
   gifts: 'عطور وهدايا وتغليف للمناسبات',
   wholesale: 'توريد منظم حسب مجموعات الشراء',
-  doctor: 'حجز طبيب واختيار الموعد المناسب',
-  hotel: 'احجز فندق مناسب لرحلتك',
-  chalet: 'شالية للرحلات والويكند',
-  hall: 'قاعة للمناسبات والاجتماعات',
 };
 
 const ServicesScreen = ({ navigation }) => {
@@ -95,7 +85,7 @@ const ServicesScreen = ({ navigation }) => {
       <PageHeader
         navigation={navigation}
         title="جميع الخدمات"
-        subtitle="تنقل، تسوق، احجز، وادِر طلباتك من نفس التطبيق"
+        subtitle="تنقل، تسوق، وادِر طلباتك من نفس التطبيق"
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="ابحث عن خدمة أو قسم"

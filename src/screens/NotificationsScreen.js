@@ -9,15 +9,12 @@ const initialNotifications = [
   { id: '1', type: 'order', title: 'تم قبول طلبك', message: 'مطعم برجر السرايا بدأ تجهيز الطلب الآن.', time: 'قبل 8 دقائق', unread: true, icon: 'bag-handle-outline' },
   { id: '2', type: 'ride', title: 'السائق في الطريق', message: 'الكابتن أحمد يبعد 4 دقائق عن موقعك.', time: 'قبل 15 دقيقة', unread: true, icon: 'car-outline' },
   { id: '3', type: 'offer', title: 'عرض جديد', message: 'خصم 20% على طلبات الجملة اليوم فقط.', time: 'اليوم', unread: false, icon: 'pricetag-outline' },
-  { id: '4', type: 'booking', title: 'تأكيد الموعد', message: 'تم تأكيد موعدك مع د. نورة غدًا الساعة 7:00 م.', time: 'اليوم', unread: false, icon: 'medkit-outline' },
-  { id: '5', type: 'booking', title: 'حجز الشاليه جاهز للمراجعة', message: 'تم حفظ تفاصيل الحجز بانتظار تأكيدك النهائي.', time: 'أمس', unread: false, icon: 'home-outline' },
 ];
 
 const filters = [
   { id: 'all', label: 'الكل', icon: 'apps-outline' },
   { id: 'order', label: 'الطلبات', icon: 'receipt-outline' },
   { id: 'ride', label: 'المشاوير', icon: 'car-outline' },
-  { id: 'booking', label: 'الحجوزات', icon: 'calendar-outline' },
   { id: 'offer', label: 'العروض', icon: 'pricetag-outline' },
 ];
 
@@ -61,7 +58,7 @@ const NotificationsScreen = ({ navigation }) => {
       return;
     }
 
-    navigation.navigate('DoctorBooking');
+    navigation.navigate('MainTabs', { screen: 'Home' });
   };
 
   return (
@@ -69,7 +66,7 @@ const NotificationsScreen = ({ navigation }) => {
       <PageHeader
         navigation={navigation}
         title="الإشعارات"
-        subtitle="كل تحديثات الطلبات والمشاوير والحجوزات في مكان واحد"
+        subtitle="كل تحديثات الطلبات والمشاوير والعروض في مكان واحد"
         actionIcon="checkmark-done-outline"
         onActionPress={markAllRead}
         searchValue={searchQuery}

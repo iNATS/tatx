@@ -30,12 +30,6 @@ import VendorSignupScreen from '../screens/VendorSignupScreen';
 import WholesaleScreen from '../screens/WholesaleScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ServicesScreen from '../screens/ServicesScreen';
-import DoctorBookingScreen from '../screens/DoctorBookingScreen';
-import DoctorBookingScheduleScreen from '../screens/DoctorBookingScheduleScreen';
-import DoctorBookingPatientScreen from '../screens/DoctorBookingPatientScreen';
-import DoctorBookingConfirmScreen from '../screens/DoctorBookingConfirmScreen';
-import StayBookingScreen from '../screens/StayBookingScreen';
-import StayBookingDetailScreen from '../screens/StayBookingDetailScreen';
 import VendorAppScreen from '../screens/VendorAppScreen';
 import CategoryVendorDetailScreen from '../screens/CategoryVendorDetailScreen';
 
@@ -142,12 +136,6 @@ const AppNavigator = () => {
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="Notifications" component={NotificationsScreen} />
             <Stack.Screen name="Services" component={ServicesScreen} />
-            <Stack.Screen name="DoctorBooking" component={DoctorBookingScreen} />
-            <Stack.Screen name="DoctorBookingSchedule" component={DoctorBookingScheduleScreen} />
-            <Stack.Screen name="DoctorBookingPatient" component={DoctorBookingPatientScreen} />
-            <Stack.Screen name="DoctorBookingConfirm" component={DoctorBookingConfirmScreen} />
-            <Stack.Screen name="StayBooking" component={StayBookingScreen} />
-            <Stack.Screen name="StayBookingDetail" component={StayBookingDetailScreen} />
             <Stack.Screen name="Location" component={LocationScreen} />
             <Stack.Screen name="Payment" component={PaymentScreen} />
             <Stack.Screen name="Wholesale" component={WholesaleScreen} />

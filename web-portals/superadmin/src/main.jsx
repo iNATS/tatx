@@ -1,351 +1,708 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Store, 
-  ShoppingBag, 
-  Wallet, 
-  Settings, 
-  Bell, 
-  Search,
-  Menu,
-  X,
-  TrendingUp,
-  TrendingDown,
-  Package,
+import {
+  Activity,
+  Bell,
   CreditCard,
-  Activity
+  FileWarning,
+  Filter,
+  Gift,
+  LayoutDashboard,
+  LifeBuoy,
+  Menu,
+  MessageSquare,
+  Package,
+  Search,
+  Settings,
+  ShieldCheck,
+  ShoppingBag,
+  Store,
+  Tag,
+  TrendingDown,
+  TrendingUp,
+  UserCog,
+  Users,
+  Wallet,
+  X,
 } from 'lucide-react';
 
-// shadcn Arabic UI Components
+const appSummary = {
+  market: 'الرياض - السعودية',
+  currency: 'ر.س',
+  uptime: '99.94%',
+  activeServices: 8,
+  pendingApprovals: 14,
+};
+
+const dashboardStats = [
+  { id: 'gmv', title: 'إجمالي المبيعات', value: '248,540 ر.س', change: '+14.2%', trend: 'up', icon: CreditCard, color: 'from-rose-500 to-pink-500' },
+  { id: 'orders', title: 'الطلبات اليوم', value: '1,284', change: '+8.5%', trend: 'up', icon: ShoppingBag, color: 'from-sky-500 to-cyan-500' },
+  { id: 'vendors', title: 'البائعون النشطون', value: '186', change: '+12', trend: 'up', icon: Store, color: 'from-emerald-500 to-green-500' },
+  { id: 'users', title: 'المستخدمون النشطون', value: '24,870', change: '-1.3%', trend: 'down', icon: Users, color: 'from-violet-500 to-purple-500' },
+];
+
+const serviceHealth = [
+  { id: 'taxi', name: 'مشوار', status: 'مستقر', orders: '342 طلب', issueCount: 1, fill: 86, tone: 'emerald' },
+  { id: 'food', name: 'مطاعم', status: 'ضغط مرتفع', orders: '518 طلب', issueCount: 5, fill: 73, tone: 'amber' },
+  { id: 'market', name: 'سوبرماركيت', status: 'مستقر', orders: '266 طلب', issueCount: 2, fill: 79, tone: 'sky' },
+  { id: 'wholesale', name: 'سوق الجملة', status: 'متابعة مطلوبة', orders: '94 طلب', issueCount: 6, fill: 58, tone: 'rose' },
+];
+
+const usersSeed = [
+  { id: 'USR-1001', name: 'سارة القحطاني', phone: '0555000001', city: 'الرياض', orders: 28, wallet: '420 ر.س', status: 'نشط', segment: 'VIP' },
+  { id: 'USR-1002', name: 'محمد العتيبي', phone: '0555000345', city: 'جدة', orders: 14, wallet: '85 ر.س', status: 'نشط', segment: 'عادي' },
+  { id: 'USR-1003', name: 'ريم الحربي', phone: '0555000876', city: 'الدمام', orders: 4, wallet: '0 ر.س', status: 'مقيد', segment: 'جديد' },
+  { id: 'USR-1004', name: 'فيصل الدوسري', phone: '0555000194', city: 'الرياض', orders: 9, wallet: '140 ر.س', status: 'نشط', segment: 'عادي' },
+];
+
+const vendorsSeed = [
+  { id: 'VND-2001', name: 'برجر السرايا', type: 'مطاعم', city: 'الرياض', orders: 234, payout: '12,450 ر.س', status: 'نشط', compliance: 'مكتمل' },
+  { id: 'VND-2002', name: 'سلة الرياض', type: 'سوبرماركيت', city: 'الرياض', orders: 189, payout: '8,920 ر.س', status: 'نشط', compliance: 'مكتمل' },
+  { id: 'VND-2003', name: 'ورد نجد', type: 'عطور وهدايا', city: 'الرياض', orders: 76, payout: '3,180 ر.س', status: 'مراجعة', compliance: 'ينقصه مستند' },
+  { id: 'VND-2004', name: 'مستودع الشمال', type: 'سوق الجملة', city: 'الرياض', orders: 42, payout: '17,600 ر.س', status: 'موقوف مؤقتا', compliance: 'مكتمل' },
+];
+
+const ordersSeed = [
+  { id: 'ORD-9401', customer: 'سارة القحطاني', vendor: 'برجر السرايا', service: 'مطاعم', total: '84 ر.س', status: 'في التوصيل', risk: 'منخفض' },
+  { id: 'ORD-9402', customer: 'محمد العتيبي', vendor: 'سلة الرياض', service: 'سوبرماركيت', total: '232 ر.س', status: 'قيد التحضير', risk: 'متوسط' },
+  { id: 'ORD-9403', customer: 'ريم الحربي', vendor: 'ورد نجد', service: 'عطور وهدايا', total: '145 ر.س', status: 'ملغي', risk: 'مرتفع' },
+  { id: 'ORD-9404', customer: 'فيصل الدوسري', vendor: 'مشوار سريع', service: 'مشوار', total: '26 ر.س', status: 'مكتمل', risk: 'منخفض' },
+];
+
+const contentSeed = [
+  { id: 'CNT-1', section: 'العروض', title: 'خصم 30% على الوجبات العائلية', owner: 'برجر السرايا', state: 'منشور', updatedAt: 'قبل 20 دقيقة' },
+  { id: 'CNT-2', section: 'التصنيفات', title: 'العاب اطفال', owner: 'فريق المحتوى', state: 'منشور', updatedAt: 'اليوم' },
+  { id: 'CNT-3', section: 'العروض', title: 'توصيل مجاني فوق 120 ر.س', owner: 'سلة الرياض', state: 'مراجعة', updatedAt: 'قبل ساعة' },
+  { id: 'CNT-4', section: 'الخدمات', title: 'سوق الجملة', owner: 'فريق العمليات', state: 'منشور', updatedAt: 'أمس' },
+];
+
+const financeSeed = [
+  { id: 'FIN-1', label: 'رصيد محافظ العملاء', value: '94,800 ر.س', note: 'يشمل الأرصدة المعلقة' },
+  { id: 'FIN-2', label: 'مستحقات البائعين', value: '62,300 ر.س', note: 'دفعة هذا الأسبوع' },
+  { id: 'FIN-3', label: 'عمولات المنصة', value: '18,420 ر.س', note: 'حتى الآن هذا الشهر' },
+];
+
+const supportSeed = [
+  { id: 'SUP-1', title: 'زيادة شكاوى التأخير في المطاعم', owner: 'فريق العمليات', severity: 'حرج', sla: '15 دقيقة', status: 'قيد المعالجة' },
+  { id: 'SUP-2', title: 'متجر بانتظار مراجعة المستندات', owner: 'امتثال البائعين', severity: 'متوسط', sla: '4 ساعات', status: 'بانتظار القرار' },
+  { id: 'SUP-3', title: 'طلب استرجاع مبلغ لمحفظة عميل', owner: 'الدعم المالي', severity: 'منخفض', sla: '8 ساعات', status: 'تم الحل' },
+];
+
+const settingsSeed = [
+  { id: 'set-1', title: 'العمولة الأساسية', value: '12%', description: 'تطبّق على المطاعم والسوبرماركيت' },
+  { id: 'set-2', title: 'الحد الأدنى للطلب', value: '20 ر.س', description: 'للخدمات اللوجستية والطلبات السريعة' },
+  { id: 'set-3', title: 'تنبيه الوثائق', value: '7 أيام', description: 'قبل انتهاء مستندات البائعين' },
+  { id: 'set-4', title: 'تفعيل المراجعة اليدوية', value: 'نشط', description: 'على الطلبات عالية المخاطر' },
+];
+
+const menuItems = [
+  { id: 'dashboard', label: 'لوحة التحكم', icon: LayoutDashboard, hint: 'الرؤية التشغيلية الشاملة' },
+  { id: 'users', label: 'المستخدمون', icon: Users, hint: 'الحسابات والمحافظ والسلوك' },
+  { id: 'vendors', label: 'البائعون', icon: Store, hint: 'التفعيل والامتثال والجودة' },
+  { id: 'orders', label: 'الطلبات', icon: ShoppingBag, hint: 'المتابعة والتدخلات الفورية' },
+  { id: 'content', label: 'المحتوى والخدمات', icon: Tag, hint: 'العروض والتصنيفات والأقسام' },
+  { id: 'finance', label: 'المالية', icon: Wallet, hint: 'المستحقات والعمولات والمحافظ' },
+  { id: 'support', label: 'الدعم والامتثال', icon: ShieldCheck, hint: 'الشكاوى والمخاطر والتذاكر' },
+  { id: 'settings', label: 'إعدادات النظام', icon: Settings, hint: 'السياسات العامة والتحكم' },
+];
+
+const toneClasses = {
+  rose: 'bg-rose-100 text-rose-700',
+  emerald: 'bg-emerald-100 text-emerald-700',
+  amber: 'bg-amber-100 text-amber-700',
+  sky: 'bg-sky-100 text-sky-700',
+  slate: 'bg-slate-100 text-slate-700',
+};
+
+const statusClasses = {
+  'نشط': 'bg-emerald-100 text-emerald-700',
+  'مكتمل': 'bg-emerald-100 text-emerald-700',
+  'منشور': 'bg-emerald-100 text-emerald-700',
+  'مراجعة': 'bg-amber-100 text-amber-700',
+  'ينقصه مستند': 'bg-amber-100 text-amber-700',
+  'قيد التحضير': 'bg-sky-100 text-sky-700',
+  'في التوصيل': 'bg-violet-100 text-violet-700',
+  'بانتظار القرار': 'bg-amber-100 text-amber-700',
+  'قيد المعالجة': 'bg-sky-100 text-sky-700',
+  'تم الحل': 'bg-emerald-100 text-emerald-700',
+  'ملغي': 'bg-rose-100 text-rose-700',
+  'موقوف مؤقتا': 'bg-rose-100 text-rose-700',
+  'مقيد': 'bg-rose-100 text-rose-700',
+  'حرج': 'bg-rose-100 text-rose-700',
+  'متوسط': 'bg-amber-100 text-amber-700',
+  'منخفض': 'bg-emerald-100 text-emerald-700',
+};
+
 const Card = ({ children, className = '' }) => (
-  <div className={`bg-white rounded-xl shadow-sm border border-gray-100 ${className}`}>
+  <section className={`rounded-[28px] border border-white/70 bg-white/95 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur ${className}`}>
     {children}
-  </div>
+  </section>
 );
 
 const CardHeader = ({ children, className = '' }) => (
-  <div className={`p-6 pb-4 ${className}`}>{children}</div>
+  <div className={`flex items-start justify-between gap-3 px-6 pt-6 ${className}`}>{children}</div>
 );
 
 const CardTitle = ({ children, className = '' }) => (
-  <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>{children}</h3>
+  <h3 className={`text-lg font-bold text-slate-900 ${className}`}>{children}</h3>
+);
+
+const CardDescription = ({ children, className = '' }) => (
+  <p className={`mt-1 text-sm leading-6 text-slate-500 ${className}`}>{children}</p>
 );
 
 const CardContent = ({ children, className = '' }) => (
-  <div className={`p-6 pt-0 ${className}`}>{children}</div>
+  <div className={`px-6 pb-6 pt-5 ${className}`}>{children}</div>
 );
 
-const Button = ({ children, variant = 'default', size = 'default', className = '', ...props }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2';
+const Button = ({ children, variant = 'primary', size = 'md', className = '', ...props }) => {
   const variants = {
-    default: 'bg-primary-600 text-white hover:bg-primary-700',
-    outline: 'border border-gray-200 bg-white hover:bg-gray-50 text-gray-700',
-    ghost: 'hover:bg-gray-100 text-gray-700',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
+    primary: 'bg-slate-950 text-white hover:bg-slate-800',
+    outline: 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
+    soft: 'bg-rose-50 text-rose-700 hover:bg-rose-100',
+    ghost: 'text-slate-600 hover:bg-slate-100',
   };
   const sizes = {
-    default: 'px-4 py-2 text-sm',
-    sm: 'px-3 py-1.5 text-xs',
-    lg: 'px-6 py-3 text-base',
-    icon: 'w-10 h-10',
+    sm: 'h-9 px-3 text-xs',
+    md: 'h-11 px-4 text-sm',
+    icon: 'h-11 w-11',
   };
+
   return (
-    <button className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
+    <button
+      className={`inline-flex items-center justify-center gap-2 rounded-2xl font-medium transition ${variants[variant]} ${sizes[size]} ${className}`}
+      {...props}
+    >
       {children}
     </button>
   );
 };
 
-const Badge = ({ children, variant = 'default' }) => {
-  const variants = {
-    default: 'bg-primary-100 text-primary-700',
-    success: 'bg-green-100 text-green-700',
-    warning: 'bg-yellow-100 text-yellow-700',
-    error: 'bg-red-100 text-red-700',
-  };
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]}`}>
-      {children}
-    </span>
-  );
-};
+const Badge = ({ children, tone = 'slate', className = '' }) => (
+  <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${toneClasses[tone] || statusClasses[children] || toneClasses.slate} ${className}`}>
+    {children}
+  </span>
+);
 
-const Avatar = ({ src, fallback, className = '' }) => (
-  <div className={`w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden ${className}`}>
-    {src ? (
-      <img src={src} alt={fallback} className="w-full h-full object-cover" />
-    ) : (
-      <span className="text-primary-700 font-semibold">{fallback}</span>
-    )}
+const Avatar = ({ label, className = '' }) => (
+  <div className={`flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-100 to-pink-50 text-sm font-bold text-rose-700 ${className}`}>
+    {label}
   </div>
 );
 
-const StatCard = ({ title, value, change, changeType, icon: Icon, color }) => (
-  <Card>
-    <CardHeader className="flex flex-row items-center justify-between pb-2">
-      <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
-      <div className={`p-2 rounded-lg ${color}`}>
-        <Icon className="w-4 h-4 text-white" />
-      </div>
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
-      <div className="flex items-center mt-1">
-        {changeType === 'up' ? (
-          <TrendingUp className="w-4 h-4 text-green-500 ml-1" />
-        ) : (
-          <TrendingDown className="w-4 h-4 text-red-500 ml-1" />
-        )}
-        <span className={`text-xs ${changeType === 'up' ? 'text-green-500' : 'text-red-500'}`}>
-          {change}
-        </span>
-        <span className="text-xs text-gray-400 mr-1">من الشهر الماضي</span>
+const SectionHeading = ({ title, subtitle, actionLabel }) => (
+  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h2 className="text-2xl font-bold text-slate-950">{title}</h2>
+      <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+    </div>
+    {actionLabel ? <Button variant="outline">{actionLabel}</Button> : null}
+  </div>
+);
+
+const StatCard = ({ title, value, change, trend, icon: Icon, color }) => (
+  <Card className="overflow-hidden">
+    <CardContent className="pt-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-slate-500">{title}</p>
+          <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">{value}</p>
+          <div className="mt-3 flex items-center gap-2 text-xs">
+            {trend === 'up' ? (
+              <TrendingUp className="h-4 w-4 text-emerald-500" />
+            ) : (
+              <TrendingDown className="h-4 w-4 text-rose-500" />
+            )}
+            <span className={trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}>{change}</span>
+            <span className="text-slate-400">مقارنة بالأسبوع الماضي</span>
+          </div>
+        </div>
+        <div className={`flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br ${color} text-white shadow-lg`}>
+          <Icon className="h-6 w-6" />
+        </div>
       </div>
     </CardContent>
   </Card>
 );
 
-const Sidebar = ({ isOpen, onClose, activeTab, setActiveTab }) => {
-  const menuItems = [
-    { id: 'dashboard', label: 'لوحة التحكم', icon: LayoutDashboard },
-    { id: 'vendors', label: 'المتاجر', icon: Store },
-    { id: 'orders', label: 'الطلبات', icon: ShoppingBag },
-    { id: 'customers', label: 'العملاء', icon: Users },
-    { id: 'finance', label: 'المالية', icon: Wallet },
-    { id: 'analytics', label: 'التحليلات', icon: Activity },
-    { id: 'settings', label: 'الإعدادات', icon: Settings },
-  ];
+const SearchField = ({ value, onChange, placeholder }) => (
+  <div className="relative w-full md:max-w-md">
+    <Search className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+    <input
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      className="h-12 w-full rounded-2xl border border-slate-200 bg-white pr-11 pl-4 text-sm outline-none transition focus:border-rose-300 focus:ring-4 focus:ring-rose-100"
+    />
+  </div>
+);
 
-  return (
-    <>
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
-      )}
-      
-      {/* Sidebar */}
-      <aside className={`fixed top-0 right-0 z-50 h-full w-72 bg-white border-l border-gray-100 transform transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">تاتكس</h1>
-                <p className="text-xs text-gray-400">لوحة التحكم</p>
-              </div>
+const TableCard = ({ title, subtitle, columns, rows, renderRow, actionLabel }) => (
+  <Card>
+    <CardHeader>
+      <div>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{subtitle}</CardDescription>
+      </div>
+      {actionLabel ? <Button variant="outline">{actionLabel}</Button> : null}
+    </CardHeader>
+    <CardContent>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-100 text-right text-xs font-semibold text-slate-400">
+              {columns.map((column) => (
+                <th key={column} className="whitespace-nowrap px-4 py-3 first:pr-0 last:pl-0">{column}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => renderRow(row))}
+          </tbody>
+        </table>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const Sidebar = ({ isOpen, onClose, activeTab, setActiveTab }) => (
+  <>
+    {isOpen ? <div className="fixed inset-0 z-40 bg-slate-950/40 lg:hidden" onClick={onClose} /> : null}
+    <aside className={`fixed inset-y-0 right-0 z-50 w-[310px] border-l border-white/60 bg-[linear-gradient(180deg,#fff7f9_0%,#ffffff_48%,#fff8fb_100%)] shadow-2xl transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className="flex h-full flex-col">
+        <div className="flex items-center justify-between border-b border-rose-100/70 px-6 py-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-lg font-black text-white shadow-lg shadow-rose-200">
+              T
             </div>
-            <button onClick={onClose} className="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
+            <div>
+              <p className="text-lg font-black text-slate-950">TATX Admin</p>
+              <p className="text-xs text-slate-400">تشغيل وإدارة المنصة</p>
+            </div>
           </div>
+          <button onClick={onClose} className="rounded-2xl p-2 text-slate-500 hover:bg-white lg:hidden">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 overflow-y-auto">
-            {menuItems.map((item) => (
+        <div className="px-6 pt-6">
+          <Card className="border-rose-100 bg-gradient-to-br from-slate-950 via-slate-900 to-rose-950 text-white">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <Avatar label="م" className="bg-white/10 text-white" />
+                <div>
+                  <p className="font-bold">مشرف العمليات</p>
+                  <p className="text-xs text-white/70">admin@tatx.com</p>
+                </div>
+              </div>
+              <div className="mt-5 grid grid-cols-2 gap-3 text-xs">
+                <div className="rounded-2xl bg-white/10 p-3">
+                  <p className="text-white/60">الخدمات</p>
+                  <p className="mt-1 text-lg font-bold">{appSummary.activeServices}</p>
+                </div>
+                <div className="rounded-2xl bg-white/10 p-3">
+                  <p className="text-white/60">اعتمادات</p>
+                  <p className="mt-1 text-lg font-bold">{appSummary.pendingApprovals}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-4 py-6">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const active = activeTab === item.id;
+            return (
               <button
                 key={item.id}
                 onClick={() => {
                   setActiveTab(item.id);
                   onClose();
                 }}
-                className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all ${
-                  activeTab === item.id ? 'active' : 'text-gray-600'
-                }`}
+                className={`mb-2 flex w-full items-start gap-3 rounded-3xl px-4 py-4 text-right transition ${active ? 'bg-slate-950 text-white shadow-lg shadow-slate-200' : 'text-slate-600 hover:bg-white'}`}
               >
-                <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-primary-600' : 'text-gray-400'}`} />
-                <span className={`font-medium ${activeTab === item.id ? 'text-primary-600' : ''}`}>
-                  {item.label}
-                </span>
+                <div className={`mt-0.5 rounded-2xl p-2 ${active ? 'bg-white/10 text-white' : 'bg-rose-50 text-rose-500'}`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <div className="font-semibold">{item.label}</div>
+                  <div className={`mt-1 text-xs ${active ? 'text-white/70' : 'text-slate-400'}`}>{item.hint}</div>
+                </div>
               </button>
-            ))}
-          </nav>
+            );
+          })}
+        </nav>
+      </div>
+    </aside>
+  </>
+);
 
-          {/* User Profile */}
-          <div className="p-4 border-t border-gray-100">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-              <Avatar fallback="م" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">مدير النظام</p>
-                <p className="text-xs text-gray-400">admin@tatx.com</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </>
-  );
-};
-
-const Header = ({ onMenuClick }) => (
-  <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-gray-100">
-    <div className="flex items-center justify-between px-6 py-4">
-      <div className="flex items-center gap-4">
-        <button onClick={onMenuClick} className="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
-          <Menu className="w-5 h-5 text-gray-500" />
+const Header = ({ onMenuClick, search, setSearch, title }) => (
+  <header className="sticky top-0 z-30 border-b border-white/70 bg-white/80 backdrop-blur-xl">
+    <div className="flex flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex items-center gap-3">
+        <button onClick={onMenuClick} className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-600 lg:hidden">
+          <Menu className="h-5 w-5" />
         </button>
-        <div className="relative hidden md:block">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="ابحث عن..."
-            className="pr-10 pl-4 py-2 w-80 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose-500">Superadmin</p>
+          <h1 className="mt-1 text-2xl font-black text-slate-950">{title}</h1>
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <SearchField value={search} onChange={setSearch} placeholder="ابحث عن مستخدم، متجر، طلب، أو تذكرة" />
+        <Button variant="outline" size="icon" className="relative shrink-0">
+          <Bell className="h-5 w-5" />
+          <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500" />
         </Button>
-        <Avatar fallback="م" />
       </div>
     </div>
   </header>
 );
 
-const DashboardContent = () => {
-  const stats = [
-    { title: 'إجمالي المبيعات', value: '٢٤,٥٨٠ ر.س', change: '+١٢.٥%', changeType: 'up', icon: CreditCard, color: 'bg-primary-500' },
-    { title: 'الطلبات الجديدة', value: '١٨٤', change: '+٨.٢%', changeType: 'up', icon: Package, color: 'bg-blue-500' },
-    { title: 'المتاجر النشطة', value: '٤٨', change: '+٣', changeType: 'up', icon: Store, color: 'bg-green-500' },
-    { title: 'العملاء الجدد', value: '٣٢١', change: '-٢.١%', changeType: 'down', icon: Users, color: 'bg-purple-500' },
-  ];
+const DashboardTab = () => (
+  <div className="space-y-6">
+    <SectionHeading title="الرؤية العامة" subtitle="متابعة الأداء الحي للتطبيق والمستخدمين والبائعين من شاشة واحدة" actionLabel="تصدير التقرير اليومي" />
 
-  const recentOrders = [
-    { id: '#ORD-001', customer: 'أحمد محمد', store: 'مطعم البركة', amount: '٨٥ ر.س', status: 'مكتمل', statusVariant: 'success' },
-    { id: '#ORD-002', customer: 'فاطمة علي', store: 'سوبرماركت النخبة', amount: '٢٣٠ ر.س', status: 'قيد التحضير', statusVariant: 'warning' },
-    { id: '#ORD-003', customer: 'محمد سعيد', store: 'صيدلية الشفاء', amount: '٤٥ ر.س', status: 'في الطريق', statusVariant: 'default' },
-    { id: '#ORD-004', customer: 'نورة خالد', store: 'مخبز البركة', amount: '٦٥ ر.س', status: 'مكتمل', statusVariant: 'success' },
-    { id: '#ORD-005', customer: 'عمر حسن', store: 'تاكسي سريع', amount: '٢٥ ر.س', status: 'ملغي', statusVariant: 'error' },
-  ];
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {dashboardStats.map((item) => (
+        <StatCard key={item.id} {...item} />
+      ))}
+    </div>
 
-  const topVendors = [
-    { name: 'مطعم البركة', orders: ٢٣٤, revenue: '١٢,٤٥٠ ر.س', rating: 4.8 },
-    { name: 'سوبرماركت النخبة', orders: ١٨٩, revenue: '٨,٩٢٠ ر.س', rating: 4.7 },
-    { name: 'صيدلية الشفاء', orders: ١٥٦, revenue: '٦,٣٤٠ ر.س', rating: 4.9 },
-  ];
+    <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>صحة الخدمات</CardTitle>
+            <CardDescription>تعطيك مؤشرا مباشرا عن الضغط التشغيلي، جودة التنفيذ، وعدد المشاكل الحالية.</CardDescription>
+          </div>
+          <Button variant="outline">عرض السجل التشغيلي</Button>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {serviceHealth.map((service) => (
+            <div key={service.id} className="rounded-3xl border border-slate-100 bg-slate-50/70 p-4">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-slate-900">{service.name}</p>
+                    <Badge tone={service.tone}>{service.status}</Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-slate-500">{service.orders} • {service.issueCount} ملاحظات مفتوحة</p>
+                </div>
+                <div className="w-full max-w-xs">
+                  <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
+                    <span>أداء التشغيل</span>
+                    <span>{service.fill}%</span>
+                  </div>
+                  <div className="h-2.5 rounded-full bg-slate-200">
+                    <div className={`h-2.5 rounded-full ${service.tone === 'emerald' ? 'bg-emerald-500' : service.tone === 'amber' ? 'bg-amber-500' : service.tone === 'sky' ? 'bg-sky-500' : 'bg-rose-500'}`} style={{ width: `${service.fill}%` }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>نقاط تحتاج تدخل</CardTitle>
+            <CardDescription>العناصر التي تستحق مراجعة فورية من الإدارة.</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {[
+            { title: '14 طلب اعتماد بائع جديد', tone: 'amber', icon: Store },
+            { title: '6 تذاكر تصعيد دعم مفتوحة', tone: 'rose', icon: LifeBuoy },
+            { title: '3 عروض بانتظار النشر', tone: 'sky', icon: Gift },
+            { title: 'مراجعة تسوية مالية أسبوعية', tone: 'emerald', icon: Wallet },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.title} className="flex items-center gap-3 rounded-3xl border border-slate-100 p-4">
+                <div className={`rounded-2xl p-3 ${toneClasses[item.tone]}`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="flex-1 text-sm font-medium text-slate-700">{item.title}</div>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+);
+
+const UsersTab = ({ search }) => {
+  const rows = useMemo(() => usersSeed.filter((item) => [item.id, item.name, item.phone, item.city].join(' ').includes(search)), [search]);
 
   return (
     <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => (
-          <StatCard key={index} {...stat} />
-        ))}
-      </div>
-
-      {/* Recent Orders & Top Vendors */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Orders */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>أحدث الطلبات</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">رقم الطلب</th>
-                    <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">العميل</th>
-                    <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">المتجر</th>
-                    <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">المبلغ</th>
-                    <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">الحالة</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentOrders.map((order, index) => (
-                    <tr key={index} className="border-b border-gray-50 hover:bg-gray-50">
-                      <td className="py-3 px-4 text-sm font-medium text-gray-900">{order.id}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">{order.customer}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">{order.store}</td>
-                      <td className="py-3 px-4 text-sm font-medium text-gray-900">{order.amount}</td>
-                      <td className="py-3 px-4">
-                        <Badge variant={order.statusVariant}>{order.status}</Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Top Vendors */}
-        <Card>
-          <CardHeader>
-            <CardTitle>أفضل المتاجر</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {topVendors.map((vendor, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
-                      <Store className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{vendor.name}</p>
-                      <p className="text-xs text-gray-400">{vendor.orders} طلب</p>
-                    </div>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-bold text-gray-900">{vendor.revenue}</p>
-                    <div className="flex items-center gap-1 mt-1">
-                      <span className="text-xs text-yellow-500">★</span>
-                      <span className="text-xs text-gray-600">{vendor.rating}</span>
-                    </div>
-                  </div>
+      <SectionHeading title="إدارة المستخدمين" subtitle="عرض الحسابات، حالة النشاط، الرصيد، وعدد الطلبات مع إجراءات الإدارة." actionLabel="إضافة مستخدم" />
+      <TableCard
+        title="قائمة المستخدمين"
+        subtitle="إدارة الحسابات الفردية، الحالة، والمحفظة."
+        actionLabel="تصدير CSV"
+        columns={['المعرف', 'المستخدم', 'المدينة', 'الطلبات', 'المحفظة', 'الشريحة', 'الحالة', 'الإجراءات']}
+        rows={rows}
+        renderRow={(user) => (
+          <tr key={user.id} className="border-b border-slate-50 text-slate-700">
+            <td className="px-4 py-4 font-semibold text-slate-900 first:pr-0">{user.id}</td>
+            <td className="px-4 py-4">
+              <div className="flex items-center gap-3">
+                <Avatar label={user.name.slice(0, 1)} />
+                <div>
+                  <div className="font-semibold text-slate-900">{user.name}</div>
+                  <div className="text-xs text-slate-400">{user.phone}</div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              </div>
+            </td>
+            <td className="px-4 py-4">{user.city}</td>
+            <td className="px-4 py-4">{user.orders}</td>
+            <td className="px-4 py-4 font-semibold">{user.wallet}</td>
+            <td className="px-4 py-4">{user.segment}</td>
+            <td className="px-4 py-4"><Badge>{user.status}</Badge></td>
+            <td className="px-4 py-4 pl-0">
+              <div className="flex justify-end gap-2">
+                <Button size="sm" variant="outline">عرض</Button>
+                <Button size="sm" variant="soft">تقييد</Button>
+              </div>
+            </td>
+          </tr>
+        )}
+      />
     </div>
   );
 };
 
-const App = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard');
+const VendorsTab = ({ search }) => {
+  const rows = useMemo(() => vendorsSeed.filter((item) => [item.id, item.name, item.type, item.city].join(' ').includes(search)), [search]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+    <div className="space-y-6">
+      <SectionHeading title="إدارة البائعين" subtitle="التحكم في اعتماد البائعين، حالة الامتثال، المستحقات، ونشاط المتاجر." actionLabel="اعتماد بائع جديد" />
+      <TableCard
+        title="البائعون والمتاجر"
+        subtitle="مراجعة المتاجر حسب النوع والحالة والالتزام."
+        actionLabel="فلترة متقدمة"
+        columns={['المعرف', 'البائع', 'النوع', 'المدينة', 'الطلبات', 'المستحقات', 'الامتثال', 'الحالة']}
+        rows={rows}
+        renderRow={(vendor) => (
+          <tr key={vendor.id} className="border-b border-slate-50 text-slate-700">
+            <td className="px-4 py-4 font-semibold text-slate-900 first:pr-0">{vendor.id}</td>
+            <td className="px-4 py-4 font-semibold">{vendor.name}</td>
+            <td className="px-4 py-4">{vendor.type}</td>
+            <td className="px-4 py-4">{vendor.city}</td>
+            <td className="px-4 py-4">{vendor.orders}</td>
+            <td className="px-4 py-4 font-semibold">{vendor.payout}</td>
+            <td className="px-4 py-4"><Badge>{vendor.compliance}</Badge></td>
+            <td className="px-4 py-4 pl-0"><Badge>{vendor.status}</Badge></td>
+          </tr>
+        )}
       />
-      
-      <div className="lg:pr-72">
-        <Header onMenuClick={() => setSidebarOpen(true)} />
-        
-        <main className="p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">لوحة التحكم</h1>
-            <p className="text-gray-400 mt-1">مرحباً بك في لوحة تحكم تاتكس</p>
-          </div>
-          
-          {activeTab === 'dashboard' && <DashboardContent />}
-          
-          {activeTab !== 'dashboard' && (
-            <Card className="p-12 text-center">
-              <div className="max-w-md mx-auto">
-                <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center mx-auto mb-4">
-                  <Settings className="w-8 h-8 text-primary-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">قريباً</h2>
-                <p className="text-gray-400">هذه الصفحة قيد التطوير وستكون متاحة قريباً</p>
+    </div>
+  );
+};
+
+const OrdersTab = ({ search }) => {
+  const rows = useMemo(() => ordersSeed.filter((item) => [item.id, item.customer, item.vendor, item.service].join(' ').includes(search)), [search]);
+
+  return (
+    <div className="space-y-6">
+      <SectionHeading title="إدارة الطلبات" subtitle="مراقبة الطلبات لحظيا، معرفة مستوى الخطورة، والتدخل السريع عند الحاجة." actionLabel="تشغيل المراقبة الحية" />
+      <TableCard
+        title="سجل الطلبات"
+        subtitle="يشمل حالة الطلب الحالية ومؤشر الخطورة."
+        columns={['رقم الطلب', 'العميل', 'البائع', 'الخدمة', 'الإجمالي', 'الحالة', 'الخطورة', 'الإجراء']}
+        rows={rows}
+        renderRow={(order) => (
+          <tr key={order.id} className="border-b border-slate-50 text-slate-700">
+            <td className="px-4 py-4 font-semibold text-slate-900 first:pr-0">{order.id}</td>
+            <td className="px-4 py-4">{order.customer}</td>
+            <td className="px-4 py-4">{order.vendor}</td>
+            <td className="px-4 py-4">{order.service}</td>
+            <td className="px-4 py-4 font-semibold">{order.total}</td>
+            <td className="px-4 py-4"><Badge>{order.status}</Badge></td>
+            <td className="px-4 py-4"><Badge>{order.risk}</Badge></td>
+            <td className="px-4 py-4 pl-0"><Button size="sm" variant="outline">تفاصيل</Button></td>
+          </tr>
+        )}
+      />
+    </div>
+  );
+};
+
+const ContentTab = ({ search }) => {
+  const rows = useMemo(() => contentSeed.filter((item) => [item.id, item.title, item.owner, item.section].join(' ').includes(search)), [search]);
+
+  return (
+    <div className="space-y-6">
+      <SectionHeading title="المحتوى والخدمات" subtitle="إدارة الأقسام، العروض، والتنبيهات التحريرية الخاصة بالتطبيق." actionLabel="إنشاء حملة جديدة" />
+      <TableCard
+        title="العناصر التحريرية"
+        subtitle="العروض والتصنيفات والأقسام النشطة داخل التطبيق."
+        columns={['المعرف', 'القسم', 'العنوان', 'المالك', 'الحالة', 'آخر تحديث', 'الإجراء']}
+        rows={rows}
+        renderRow={(item) => (
+          <tr key={item.id} className="border-b border-slate-50 text-slate-700">
+            <td className="px-4 py-4 font-semibold text-slate-900 first:pr-0">{item.id}</td>
+            <td className="px-4 py-4">{item.section}</td>
+            <td className="px-4 py-4 font-semibold">{item.title}</td>
+            <td className="px-4 py-4">{item.owner}</td>
+            <td className="px-4 py-4"><Badge>{item.state}</Badge></td>
+            <td className="px-4 py-4">{item.updatedAt}</td>
+            <td className="px-4 py-4 pl-0"><Button size="sm" variant="outline">تحرير</Button></td>
+          </tr>
+        )}
+      />
+    </div>
+  );
+};
+
+const FinanceTab = () => (
+  <div className="space-y-6">
+    <SectionHeading title="المالية" subtitle="إدارة المحافظ، المستحقات، والعمولات على مستوى المنصة كاملة." actionLabel="تسوية أسبوعية" />
+    <div className="grid gap-4 xl:grid-cols-3">
+      {financeSeed.map((item) => (
+        <Card key={item.id}>
+          <CardContent className="pt-6">
+            <p className="text-sm font-medium text-slate-500">{item.label}</p>
+            <p className="mt-3 text-3xl font-black text-slate-950">{item.value}</p>
+            <p className="mt-2 text-sm text-slate-400">{item.note}</p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+    <Card>
+      <CardHeader>
+        <div>
+          <CardTitle>ملخص التشغيل المالي</CardTitle>
+          <CardDescription>أهم الإجراءات المالية التي يمكن للإدارة التحكم بها مباشرة.</CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {[
+          'اعتماد دفعات البائعين',
+          'تجميد محفظة مستخدم',
+          'إصدار استرداد مالي',
+          'مراجعة عمولات الأقسام',
+        ].map((item) => (
+          <div key={item} className="rounded-3xl border border-slate-100 bg-slate-50 p-4 text-sm font-medium text-slate-700">{item}</div>
+        ))}
+      </CardContent>
+    </Card>
+  </div>
+);
+
+const SupportTab = () => (
+  <div className="space-y-6">
+    <SectionHeading title="الدعم والامتثال" subtitle="التذاكر الحساسة، الشكاوى المفتوحة، وحالات المخاطر التي تحتاج قرارا إداريا." actionLabel="تعيين فريق مناوب" />
+    <div className="grid gap-4 xl:grid-cols-3">
+      {supportSeed.map((item) => (
+        <Card key={item.id}>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between gap-3">
+              <Badge>{item.severity}</Badge>
+              <span className="text-xs text-slate-400">SLA: {item.sla}</span>
+            </div>
+            <h3 className="mt-4 text-lg font-bold text-slate-950">{item.title}</h3>
+            <p className="mt-2 text-sm text-slate-500">{item.owner}</p>
+            <div className="mt-4 flex items-center justify-between">
+              <Badge>{item.status}</Badge>
+              <Button size="sm" variant="outline">فتح</Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+);
+
+const SettingsTab = () => (
+  <div className="space-y-6">
+    <SectionHeading title="إعدادات النظام" subtitle="مفاتيح التحكم العليا للمنصة: عمولات، حدود، وسياسات تشغيل." actionLabel="حفظ التعديلات" />
+    <div className="grid gap-4 xl:grid-cols-2">
+      {settingsSeed.map((item) => (
+        <Card key={item.id}>
+          <CardContent className="pt-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-bold text-slate-950">{item.title}</p>
+                <p className="mt-2 text-sm text-slate-500">{item.description}</p>
               </div>
-            </Card>
-          )}
+              <Badge tone="rose">{item.value}</Badge>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+);
+
+const pageMeta = {
+  dashboard: { title: 'لوحة التحكم', subtitle: 'متابعة الأداء والإشراف الكامل على التطبيق' },
+  users: { title: 'المستخدمون', subtitle: 'إدارة العملاء والحسابات والمحافظ' },
+  vendors: { title: 'البائعون', subtitle: 'الاعتمادات والامتثال وجودة المتاجر' },
+  orders: { title: 'الطلبات', subtitle: 'سير التنفيذ ومتابعة الحالات التشغيلية' },
+  content: { title: 'المحتوى والخدمات', subtitle: 'العروض والتصنيفات والخدمات الرئيسية' },
+  finance: { title: 'المالية', subtitle: 'التسويات والعمولات والتحكم المالي' },
+  support: { title: 'الدعم والامتثال', subtitle: 'الشكاوى والتذاكر والتصعيدات' },
+  settings: { title: 'إعدادات النظام', subtitle: 'سياسات المنصة والتحكم العام' },
+};
+
+const App = () => {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const currentMeta = pageMeta[activeTab] || pageMeta.dashboard;
+
+  return (
+    <div dir="rtl" className="min-h-screen bg-[radial-gradient(circle_at_top_right,#ffe7ef_0%,#fff8fb_20%,#f8fafc_56%,#ffffff_100%)] text-right">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      <div className="lg:pr-[310px]">
+        <Header onMenuClick={() => setSidebarOpen(true)} search={search} setSearch={setSearch} title={currentMeta.title} />
+
+        <main className="px-4 py-6 sm:px-6">
+          <div className="mb-8 flex flex-col gap-4 rounded-[32px] border border-white/70 bg-white/75 p-6 shadow-[0_30px_80px_-50px_rgba(244,63,94,0.5)] backdrop-blur-xl lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-rose-500">TATX Platform Control</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-950">{currentMeta.title}</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-500">{currentMeta.subtitle}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <div className="rounded-2xl bg-slate-950 px-4 py-3 text-white">
+                <p className="text-xs text-white/60">السوق</p>
+                <p className="mt-1 font-bold">{appSummary.market}</p>
+              </div>
+              <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+                <p className="text-xs text-slate-400">التوفر</p>
+                <p className="mt-1 font-bold text-slate-900">{appSummary.uptime}</p>
+              </div>
+              <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+                <p className="text-xs text-slate-400">خدمات نشطة</p>
+                <p className="mt-1 font-bold text-slate-900">{appSummary.activeServices}</p>
+              </div>
+              <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+                <p className="text-xs text-slate-400">اعتمادات</p>
+                <p className="mt-1 font-bold text-slate-900">{appSummary.pendingApprovals}</p>
+              </div>
+            </div>
+          </div>
+
+          {activeTab === 'dashboard' && <DashboardTab />}
+          {activeTab === 'users' && <UsersTab search={search} />}
+          {activeTab === 'vendors' && <VendorsTab search={search} />}
+          {activeTab === 'orders' && <OrdersTab search={search} />}
+          {activeTab === 'content' && <ContentTab search={search} />}
+          {activeTab === 'finance' && <FinanceTab />}
+          {activeTab === 'support' && <SupportTab />}
+          {activeTab === 'settings' && <SettingsTab />}
         </main>
       </div>
     </div>

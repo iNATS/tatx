@@ -4,19 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
-import { homeServices, homeOffers, products, demoMarket, stayBookingOptions, restaurants } from '../data/staticData';
+import { homeServices, homeOffers, products, demoMarket, restaurants } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
 import PriceDisplay from '../components/PriceDisplay';
-
-const doctorHighlights = [
-  { id: 'd1', name: 'طب أسرة', subtitle: 'حجز ومتابعة', icon: 'medkit-outline', image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=900' },
-  { id: 'd2', name: 'باطنية', subtitle: 'استشارات وفحوصات', icon: 'pulse-outline', image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=900' },
-  { id: 'd3', name: 'جلدية', subtitle: 'عناية وعلاج', icon: 'sparkles-outline', image: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=900' },
-  { id: 'd4', name: 'أسنان', subtitle: 'كشف وعلاج', icon: 'fitness-outline', image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=900' },
-  { id: 'd5', name: 'أطفال', subtitle: 'مواعيد قريبة', icon: 'happy-outline', image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=900' },
-  { id: 'd6', name: 'أونلاين', subtitle: 'استشارة فورية', icon: 'videocam-outline', image: 'https://images.unsplash.com/photo-1584516150909-c43483ee7938?w=900' },
-];
 
 const wholesaleHighlights = [
   { id: 'w1', name: 'مواد غذائية', subtitle: 'للمطاعم والأعمال', icon: 'cube-outline' },
@@ -37,40 +28,6 @@ const pharmacyHighlights = [
 ];
 
 const marketHighlights = [...products.slice(0, 6)];
-
-const bookingHighlights = [
-  ...stayBookingOptions,
-  {
-    id: 'stay-4',
-    title: 'فندق أعمال في العليا',
-    area: 'العليا',
-    guests: 2,
-    price: 420,
-    type: 'hotel',
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900',
-    features: ['مركز أعمال', 'إفطار', 'موقف سيارات'],
-  },
-  {
-    id: 'stay-5',
-    title: 'شاليه جلسات خارجية',
-    area: 'بنبان',
-    guests: 10,
-    price: 760,
-    type: 'chalet',
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=900',
-    features: ['جلسات', 'مسبح', 'خصوصية'],
-  },
-  {
-    id: 'stay-6',
-    title: 'قاعة مناسبات صغيرة',
-    area: 'الملقا',
-    guests: 120,
-    price: 3200,
-    type: 'hall',
-    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=900',
-    features: ['ضيافة', 'صوتيات', 'مواقف'],
-  },
-];
 
 const HomeScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -109,9 +66,6 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Category', { name: 'مطاعم' });
   };
 
-  const hotels = bookingHighlights.filter((item) => item.type === 'hotel').slice(0, 6);
-  const chalets = bookingHighlights.filter((item) => item.type === 'chalet').slice(0, 6);
-  const halls = bookingHighlights.filter((item) => item.type === 'hall').slice(0, 6);
   const marketBackgroundCards = marketHighlights.slice(0, 4);
 
   const renderMiniScroller = (items, onPress, type = 'icon') => (
@@ -183,7 +137,7 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.searchMain}>
               <View style={styles.searchTextWrap}>
                 <Text style={styles.searchTitle}>ابحث</Text>
-                <Text style={styles.searchPlaceholder}>منتجات، مطاعم، صيدلية، دكتور، أو حجوزات</Text>
+                <Text style={styles.searchPlaceholder}>منتجات، مطاعم، صيدلية، سوق الجملة، أو هدايا</Text>
               </View>
               <View style={styles.searchIconWrap}>
                 <Ionicons name="search-outline" size={21} color={colors.primary} />
@@ -311,27 +265,6 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>عروض الأطباء</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('DoctorBooking')}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
-          {doctorHighlights.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.specialtyLuxuryCard} activeOpacity={0.9} onPress={() => navigation.navigate('DoctorBooking')}>
-              <Image source={{ uri: item.image }} style={styles.specialtyLuxuryImage} />
-              <View style={styles.specialtyLuxuryInfo}>
-                <View style={styles.specialtyLuxuryBadge}>
-                  <Ionicons name={item.icon} size={16} color={colors.primary} />
-                </View>
-                <Text style={styles.specialtyLuxuryTitle}>{item.name}</Text>
-                <Text style={styles.specialtyLuxurySubtitle}>{item.subtitle}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
           <Text style={styles.sectionTitle}>تصنيفات الصيدلية</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'صيدلية' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
@@ -352,37 +285,6 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        <TouchableOpacity style={styles.hotelPromoCard} activeOpacity={0.9} onPress={() => navigation.navigate('StayBooking', { bookingType: 'hotel' })}>
-          <Image source={{ uri: hotels[0]?.image }} style={styles.hotelPromoImage} />
-          <View style={styles.hotelPromoContentCard}>
-            <Text style={styles.hotelPromoTitle}>احجز الفنادق من داخل التطبيق</Text>
-            <Text style={styles.hotelPromoSubtitle}>خيارات إقامة مختارة داخل المملكة مع متابعة سهلة للحجز.</Text>
-          </View>
-        </TouchableOpacity>
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>الفنادق</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'hotel' })}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-        </View>
-        {renderMiniScroller(hotels, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>الشاليهات</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'chalet' })}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-        </View>
-        {renderMiniScroller(chalets, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
-
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>القاعات</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'hall' })}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
-          </TouchableOpacity>
-        </View>
-        {renderMiniScroller(halls, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
       </ScrollView>
 
       {cartCount > 0 && (
@@ -564,16 +466,6 @@ const styles = StyleSheet.create({
   specialtyLuxuryBadge: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#FFF1F4', alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
   specialtyLuxuryTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17, textAlign: 'right' },
   specialtyLuxurySubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', marginTop: 4, lineHeight: 18 },
-  hotelPromoCard: { marginTop: spacing.xl, height: 230, borderRadius: 30, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
-  hotelPromoImage: { width: '100%', height: '100%' },
-  hotelPromoContentCard: { position: 'absolute', left: spacing.md, right: spacing.md, bottom: spacing.md, backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 24, padding: spacing.md, alignItems: 'flex-end', ...shadows.sm },
-  hotelPromoTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 22, textAlign: 'right' },
-  hotelPromoSubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', lineHeight: 18, marginTop: 4 },
-  bookingRailCard: { width: 220, height: 238, borderRadius: 28, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
-  bookingMiniImage: { width: '100%', height: 150, backgroundColor: colors.cardSecondary },
-  bookingMiniContentCard: { margin: spacing.md, marginTop: spacing.md, backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: 20, padding: spacing.md, alignItems: 'flex-end', ...shadows.sm },
-  bookingMiniTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 16, textAlign: 'right' },
-  bookingMiniMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4, marginBottom: spacing.xs, textAlign: 'right' },
   cartBar: { position: 'absolute', left: spacing.md, right: spacing.md, backgroundColor: colors.text, borderRadius: 24, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', ...shadows.float },
   cartBarTitle: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
   cartBarSubtitle: { color: 'rgba(255,255,255,0.72)', fontSize: 12, marginTop: 2, textAlign: 'right' },

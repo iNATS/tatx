@@ -35,10 +35,6 @@ const VendorSignupScreen = ({ navigation }) => {
     { id: 'market', name: 'متجر', icon: 'cart' },
     { id: 'pharmacy', name: 'صيدلية', icon: 'medkit' },
     { id: 'wholesale', name: 'جملة', icon: 'layers' },
-    { id: 'hotel', name: 'فندق', icon: 'bed' },
-    { id: 'chalet', name: 'شاليه', icon: 'home' },
-    { id: 'hall', name: 'قاعة', icon: 'business' },
-    { id: 'doctor', name: 'عيادة', icon: 'pulse' },
     { id: 'flowers', name: 'ورود', icon: 'flower' },
     { id: 'other', name: 'أخرى', icon: 'apps' },
   ];
