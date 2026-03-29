@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   bannerSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
   bannerButton: { backgroundColor: colors.cardSecondary, paddingHorizontal: spacing.md, paddingVertical: 10, borderRadius: borderRadius.full },
   bannerButtonText: { color: colors.primary, fontFamily: fonts.semiBold, textAlign: 'right' },
-  addressCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, direction: 'rtl', ...shadows.sm },
+  addressCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', ...shadows.sm },
   cardTop: { justifyContent: 'space-between', alignItems: 'center' },
   titleRow: { alignItems: 'center', gap: spacing.sm },
   addressTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, textAlign: 'right' },

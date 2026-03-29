@@ -201,12 +201,12 @@ const styles = StyleSheet.create({
   heroButton: { marginTop: spacing.md, alignSelf: 'flex-end', backgroundColor: colors.primary, paddingHorizontal: spacing.lg, paddingVertical: 13, borderRadius: borderRadius.full },
   heroButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14 },
   statsRow: { gap: spacing.sm, marginBottom: spacing.lg },
-  statCard: { flex: 1, backgroundColor: colors.card, borderRadius: 22, padding: spacing.md, direction: 'rtl', ...shadows.sm },
+  statCard: { flex: 1, backgroundColor: colors.card, borderRadius: 22, padding: spacing.md, writingDirection: 'rtl', ...shadows.sm },
   statValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 20, textAlign: 'right' },
   statLabel: { color: colors.textSecondary, fontSize: 12, marginTop: spacing.xs, textAlign: 'right' },
   section: { marginBottom: spacing.lg },
   sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 18, marginBottom: spacing.md, textAlign: 'right' },
-  taskRow: { alignItems: 'center', gap: spacing.sm, backgroundColor: colors.card, borderRadius: 20, padding: spacing.md, direction: 'rtl', ...shadows.sm },
+  taskRow: { alignItems: 'center', gap: spacing.sm, backgroundColor: colors.card, borderRadius: 20, padding: spacing.md, writingDirection: 'rtl', ...shadows.sm },
   taskText: { flex: 1, color: colors.textSecondary, fontSize: 14, lineHeight: 21, textAlign: 'right' },
 });
 

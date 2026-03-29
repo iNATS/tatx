@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     marginBottom: spacing.md,
-    direction: 'rtl',
+    writingDirection: 'rtl',
     ...shadows.lg,
   },
   balanceGradient: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
-    direction: 'rtl',
+    writingDirection: 'rtl',
     ...shadows.sm,
   },
   pointsContent: {
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     alignItems: 'center',
-    direction: 'rtl',
+    writingDirection: 'rtl',
     ...shadows.sm,
   },
   statIcon: {
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
     padding: spacing.md,
-    direction: 'rtl',
+    writingDirection: 'rtl',
     ...shadows.sm,
   },
   transactionsHeader: {

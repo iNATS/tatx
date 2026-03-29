@@ -28,7 +28,9 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "themeColor": "#E91E63",
+      "backgroundColor": "#FFF6F8"
     },
     "extra": {
       "eas": {

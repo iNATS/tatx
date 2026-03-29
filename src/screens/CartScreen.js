@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     flexDirection: 'row-reverse',
-    direction: 'rtl',
+    writingDirection: 'rtl',
     ...shadows.sm,
   },
   itemImage: { width: 82, height: 82, borderRadius: 18, backgroundColor: colors.cardSecondary },

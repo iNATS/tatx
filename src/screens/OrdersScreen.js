@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     padding: spacing.md,
     marginBottom: spacing.md,
-    direction: 'rtl',
+    writingDirection: 'rtl',
     ...shadows.sm,
   },
   orderHeader: { alignItems: 'center' },

@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 30,
     backgroundColor: '#8E0814',
-    direction: 'rtl',
+    writingDirection: 'rtl',
     ...shadows.md,
   },
   fullWidthCard: {
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    direction: 'rtl',
+    writingDirection: 'rtl',
     justifyContent: 'center',
   },
   blob: {

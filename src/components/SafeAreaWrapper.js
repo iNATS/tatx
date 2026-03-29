@@ -14,7 +14,6 @@ const SafeAreaWrapper = ({ children, style, backgroundColor = colors.background 
         styles.container,
         {
           backgroundColor,
-          direction: I18nManager.isRTL ? 'rtl' : 'ltr',
           writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
           textAlign: I18nManager.isRTL ? 'right' : 'left',
         },

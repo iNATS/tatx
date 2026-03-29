@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { I18nManager, ActivityIndicator, View, Platform } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppProvider } from './src/context/AppContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { loadFonts } from './src/utils/loadFonts';
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
-I18nManager.swapLeftAndRightInRTL(true);
+if (typeof I18nManager.swapLeftAndRightInRTL === 'function') {
+  I18nManager.swapLeftAndRightInRTL(true);
+}
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -45,9 +48,11 @@ export default function App() {
   }
 
   return (
-    <AppProvider>
-      <StatusBar style="dark" />
-      <AppNavigator />
-    </AppProvider>
+    <SafeAreaProvider>
+      <AppProvider>
+        <StatusBar style="dark" />
+        <AppNavigator />
+      </AppProvider>
+    </SafeAreaProvider>
   );
 }

@@ -44,7 +44,10 @@ function sendFile(res, filePath) {
 
 const server = http.createServer((req, res) => {
   const requestUrl = new URL(req.url, `http://${req.headers.host}`);
-  const sanitizedPath = path.normalize(decodeURIComponent(requestUrl.pathname)).replace(/^(\.\.[/\\])+/, '');
+  const sanitizedPath = path
+    .normalize(decodeURIComponent(requestUrl.pathname))
+    .replace(/^(\.\.[/\\])+/, '')
+    .replace(/^[/\\]+/, '');
   let filePath = path.join(distDir, sanitizedPath);
 
   if (requestUrl.pathname === '/') {
@@ -59,6 +62,12 @@ const server = http.createServer((req, res) => {
 
     if (!error && stats.isFile()) {
       sendFile(res, filePath);
+      return;
+    }
+
+    if (path.extname(requestUrl.pathname)) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('Not found');
       return;
     }
 
