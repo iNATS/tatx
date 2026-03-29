@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const { width } = Dimensions.get('window');
 
@@ -27,17 +28,21 @@ const onboardingData = [
 ];
 
 const OnboardingScreen = ({ navigation }) => {
+  const { isRTL } = useApp();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef(null);
 
   const handleScroll = (event) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / width);
+    const rawIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+    const index = isRTL ? onboardingData.length - 1 - rawIndex : rawIndex;
     setCurrentIndex(index);
   };
 
   const handleNext = () => {
     if (currentIndex < onboardingData.length - 1) {
-      scrollViewRef.current?.scrollTo({ x: (currentIndex + 1) * width, animated: true });
+      const nextIndex = currentIndex + 1;
+      const targetX = isRTL ? (onboardingData.length - 1 - nextIndex) * width : nextIndex * width;
+      scrollViewRef.current?.scrollTo({ x: targetX, animated: true });
       return;
     }
     navigation.replace('Login');
@@ -48,6 +53,7 @@ const OnboardingScreen = ({ navigation }) => {
       <ScrollView
         ref={scrollViewRef}
         horizontal
+        inverted={isRTL}
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
@@ -129,7 +135,7 @@ const styles = StyleSheet.create({
     left: spacing.lg,
     right: spacing.lg,
     bottom: spacing.xl,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -143,7 +149,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   pagination: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     gap: spacing.sm,
   },
   dot: {

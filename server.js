@@ -2,8 +2,9 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+const host = process.env.HOST || '127.0.0.1';
 const port = Number(process.env.PORT || 3000);
-const distDir = path.join(__dirname, 'dist');
+const distDir = path.join(__dirname, process.env.DIST_DIR || 'dist-web');
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
@@ -66,6 +67,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(port, () => {
-  console.log(`TATX web server listening on port ${port}`);
+server.listen(port, host, () => {
+  console.log(`TATX web server listening on http://${host}:${port}`);
 });

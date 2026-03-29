@@ -3,9 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image,
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const VendorSignupScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const { rowDirection, isRTL } = useApp();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     // Step 1: Basic Info
@@ -181,7 +183,7 @@ const VendorSignupScreen = ({ navigation }) => {
           <Ionicons name="mail" size={20} color={colors.textSecondary} />
           <TextInput
             style={styles.input}
-            placeholder="example@email.com"
+            placeholder="name@domain.sa"
             placeholderTextColor={colors.textSecondary}
             keyboardType="email-address"
             value={formData.email}
@@ -393,9 +395,9 @@ const VendorSignupScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm), flexDirection: rowDirection }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
+          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>تسجيل متجر جديد</Text>
         <View style={styles.headerBtn} />
@@ -416,13 +418,13 @@ const VendorSignupScreen = ({ navigation }) => {
       </ScrollView>
 
       {/* Navigation Buttons */}
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md), flexDirection: rowDirection }]}>
         {step > 1 && (
           <TouchableOpacity 
             style={styles.backButton}
             onPress={() => setStep(step - 1)}
           >
-            <Ionicons name="arrow-back" size={20} color={colors.text} />
+            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={20} color={colors.text} />
             <Text style={styles.backButtonText}>السابق</Text>
           </TouchableOpacity>
         )}
@@ -433,7 +435,7 @@ const VendorSignupScreen = ({ navigation }) => {
           <Text style={styles.nextButtonText}>
             {step === 4 ? 'إرسال الطلب' : 'التالي'}
           </Text>
-          <Ionicons name="arrow-forward" size={20} color={colors.white} />
+          <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={20} color={colors.white} />
         </TouchableOpacity>
       </View>
     </View>
@@ -446,7 +448,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
@@ -468,7 +469,7 @@ const styles = StyleSheet.create({
   },
   // Step Indicator
   stepIndicator: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
@@ -523,6 +524,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     marginBottom: spacing.lg,
+    textAlign: 'right',
   },
   inputGroup: {
     marginBottom: spacing.md,
@@ -532,12 +534,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     marginBottom: spacing.sm,
+    textAlign: 'right',
   },
   required: {
     color: colors.error,
   },
   inputContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.grayLight,
     borderRadius: borderRadius.lg,
@@ -548,7 +551,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: colors.text,
-    marginLeft: spacing.sm,
+    marginRight: spacing.sm,
+    textAlign: 'right',
   },
   textArea: {
     height: 100,
@@ -557,7 +561,7 @@ const styles = StyleSheet.create({
   },
   // Categories Grid
   categoriesGrid: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     flexWrap: 'wrap',
     marginBottom: spacing.md,
   },
@@ -584,7 +588,7 @@ const styles = StyleSheet.create({
   },
   // Document Info
   documentInfo: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.info + '15',
     padding: spacing.sm,
@@ -594,8 +598,9 @@ const styles = StyleSheet.create({
   documentInfoText: {
     fontSize: 13,
     color: colors.info,
-    marginLeft: spacing.sm,
+    marginRight: spacing.sm,
     flex: 1,
+    textAlign: 'right',
   },
   // Upload Section
   uploadSection: {
@@ -618,7 +623,7 @@ const styles = StyleSheet.create({
   },
   // Bank Info
   bankInfo: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.success + '15',
     padding: spacing.sm,
@@ -628,22 +633,24 @@ const styles = StyleSheet.create({
   bankInfoText: {
     fontSize: 13,
     color: colors.success,
-    marginLeft: spacing.sm,
+    marginRight: spacing.sm,
     flex: 1,
+    textAlign: 'right',
   },
   // Terms
   termsContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     marginTop: spacing.md,
   },
   checkbox: {
-    marginLeft: spacing.sm,
+    marginRight: spacing.sm,
   },
   termsText: {
     fontSize: 13,
     color: colors.textSecondary,
     flex: 1,
+    textAlign: 'right',
   },
   termsLink: {
     color: colors.primary,
@@ -655,7 +662,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
     paddingHorizontal: spacing.md,
     backgroundColor: colors.white,
     borderTopWidth: 1,
@@ -663,7 +669,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   backButton: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
@@ -679,7 +685,7 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,

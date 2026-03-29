@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -38,6 +39,7 @@ const ModalSheet = ({
   headerActions,
 }) => {
   const insets = useSafeAreaInsets();
+  const { rowDirection, textAlignStart } = useApp();
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const backdropAnim = useRef(new Animated.Value(0)).current;
   const panY = useRef(new Animated.Value(0)).current;
@@ -155,19 +157,19 @@ const ModalSheet = ({
 
           {/* Header */}
           {(title || showCloseButton || headerActions) && (
-            <View style={styles.header}>
-              <View style={styles.headerLeft}>
+            <View style={[styles.header, { flexDirection: rowDirection }]}>
+              <View style={[styles.headerSide, rowDirection === 'row-reverse' ? styles.headerSideStart : styles.headerSideEnd]}>
                 {headerActions?.left}
               </View>
               
               {(title || subtitle) && (
                 <View style={styles.headerCenter}>
-                  {title && <Text style={styles.title}>{title}</Text>}
-                  {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+                  {title && <Text style={[styles.title, { textAlign: textAlignStart }]}>{title}</Text>}
+                  {subtitle && <Text style={[styles.subtitle, { textAlign: textAlignStart }]}>{subtitle}</Text>}
                 </View>
               )}
               
-              <View style={styles.headerRight}>
+              <View style={[styles.headerSide, rowDirection === 'row-reverse' ? styles.headerSideEnd : styles.headerSideStart]}>
                 {headerActions?.right}
                 {showCloseButton && (
                   <TouchableOpacity
@@ -235,7 +237,6 @@ const styles = StyleSheet.create({
     borderRadius: 2.5,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
@@ -243,27 +244,27 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
   },
-  headerLeft: {
+  headerSide: {
     width: 40,
   },
   headerCenter: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
-  headerRight: {
-    width: 40,
+  headerSideStart: {
+    alignItems: 'flex-start',
+  },
+  headerSideEnd: {
     alignItems: 'flex-end',
   },
   title: {
     fontSize: 17,
     fontWeight: '700',
     color: colors.text,
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 13,
     color: colors.textSecondary,
-    textAlign: 'center',
     marginTop: 2,
   },
   closeButton: {

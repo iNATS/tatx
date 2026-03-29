@@ -23,7 +23,7 @@ const OrderSuccessScreen = ({ navigation, route }) => {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.card}>
-          <View style={styles.orderHeader}>
+          <View style={[styles.orderHeader, { flexDirection: rowDirection }]}>
             <Image source={{ uri: order.restaurantLogo || order.items?.[0]?.image }} style={styles.logo} />
             <View style={styles.orderInfo}>
               <Text style={[styles.orderName, { textAlign: textAlignStart }]}>{order.restaurantName || 'طلب جديد'}</Text>
@@ -32,24 +32,24 @@ const OrderSuccessScreen = ({ navigation, route }) => {
             </View>
           </View>
 
-          <View style={[styles.infoRow, { flexDirection: rowDirection }]}><Text style={styles.infoValue}>{order.address}</Text><Text style={styles.infoLabel}>عنوان التوصيل</Text></View>
-          <View style={[styles.infoRow, { flexDirection: rowDirection }]}><Text style={styles.infoValue}>{order.paymentMethod || 'Apple Pay'}</Text><Text style={styles.infoLabel}>طريقة الدفع</Text></View>
-          <View style={[styles.infoRow, { flexDirection: rowDirection }]}><Text style={styles.infoValue}>{order.deliveryWindow || 'خلال 25 - 40 دقيقة'}</Text><Text style={styles.infoLabel}>وقت الوصول</Text></View>
+          <View style={[styles.infoRow, { flexDirection: rowDirection }]}><Text style={styles.infoLabel}>عنوان التوصيل</Text><Text style={styles.infoValue}>{order.address}</Text></View>
+          <View style={[styles.infoRow, { flexDirection: rowDirection }]}><Text style={styles.infoLabel}>طريقة الدفع</Text><Text style={styles.infoValue}>{order.paymentMethod || 'آبل باي'}</Text></View>
+          <View style={[styles.infoRow, { flexDirection: rowDirection }]}><Text style={styles.infoLabel}>وقت الوصول</Text><Text style={styles.infoValue}>{order.deliveryWindow || 'خلال 25 - 40 دقيقة'}</Text></View>
         </View>
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>ملخص الطلب</Text>
           {order.items.map((item) => (
             <View key={item.id || item.name} style={[styles.itemRow, { flexDirection: rowDirection }]}>
-              <Text style={styles.itemPrice}>{formatCurrency(item.price * item.quantity)}</Text>
               <Text style={styles.itemName}>{item.quantity}x {item.name}</Text>
+              <Text style={styles.itemPrice}>{formatCurrency(item.price * item.quantity)}</Text>
             </View>
           ))}
           <View style={styles.divider} />
-          <View style={[styles.itemRow, { flexDirection: rowDirection }]}><Text style={styles.itemPrice}>{formatCurrency(order.subtotal)}</Text><Text style={styles.itemName}>قيمة المنتجات</Text></View>
-          <View style={[styles.itemRow, { flexDirection: rowDirection }]}><Text style={styles.itemPrice}>{formatCurrency(order.deliveryFee)}</Text><Text style={styles.itemName}>رسوم التوصيل</Text></View>
-          {!!order.discount && <View style={[styles.itemRow, { flexDirection: rowDirection }]}><Text style={[styles.itemPrice, styles.discountText]}>- {formatCurrency(order.discount)}</Text><Text style={styles.itemName}>الخصم</Text></View>}
-          <View style={[styles.itemRow, { flexDirection: rowDirection }]}><Text style={styles.totalText}>{formatCurrency(order.total)}</Text><Text style={styles.totalText}>الإجمالي</Text></View>
+          <View style={[styles.itemRow, { flexDirection: rowDirection }]}><Text style={styles.itemName}>قيمة المنتجات</Text><Text style={styles.itemPrice}>{formatCurrency(order.subtotal)}</Text></View>
+          <View style={[styles.itemRow, { flexDirection: rowDirection }]}><Text style={styles.itemName}>رسوم التوصيل</Text><Text style={styles.itemPrice}>{formatCurrency(order.deliveryFee)}</Text></View>
+          {!!order.discount && <View style={[styles.itemRow, { flexDirection: rowDirection }]}><Text style={styles.itemName}>الخصم</Text><Text style={[styles.itemPrice, styles.discountText]}>- {formatCurrency(order.discount)}</Text></View>}
+          <View style={[styles.itemRow, { flexDirection: rowDirection }]}><Text style={styles.totalText}>الإجمالي</Text><Text style={styles.totalText}>{formatCurrency(order.total)}</Text></View>
         </View>
 
         <TouchableOpacity style={styles.secondaryButton} onPress={() => Alert.alert('شكراً لك', 'يمكنك تقييم الطلب بعد اكتمال التوصيل.')}>
@@ -77,16 +77,16 @@ const styles = StyleSheet.create({
   subtitle: { marginTop: spacing.sm, color: colors.textSecondary, textAlign: 'center', lineHeight: 22 },
   content: { padding: spacing.md, paddingBottom: 140 },
   card: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
-  orderHeader: { flexDirection: 'row-reverse', alignItems: 'center', marginBottom: spacing.md },
+  orderHeader: { alignItems: 'center', marginBottom: spacing.md },
   logo: { width: 64, height: 64, borderRadius: 18, backgroundColor: colors.cardSecondary },
-  orderInfo: { flex: 1, marginRight: spacing.md, alignItems: 'flex-end' },
+  orderInfo: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   orderName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 17 },
   orderMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
-  infoRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginBottom: spacing.sm },
+  infoRow: { justifyContent: 'space-between', marginBottom: spacing.sm },
   infoLabel: { color: colors.textSecondary, fontSize: 13 },
-  infoValue: { color: colors.text, fontSize: 13, fontFamily: fonts.semiBold, flex: 1, textAlign: 'left' },
+  infoValue: { color: colors.text, fontSize: 13, fontFamily: fonts.semiBold, flex: 1, textAlign: 'right' },
   sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, marginBottom: spacing.md, textAlign: 'right' },
-  itemRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginBottom: spacing.sm },
+  itemRow: { justifyContent: 'space-between', marginBottom: spacing.sm },
   itemName: { color: colors.text, fontSize: 14 },
   itemPrice: { color: colors.textSecondary, fontSize: 14, fontFamily: fonts.semiBold },
   totalText: { color: colors.primary, fontSize: 16, fontFamily: fonts.bold },

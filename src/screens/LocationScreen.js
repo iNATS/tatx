@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal,
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const defaultAddresses = [
   { id: '1', label: 'المنزل', address: 'الرياض، حي الياسمين', details: 'شارع 12، مبنى 7', isDefault: true, icon: 'home-outline' },
@@ -11,6 +12,7 @@ const defaultAddresses = [
 
 const LocationScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const { isRTL, rowDirection, textAlignStart } = useApp();
   const [addresses, setAddresses] = useState(defaultAddresses);
   const [editingId, setEditingId] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -61,9 +63,9 @@ const LocationScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.sm, flexDirection: rowDirection }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
+          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>العناوين</Text>
         <TouchableOpacity style={styles.headerButton} onPress={openNewModal}>
@@ -72,7 +74,7 @@ const LocationScreen = ({ navigation }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <View style={styles.currentBanner}>
+        <View style={[styles.currentBanner, { flexDirection: 'row-reverse' }]}>
           <Ionicons name="navigate-circle-outline" size={26} color={colors.primary} />
           <View style={styles.currentBannerText}>
             <Text style={styles.bannerTitle}>العنوان الحالي</Text>
@@ -85,8 +87,8 @@ const LocationScreen = ({ navigation }) => {
 
         {addresses.map((address) => (
           <View key={address.id} style={styles.addressCard}>
-            <View style={styles.cardTop}>
-              <View style={styles.actionRow}>
+          <View style={[styles.cardTop, { flexDirection: 'row-reverse' }]}>
+              <View style={[styles.actionRow, { flexDirection: 'row-reverse' }]}>
                 <TouchableOpacity style={styles.smallButton} onPress={() => removeAddress(address.id)}>
                   <Ionicons name="trash-outline" size={18} color={colors.error} />
                 </TouchableOpacity>
@@ -94,14 +96,14 @@ const LocationScreen = ({ navigation }) => {
                   <Ionicons name="create-outline" size={18} color={colors.textSecondary} />
                 </TouchableOpacity>
               </View>
-              <View style={styles.titleRow}>
+              <View style={[styles.titleRow, { flexDirection: 'row-reverse' }]}>
                 {address.isDefault && <Text style={styles.defaultPill}>الافتراضي</Text>}
                 <Text style={styles.addressTitle}>{address.label}</Text>
               </View>
             </View>
             <Text style={styles.addressLine}>{address.address}</Text>
             <Text style={styles.addressDetails}>{address.details}</Text>
-            <View style={styles.cardBottom}>
+            <View style={[styles.cardBottom, { flexDirection: 'row-reverse' }]}>
               <TouchableOpacity style={styles.outlineButton} onPress={() => makeDefault(address.id)}>
                 <Text style={styles.outlineButtonText}>تعيين كافتراضي</Text>
               </TouchableOpacity>
@@ -112,7 +114,7 @@ const LocationScreen = ({ navigation }) => {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.addButton} onPress={openNewModal}>
+        <TouchableOpacity style={[styles.addButton, { flexDirection: 'row-reverse' }]} onPress={openNewModal}>
           <Ionicons name="add-circle-outline" size={22} color={colors.primary} />
           <Text style={styles.addButtonText}>إضافة عنوان جديد</Text>
         </TouchableOpacity>
@@ -134,7 +136,7 @@ const LocationScreen = ({ navigation }) => {
               <TextInput style={styles.textInput} value={form.details} onChangeText={(value) => setForm((prev) => ({ ...prev, details: value }))} placeholder="تفاصيل إضافية" placeholderTextColor={colors.textTertiary} />
             </View>
 
-            <View style={styles.modalActions}>
+            <View style={[styles.modalActions, { flexDirection: 'row-reverse' }]}>
               <TouchableOpacity style={styles.outlineButtonLarge} onPress={() => setShowModal(false)}>
                 <Text style={styles.outlineButtonText}>إلغاء</Text>
               </TouchableOpacity>
@@ -151,42 +153,42 @@ const LocationScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: { backgroundColor: colors.card, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.md, paddingBottom: spacing.md },
+  header: { backgroundColor: colors.card, justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.md, paddingBottom: spacing.md },
   headerButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md, paddingBottom: spacing.xxl },
-  currentBanner: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, flexDirection: 'row-reverse', alignItems: 'center', marginBottom: spacing.md, ...shadows.sm },
-  currentBannerText: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
-  bannerTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
-  bannerSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right' },
+  currentBanner: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, alignItems: 'center', marginBottom: spacing.md, ...shadows.sm },
+  currentBannerText: { flex: 1, width: '100%', marginHorizontal: spacing.md, alignItems: 'flex-end' },
+  bannerTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right', alignSelf: 'stretch' },
+  bannerSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
   bannerButton: { backgroundColor: colors.cardSecondary, paddingHorizontal: spacing.md, paddingVertical: 10, borderRadius: borderRadius.full },
-  bannerButtonText: { color: colors.primary, fontFamily: fonts.semiBold },
-  addressCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
-  cardTop: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
-  titleRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.sm },
-  addressTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16 },
+  bannerButtonText: { color: colors.primary, fontFamily: fonts.semiBold, textAlign: 'right' },
+  addressCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, direction: 'rtl', ...shadows.sm },
+  cardTop: { justifyContent: 'space-between', alignItems: 'center' },
+  titleRow: { alignItems: 'center', gap: spacing.sm },
+  addressTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, textAlign: 'right' },
   defaultPill: { color: colors.primary, backgroundColor: colors.cardSecondary, paddingHorizontal: spacing.sm, paddingVertical: 5, borderRadius: borderRadius.full, fontSize: 11, fontFamily: fonts.semiBold },
-  actionRow: { flexDirection: 'row-reverse', gap: spacing.sm },
+  actionRow: { gap: spacing.sm },
   smallButton: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   addressLine: { marginTop: spacing.md, color: colors.text, textAlign: 'right' },
   addressDetails: { marginTop: 4, color: colors.textSecondary, textAlign: 'right', fontSize: 12 },
-  cardBottom: { marginTop: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between' },
+  cardBottom: { marginTop: spacing.md, justifyContent: 'space-between' },
   outlineButton: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.full, paddingHorizontal: spacing.md, paddingVertical: 10 },
-  outlineButtonText: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13 },
+  outlineButtonText: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'right' },
   primaryMiniButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: spacing.lg, paddingVertical: 10 },
-  primaryMiniText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 13 },
-  addButton: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, ...shadows.sm },
-  addButtonText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 15 },
+  primaryMiniText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'right' },
+  addButton: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, alignItems: 'center', justifyContent: 'center', gap: spacing.sm, ...shadows.sm },
+  addButtonText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
   modalOverlay: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' },
   modalCard: { backgroundColor: colors.card, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: spacing.lg },
   modalHandle: { alignSelf: 'center', width: 46, height: 5, borderRadius: 999, backgroundColor: colors.border, marginBottom: spacing.md },
   modalTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'center', marginBottom: spacing.md },
   inputWrap: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, marginBottom: spacing.sm, paddingHorizontal: spacing.md },
   textInput: { minHeight: 52, color: colors.text, textAlign: 'right' },
-  modalActions: { flexDirection: 'row-reverse', gap: spacing.sm, marginTop: spacing.md },
+  modalActions: { gap: spacing.sm, marginTop: spacing.md },
   outlineButtonLarge: { flex: 1, backgroundColor: colors.cardSecondary, borderRadius: borderRadius.full, alignItems: 'center', paddingVertical: 14 },
   primaryButtonLarge: { flex: 1, backgroundColor: colors.primary, borderRadius: borderRadius.full, alignItems: 'center', paddingVertical: 14 },
-  primaryButtonLargeText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
+  primaryButtonLargeText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
 });
 
 export default LocationScreen;

@@ -74,7 +74,7 @@ const bookingHighlights = [
 
 const HomeScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { user, addToCart, cartCount, rowDirection, textAlignStart } = useApp();
+  const { user, addToCart, cartCount, rowDirection, textAlignStart, isRTL } = useApp();
   const [selectedItem, setSelectedItem] = useState(null);
   const [showItemModal, setShowItemModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -115,7 +115,7 @@ const HomeScreen = ({ navigation }) => {
   const marketBackgroundCards = marketHighlights.slice(0, 4);
 
   const renderMiniScroller = (items, onPress, type = 'icon') => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
+    <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
       {items.map((item) => (
         <TouchableOpacity
           key={item.id}
@@ -202,12 +202,12 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>الخدمات</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>الخدمات</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.servicesRow, { flexDirection: rowDirection }]}>
+        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.servicesRow}>
           {homeServices.map((service) => (
             <TouchableOpacity key={service.id} style={styles.serviceChip} activeOpacity={0.88} onPress={() => handleServicePress(service)}>
               <View style={[styles.serviceIcon, { backgroundColor: `${service.color}15` }]}>
@@ -222,7 +222,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.sectionTitle}>قسم العروض</Text>
           <Text style={styles.sectionLink}>مختارة لك</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
+        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
           {homeOffers.map((offer) => (
             <TouchableOpacity key={offer.id} style={styles.offerCard} activeOpacity={0.88} onPress={() => handleOfferPress(offer)}>
               <Image source={{ uri: offer.image }} style={styles.offerImage} />
@@ -236,10 +236,10 @@ const HomeScreen = ({ navigation }) => {
         </ScrollView>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>مطاعم</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>مطاعم</Text>
         </View>
         <View style={styles.hotList}>
           {restaurants.slice(0, 6).map((restaurant, index) => (
@@ -279,12 +279,12 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>الماركت</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Shop')}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>الماركت</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
+        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
           {marketBackgroundCards.map((item) => (
             <TouchableOpacity key={item.id} style={styles.marketLuxuryCard} activeOpacity={0.9} onPress={() => handleProductPress(item)}>
               <Image source={{ uri: item.image }} style={styles.marketLuxuryImage} />
@@ -311,12 +311,12 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>عروض الأطباء</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('DoctorBooking')}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>عروض الأطباء</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
+        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
           {doctorHighlights.map((item) => (
             <TouchableOpacity key={item.id} style={styles.specialtyLuxuryCard} activeOpacity={0.9} onPress={() => navigation.navigate('DoctorBooking')}>
               <Image source={{ uri: item.image }} style={styles.specialtyLuxuryImage} />
@@ -332,12 +332,12 @@ const HomeScreen = ({ navigation }) => {
         </ScrollView>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>تصنيفات الصيدلية</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'صيدلية' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>تصنيفات الصيدلية</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, { flexDirection: rowDirection }]}>
+        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
           {pharmacyHighlights.map((item) => (
             <TouchableOpacity key={item.id} style={styles.specialtyLuxuryCard} activeOpacity={0.9} onPress={() => navigation.navigate('Category', { name: 'صيدلية' })}>
               <Image source={{ uri: item.image }} style={styles.specialtyLuxuryImage} />
@@ -361,26 +361,26 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>الفنادق</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'hotel' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>الفنادق</Text>
         </View>
         {renderMiniScroller(hotels, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>الشاليهات</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'chalet' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>الشاليهات</Text>
         </View>
         {renderMiniScroller(chalets, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>القاعات</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('StayBooking', { bookingType: 'hall' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>القاعات</Text>
         </View>
         {renderMiniScroller(halls, (booking) => navigation.navigate('StayBookingDetail', { booking }), 'booking')}
       </ScrollView>
@@ -424,8 +424,8 @@ const styles = StyleSheet.create({
   searchIconWrap: { width: 54, height: 54, borderRadius: 20, backgroundColor: '#FFE8EE', alignItems: 'center', justifyContent: 'center' },
   heroOfferCard: { marginBottom: spacing.md, width: '100%', height: 238, borderRadius: 30, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
   sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md, justifyContent: 'space-between', alignItems: 'center' },
-  sectionTitle: { ...typography.h3, color: colors.text },
-  sectionLink: { ...typography.caption, color: colors.primary },
+  sectionTitle: { ...typography.h3, color: colors.text, textAlign: 'right' },
+  sectionLink: { ...typography.caption, color: colors.primary, textAlign: 'left' },
   servicesRow: { gap: spacing.sm, paddingBottom: spacing.xs },
   serviceChip: { backgroundColor: colors.card, borderRadius: 22, paddingHorizontal: spacing.md, paddingVertical: spacing.md, alignItems: 'center', minWidth: 88, ...shadows.sm },
   serviceIcon: { width: 44, height: 44, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },

@@ -1,16 +1,25 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { I18nManager, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useApp } from '../context/AppContext';
+import { colors } from '../constants/theme';
 
 /**
  * SafeAreaWrapper - Provides consistent safe area handling across all screens
  * Wraps content with SafeAreaView for proper notch/status bar handling
  */
-const SafeAreaWrapper = ({ children, style, backgroundColor = '#FAFAFA' }) => {
+const SafeAreaWrapper = ({ children, style, backgroundColor = colors.background }) => {
   return (
-    <SafeAreaView 
-      style={[styles.container, { backgroundColor }, style]} 
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor,
+          direction: I18nManager.isRTL ? 'rtl' : 'ltr',
+          writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
+          textAlign: I18nManager.isRTL ? 'right' : 'left',
+        },
+        style,
+      ]}
       edges={['top', 'bottom']}
     >
       {children}

@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
   miniPlacesRow: { gap: 6, paddingTop: 2, paddingBottom: spacing.xs, justifyContent: 'space-between' },
   miniPlaceChip: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
   tripActions: { gap: spacing.xs, marginTop: spacing.sm },
   tripAction: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
@@ -672,11 +672,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.sm,
   },
-  driverOfferSide: { alignItems: 'flex-start' },
+  driverOfferSide: { alignItems: 'flex-end' },
   driverEta: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
-  driverOfferInfo: { flex: 1, marginHorizontal: spacing.md },
-  driverName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
-  driverCar: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
+  driverOfferInfo: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
+  driverName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
+  driverCar: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right' },
   driverSheetClose: { marginTop: spacing.sm, alignItems: 'center', paddingVertical: 14 },
   driverSheetCloseText: { color: colors.textSecondary, fontFamily: fonts.semiBold, fontSize: 14 },
 });

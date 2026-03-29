@@ -56,7 +56,7 @@ const navTheme = {
 
 const tabConfig = {
   Home: { label: 'الرئيسية', active: 'home', inactive: 'home-outline' },
-  Taxi: { label: 'المشاوير', active: 'car', inactive: 'car-outline' },
+  Taxi: { label: 'مشوار', active: 'car', inactive: 'car-outline' },
   Shop: { label: 'المتجر', active: 'bag', inactive: 'bag-outline' },
   Orders: { label: 'طلباتي', active: 'receipt', inactive: 'receipt-outline' },
   Account: { label: 'حسابي', active: 'person', inactive: 'person-outline' },
@@ -74,9 +74,9 @@ const FloatingTabBar = ({ state, descriptors, navigation }) => {
   return (
     <View style={[styles.tabBarWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
       <View style={styles.tabBar}>
-        {state.routes.map((route, index) => {
+        {state.routes.map((route) => {
           const config = tabConfig[route.name];
-          const isFocused = state.index === index;
+          const isFocused = focusedRoute.key === route.key;
 
           const onPress = () => {
             const event = navigation.emit({
@@ -119,11 +119,11 @@ const MainTabs = () => (
 );
 
 const AppNavigator = () => {
-  const { isAuthenticated } = useApp();
+  const { isAuthenticated, isRTL } = useApp();
 
   return (
     <NavigationContainer theme={navTheme}>
-      <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+      <Stack.Navigator screenOptions={{ headerShown: false, animation: isRTL ? 'slide_from_left' : 'slide_from_right' }}>
         {!isAuthenticated ? (
           <>
             <Stack.Screen name="Splash" component={SplashScreen} />
@@ -176,11 +176,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   tabBar: {
+    flexDirection: 'row',
     marginHorizontal: spacing.lg,
     padding: spacing.sm,
     backgroundColor: 'rgba(255,255,255,0.92)',
     borderRadius: 28,
-    flexDirection: 'row',
     borderWidth: 1,
     borderColor: colors.glassBorder,
     ...shadows.float,

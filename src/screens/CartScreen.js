@@ -101,13 +101,13 @@ const CartScreen = ({ navigation }) => {
         </View>
 
         {cart.map((item) => (
-          <View key={item.id} style={[styles.itemCard, { flexDirection: rowDirection }]}>
+          <View key={item.id} style={[styles.itemCard, { flexDirection: 'row-reverse' }]}>
             <Image source={{ uri: item.image }} style={styles.itemImage} />
             <View style={styles.itemInfo}>
               <Text style={[styles.itemName, { textAlign: textAlignStart }]}>{item.name}</Text>
               {!!item.description && <Text style={[styles.itemDescription, { textAlign: textAlignStart }]}>{item.description}</Text>}
               <Text style={styles.itemPrice}>{formatCurrency((item.finalPrice || item.price) * item.quantity)}</Text>
-              <View style={[styles.actionsRow, { flexDirection: rowDirection }]}>
+              <View style={[styles.actionsRow, { flexDirection: 'row-reverse' }]}>
                 <TouchableOpacity style={styles.iconButton} onPress={() => removeFromCart(item.id)}>
                   <Ionicons name="trash-outline" size={18} color={colors.error} />
                 </TouchableOpacity>
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
     backgroundColor: colors.card,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
@@ -184,21 +184,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
-  summaryLabel: { color: colors.textSecondary, fontFamily: fonts.regular, fontSize: 14 },
-  summaryValue: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14 },
+  summaryLabel: { color: colors.textSecondary, fontFamily: fonts.regular, fontSize: 14, textAlign: 'right' },
+  summaryValue: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right' },
   itemCard: {
     backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
     flexDirection: 'row-reverse',
+    direction: 'rtl',
     ...shadows.sm,
   },
   itemImage: { width: 82, height: 82, borderRadius: 18, backgroundColor: colors.cardSecondary },
-  itemInfo: { flex: 1, marginRight: spacing.md, alignItems: 'flex-end' },
-  itemName: { fontSize: 16, fontFamily: fonts.semiBold, color: colors.text, textAlign: 'right' },
-  itemDescription: { fontSize: 12, color: colors.textSecondary, marginTop: 4, textAlign: 'right' },
-  itemPrice: { fontSize: 15, color: colors.primary, fontFamily: fonts.semiBold, marginTop: spacing.sm },
+  itemInfo: { flex: 1, width: '100%', marginRight: spacing.md, alignItems: 'flex-end' },
+  itemName: { fontSize: 16, fontFamily: fonts.semiBold, color: colors.text, textAlign: 'right', alignSelf: 'stretch' },
+  itemDescription: { fontSize: 12, color: colors.textSecondary, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
+  itemPrice: { fontSize: 15, color: colors.primary, fontFamily: fonts.semiBold, marginTop: spacing.sm, textAlign: 'right', alignSelf: 'stretch' },
   actionsRow: { width: '100%', marginTop: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
   iconButton: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.errorLight, alignItems: 'center', justifyContent: 'center' },
   quantityControl: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.sm },
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: borderRadius.full,
   },
-  checkoutButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
+  checkoutButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.xl },
   emptyIcon: { width: 88, height: 88, borderRadius: 28, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   emptyTitle: { marginTop: spacing.lg, fontSize: 22, fontFamily: fonts.bold, color: colors.text },

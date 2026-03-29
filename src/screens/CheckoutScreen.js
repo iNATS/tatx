@@ -40,7 +40,7 @@ const CheckoutScreen = ({ navigation }) => {
     }
 
     const nextOrder = {
-      id: `TATX-${Date.now().toString().slice(-5)}`,
+      id: `طلب-${Date.now().toString().slice(-5)}`,
       restaurantName: cart[0]?.name || 'طلب جديد',
       restaurantLogo: cart[0]?.image,
       status: 'pending',
@@ -61,7 +61,7 @@ const CheckoutScreen = ({ navigation }) => {
       deliveryFee,
       discount,
       total,
-      paymentMethod: paymentDetails?.name || 'Apple Pay',
+      paymentMethod: paymentDetails?.name || 'آبل باي',
       notes,
       deliveryWindow,
     };
@@ -76,7 +76,7 @@ const CheckoutScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.sm, flexDirection: rowDirection }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name={closeIcon} size={24} color={colors.text} />
         </TouchableOpacity>
@@ -141,7 +141,7 @@ const CheckoutScreen = ({ navigation }) => {
               </View>
               <View style={styles.optionInfo}>
                 <Text style={[styles.optionTitle, { textAlign: textAlignStart }]}>{method.name}</Text>
-                <Text style={[styles.optionSubtitle, { textAlign: textAlignStart }]}>{method.name === 'Apple Pay' ? 'دفع سريع وآمن' : 'متاح لهذا الطلب'}</Text>
+                <Text style={[styles.optionSubtitle, { textAlign: textAlignStart }]}>{method.name === 'آبل باي' ? 'دفع سريع وآمن' : 'متاح لهذا الطلب'}</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -180,10 +180,10 @@ const CheckoutScreen = ({ navigation }) => {
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>ملخص الدفع</Text>
-          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}><Text style={styles.summaryValue}>{formatCurrency(cartTotal)}</Text><Text style={styles.summaryLabel}>قيمة المنتجات</Text></View>
-          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}><Text style={styles.summaryValue}>{formatCurrency(deliveryFee)}</Text><Text style={styles.summaryLabel}>رسوم التوصيل</Text></View>
-          {discountApplied && <View style={[styles.summaryRow, { flexDirection: rowDirection }]}><Text style={[styles.summaryValue, styles.discountValue]}>- {formatCurrency(discount)}</Text><Text style={styles.summaryLabel}>الخصم</Text></View>}
-          <View style={[styles.summaryRow, styles.totalRow, { flexDirection: rowDirection }]}><Text style={styles.totalValue}>{formatCurrency(total)}</Text><Text style={styles.totalLabel}>الإجمالي</Text></View>
+          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}><Text style={styles.summaryLabel}>قيمة المنتجات</Text><Text style={styles.summaryValue}>{formatCurrency(cartTotal)}</Text></View>
+          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}><Text style={styles.summaryLabel}>رسوم التوصيل</Text><Text style={styles.summaryValue}>{formatCurrency(deliveryFee)}</Text></View>
+          {discountApplied && <View style={[styles.summaryRow, { flexDirection: rowDirection }]}><Text style={styles.summaryLabel}>الخصم</Text><Text style={[styles.summaryValue, styles.discountValue]}>- {formatCurrency(discount)}</Text></View>}
+          <View style={[styles.summaryRow, styles.totalRow, { flexDirection: rowDirection }]}><Text style={styles.totalLabel}>الإجمالي</Text><Text style={styles.totalValue}>{formatCurrency(total)}</Text></View>
         </View>
 
         <TouchableOpacity style={styles.submitButton} onPress={handlePlaceOrder}>
@@ -198,7 +198,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
     backgroundColor: colors.card,
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
@@ -208,25 +207,25 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md, paddingBottom: spacing.xxl },
   card: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
-  sectionHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
+  sectionHeader: { justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
   sectionTitle: { fontSize: 17, fontFamily: fonts.semiBold, color: colors.text, textAlign: 'right', marginBottom: spacing.md },
   linkText: { color: colors.primary, fontSize: 13, fontFamily: fonts.semiBold },
-  inputShell: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md, flexDirection: 'row-reverse', alignItems: 'center' },
+  inputShell: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md, alignItems: 'center' },
   input: { flex: 1, minHeight: 52, color: colors.text, textAlign: 'right', fontFamily: fonts.regular },
-  optionCard: { flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, padding: spacing.md, marginBottom: spacing.sm, borderWidth: 1, borderColor: 'transparent' },
+  optionCard: { alignItems: 'center', backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, padding: spacing.md, marginBottom: spacing.sm, borderWidth: 1, borderColor: 'transparent' },
   optionCardSelected: { borderColor: 'rgba(218,60,87,0.22)', backgroundColor: colors.cardSecondary },
   optionIndicator: { width: 28, alignItems: 'center' },
   optionInfo: { flex: 1, alignItems: 'flex-end' },
   optionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
   optionSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 2, textAlign: 'right' },
   selectedText: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', marginTop: spacing.sm },
-  discountRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing.sm },
+  discountRow: { alignItems: 'center', gap: spacing.sm },
   discountInput: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md },
   discountButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: spacing.lg, paddingVertical: 14 },
   discountButtonText: { color: colors.white, fontFamily: fonts.semiBold },
-  notesShell: { minHeight: 110, alignItems: 'flex-start', paddingVertical: spacing.sm },
+  notesShell: { minHeight: 110, alignItems: 'flex-end', paddingVertical: spacing.sm },
   notesInput: { textAlignVertical: 'top' },
-  summaryRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginBottom: spacing.sm },
+  summaryRow: { justifyContent: 'space-between', marginBottom: spacing.sm },
   summaryLabel: { color: colors.textSecondary, fontSize: 14 },
   summaryValue: { color: colors.text, fontSize: 14, fontFamily: fonts.semiBold },
   discountValue: { color: colors.success },

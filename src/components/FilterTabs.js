@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 /**
  * Reusable Filter Tabs Component
@@ -14,10 +15,13 @@ const FilterTabs = ({
   showIcons = true,
   compact = false 
 }) => {
+  const { isRTL, rowDirection, textAlignStart } = useApp();
+
   return (
     <View style={styles.container}>
       <ScrollView 
-        horizontal 
+        horizontal
+        inverted={isRTL}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -31,6 +35,7 @@ const FilterTabs = ({
               key={index}
               style={[
                 styles.tab,
+                { flexDirection: rowDirection },
                 isSelected && styles.tabActive,
                 compact && styles.tabCompact,
               ]}
@@ -47,6 +52,7 @@ const FilterTabs = ({
               <Text 
                 style={[
                   styles.tabText, 
+                  { textAlign: textAlignStart },
                   isSelected && styles.tabTextActive,
                   compact && styles.tabTextCompact,
                 ]}
@@ -74,7 +80,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   tab: {
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.cardSecondary,
     paddingHorizontal: spacing.md,
@@ -96,11 +101,11 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 13,
     color: colors.textSecondary,
-    fontWeight: '600',
+    fontFamily: fonts.semiBold,
   },
   tabTextActive: {
     color: colors.white,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
   },
   tabTextCompact: {
     fontSize: 12,

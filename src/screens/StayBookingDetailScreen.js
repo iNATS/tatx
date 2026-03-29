@@ -45,7 +45,7 @@ const termsByType = {
 
 const StayBookingDetailScreen = ({ route, navigation }) => {
   const { booking } = route.params || {};
-  const { rowDirection, textAlignStart } = useApp();
+  const { isRTL, rowDirection, textAlignStart } = useApp();
   const [selectedCheckIn, setSelectedCheckIn] = useState(dateOptions[0]);
   const [selectedCheckOut, setSelectedCheckOut] = useState(dateOptions[2]);
   const [selectedGuests, setSelectedGuests] = useState(guestOptions[0]);
@@ -109,7 +109,7 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
         <View style={styles.card}>
           <Text style={[styles.sectionTitle, { textAlign: textAlignStart }]}>اختر فترة الحجز</Text>
           <Text style={[styles.dateLabel, { textAlign: textAlignStart }]}>من</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.chipsRow, { flexDirection: rowDirection }]}>
+          <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
             {dateOptions.map((date) => (
               <TouchableOpacity
                 key={`in-${date}`}
@@ -122,7 +122,7 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
           </ScrollView>
 
           <Text style={[styles.dateLabel, { textAlign: textAlignStart }]}>إلى</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.chipsRow, { flexDirection: rowDirection }]}>
+          <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
             {dateOptions.map((date) => (
               <TouchableOpacity
                 key={`out-${date}`}
@@ -135,7 +135,7 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
           </ScrollView>
 
           <Text style={[styles.sectionTitle, { textAlign: textAlignStart, marginTop: spacing.md }]}>عدد الضيوف أو الحضور</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.chipsRow, { flexDirection: rowDirection }]}>
+          <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
             {guestOptions.map((guest) => (
               <TouchableOpacity
                 key={guest}
@@ -148,7 +148,7 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
           </ScrollView>
 
           <Text style={[styles.sectionTitle, { textAlign: textAlignStart, marginTop: spacing.md }]}>طريقة التواصل للتأكيد</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.chipsRow, { flexDirection: rowDirection }]}>
+          <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
             {contactOptions.map((option) => (
               <TouchableOpacity
                 key={option}
@@ -196,12 +196,12 @@ const StayBookingDetailScreen = ({ route, navigation }) => {
             <Text style={styles.summaryLabel}>نهاية الحجز</Text>
           </View>
           <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
-            <Text style={styles.summaryValue}>{selectedGuests}</Text>
             <Text style={styles.summaryLabel}>الضيوف / الحضور</Text>
+            <Text style={styles.summaryValue}>{selectedGuests}</Text>
           </View>
           <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
-            <Text style={styles.summaryValue}>{selectedContact}</Text>
             <Text style={styles.summaryLabel}>طريقة التأكيد</Text>
+            <Text style={styles.summaryValue}>{selectedContact}</Text>
           </View>
         </View>
 
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  titleWrap: { flex: 1, marginHorizontal: spacing.md },
+  titleWrap: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   title: { color: colors.text, fontFamily: fonts.bold, fontSize: 20 },
   subtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 4 },
   featuresRow: { flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.md },
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   packageCardSelected: { borderColor: 'rgba(218,60,87,0.22)', backgroundColor: '#FFF3F6' },
   packageIndicator: { width: 28, alignItems: 'center' },
-  packageInfo: { flex: 1, marginHorizontal: spacing.md },
+  packageInfo: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   packageName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
   packageNote: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
   packagePrice: { color: colors.primary, fontFamily: fonts.bold, fontSize: 14 },
@@ -290,9 +290,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderLight,
   },
   summaryLabel: { color: colors.textSecondary, fontSize: 13 },
-  summaryValue: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, maxWidth: '58%', textAlign: 'left' },
+  summaryValue: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, maxWidth: '58%', textAlign: 'right' },
   termRow: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: spacing.sm,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     ...shadows.float,
   },
-  footerPriceWrap: { flex: 1 },
+  footerPriceWrap: { flex: 1, alignItems: 'flex-end' },
   footerLabel: { color: colors.textSecondary, fontSize: 12 },
   footerButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: spacing.xl, paddingVertical: 15 },
   footerButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },

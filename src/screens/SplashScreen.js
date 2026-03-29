@@ -2,15 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useApp } from '../context/AppContext';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
 
 const SplashScreen = ({ navigation }) => {
-  const { setLanguage } = useApp();
   const insets = useSafeAreaInsets();
 
-  const handleLanguageSelect = (lang) => {
-    setLanguage(lang);
+  const handleStart = () => {
     navigation.replace('Onboarding');
   };
 
@@ -20,21 +17,17 @@ const SplashScreen = ({ navigation }) => {
         <View style={styles.logoShell}>
           <Image source={require('../../assets/logo.png')} style={styles.logo} resizeMode="contain" />
         </View>
-        <Text style={styles.appName}>TATX</Text>
+        <Text style={styles.appName}>تاتكس</Text>
         <Text style={styles.subtitle}>دائما معك</Text>
       </View>
 
       <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
         <View style={styles.handle} />
-        <Text style={styles.sheetTitle}>اختر لغة البداية</Text>
-        <Text style={styles.sheetSubtitle}>اختر اللغة المناسبة لك للبدء واستعراض الخدمات.</Text>
+        <Text style={styles.sheetTitle}>ابدأ التجربة</Text>
+        <Text style={styles.sheetSubtitle}>واجهة عربية كاملة بتصميم مريح وواضح يراعي أنماط الاستخدام على أجهزة آبل.</Text>
 
-        <TouchableOpacity style={styles.primaryButton} activeOpacity={0.9} onPress={() => handleLanguageSelect('ar')}>
-          <Text style={styles.primaryButtonText}>العربية</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.85} onPress={() => handleLanguageSelect('en')}>
-          <Text style={styles.secondaryButtonText}>English</Text>
+        <TouchableOpacity style={styles.primaryButton} activeOpacity={0.9} onPress={handleStart}>
+          <Text style={styles.primaryButtonText}>متابعة</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -127,20 +120,6 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: colors.white,
-    fontFamily: fonts.semiBold,
-    fontSize: 17,
-  },
-  secondaryButton: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    paddingVertical: 18,
-    alignItems: 'center',
-    marginTop: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  secondaryButtonText: {
-    color: colors.text,
     fontFamily: fonts.semiBold,
     fontSize: 17,
   },

@@ -4,19 +4,20 @@ import { demoMarket, translations, user as defaultUser } from '../data/staticDat
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [language, setLanguage] = useState('ar');
   const [user, setUser] = useState(defaultUser);
   const [cart, setCart] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
 
-  const isRTL = language === 'ar';
-  const locale = language === 'ar' ? 'ar-SA' : 'en-SA';
+  const language = 'ar';
+  const setLanguage = () => {};
+  const isRTL = true;
+  const locale = 'ar-SA';
   const currencySymbol = demoMarket.currency || '﷼';
   const rowDirection = isRTL ? 'row-reverse' : 'row';
   const textAlignStart = isRTL ? 'right' : 'left';
   const textAlignEnd = isRTL ? 'left' : 'right';
-  const dictionary = translations[language] || translations.ar;
+  const dictionary = translations.ar;
 
   const t = (key) => dictionary[key] || translations.ar?.[key] || key;
 

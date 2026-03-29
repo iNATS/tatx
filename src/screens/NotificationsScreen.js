@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: spacing.md,
     marginBottom: spacing.md,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     ...shadows.sm,
   },
   notificationCardUnread: {
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  notificationText: { flex: 1, marginHorizontal: spacing.md },
+  notificationText: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   notificationHeader: { justifyContent: 'space-between', alignItems: 'center' },
   notificationTitle: { flex: 1, color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
   notificationTime: { color: colors.textTertiary, fontSize: 12, marginHorizontal: spacing.sm },

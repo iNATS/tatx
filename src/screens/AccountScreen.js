@@ -15,7 +15,7 @@ const menuItems = [
 ];
 
 const AccountScreen = ({ navigation }) => {
-  const { user, setIsAuthenticated, language, setLanguage, rowDirection, textAlignStart, isRTL } = useApp();
+  const { user, setIsAuthenticated, rowDirection, textAlignStart, isRTL } = useApp();
   const chevronIcon = isRTL ? 'chevron-back' : 'chevron-forward';
 
   return (
@@ -24,9 +24,7 @@ const AccountScreen = ({ navigation }) => {
         navigation={navigation}
         showBack={false}
         title="حسابي"
-        subtitle="بياناتك، اللغة، وإدارة خدماتك من مكان واحد"
-        actionIcon="language-outline"
-        onActionPress={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+        subtitle="بياناتك وإدارة خدماتك من مكان واحد"
       />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
@@ -63,11 +61,11 @@ const AccountScreen = ({ navigation }) => {
               style={[styles.menuItem, { flexDirection: rowDirection }, index < menuItems.length - 1 && styles.menuItemBorder]}
               onPress={() => navigation.navigate(item.screen)}
             >
-              <Ionicons name={chevronIcon} size={18} color={colors.textTertiary} />
-              <Text style={[styles.menuLabel, { textAlign: textAlignStart }]}>{item.label}</Text>
               <View style={styles.menuIconWrap}>
                 <Ionicons name={item.icon} size={20} color={colors.primary} />
               </View>
+              <Text style={[styles.menuLabel, { textAlign: textAlignStart }]}>{item.label}</Text>
+              <Ionicons name={chevronIcon} size={18} color={colors.textTertiary} />
             </TouchableOpacity>
           ))}
         </View>
@@ -84,12 +82,12 @@ const AccountScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: spacing.md, paddingBottom: 120 },
-  profileCard: { backgroundColor: colors.card, borderRadius: 30, padding: spacing.lg, alignItems: 'center', ...shadows.md },
-  settingsButton: { alignSelf: 'flex-start', width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
-  logo: { width: 88, height: 88, marginTop: spacing.sm },
-  name: { color: colors.text, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.md },
-  subtitle: { color: colors.textSecondary, marginTop: spacing.xs, fontSize: 13 },
-  tagline: { color: colors.primary, marginTop: spacing.sm, fontFamily: fonts.semiBold, fontSize: 15 },
+  profileCard: { backgroundColor: colors.card, borderRadius: 30, padding: spacing.lg, alignItems: 'stretch', ...shadows.md },
+  settingsButton: { alignSelf: 'flex-end', width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
+  logo: { width: 88, height: 88, marginTop: spacing.sm, alignSelf: 'center' },
+  name: { color: colors.text, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.md, alignSelf: 'stretch' },
+  subtitle: { color: colors.textSecondary, marginTop: spacing.xs, fontSize: 13, alignSelf: 'stretch' },
+  tagline: { color: colors.primary, marginTop: spacing.sm, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
   identityCard: {
     width: '100%',
     backgroundColor: '#FFF4F6',
@@ -106,7 +104,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  identityBody: { flex: 1, marginHorizontal: spacing.md },
+  identityBody: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   identityTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
   identitySubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 20 },
   sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md },

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform } from 'react
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows, typography } from '../constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useApp } from '../context/AppContext';
 
 /**
  * NativeBottomSheet - A bottom sheet component with native-like appearance
@@ -16,6 +17,7 @@ const NativeBottomSheet = ({
   height = 'auto',
 }) => {
   const insets = useSafeAreaInsets();
+  const { rowDirection, textAlignStart } = useApp();
 
   return (
     <Modal
@@ -40,8 +42,8 @@ const NativeBottomSheet = ({
         </View>
         
         {title && (
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{title}</Text>
+          <View style={[styles.titleContainer, { flexDirection: rowDirection }]}>
+            <Text style={[styles.title, { textAlign: textAlignStart }]}>{title}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
@@ -82,13 +84,13 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   titleContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
   },
   title: {
+    flex: 1,
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,

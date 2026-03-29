@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   actionsContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
   },
   singleButtonContainer: {
     justifyContent: 'center',
@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   actionSeparator: {
-    borderRightWidth: 1,
-    borderRightColor: colors.borderLight,
+    borderLeftWidth: 1,
+    borderLeftColor: colors.borderLight,
   },
   actionText: {
     fontSize: 17,

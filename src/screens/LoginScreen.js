@@ -15,7 +15,7 @@ const roles = [
 
 const LoginScreen = () => {
   const insets = useSafeAreaInsets();
-  const { setIsAuthenticated, setUser } = useApp();
+  const { setIsAuthenticated, setUser, rowDirection, textAlignStart } = useApp();
   const [selectedRole, setSelectedRole] = useState('user');
   const [phone, setPhone] = useState(demoAccounts.user.phone);
   const [loading, setLoading] = useState(false);
@@ -72,7 +72,7 @@ const LoginScreen = () => {
                     <Ionicons name={role.icon} size={20} color={isSelected ? colors.white : colors.primary} />
                   </View>
                   <View style={styles.roleTextBlock}>
-                    <Text style={[styles.roleTitle, isSelected && styles.roleTitleSelected]}>{role.label}</Text>
+                    <Text style={[styles.roleTitle, { textAlign: textAlignStart }, isSelected && styles.roleTitleSelected]}>{role.label}</Text>
                     <Text style={styles.roleSubtitle}>{role.subtitle}</Text>
                   </View>
                   {isSelected && <Ionicons name="checkmark-circle" size={22} color={colors.primary} />}
@@ -83,7 +83,7 @@ const LoginScreen = () => {
 
           <View style={styles.fieldGroup}>
             <Text style={styles.fieldLabel}>رقم الجوال</Text>
-            <View style={styles.inputShell}>
+            <View style={[styles.inputShell, { flexDirection: rowDirection }]}>
               <TextInput
                 style={styles.input}
                 placeholder="05XXXXXXXX"
@@ -111,7 +111,7 @@ const LoginScreen = () => {
           </View>
           <View style={styles.infoRow}>
             <Ionicons name="card-outline" size={18} color={colors.primary} />
-            <Text style={styles.infoText}>طرق الدفع المعروضة: Apple Pay، مدى، بطاقات</Text>
+            <Text style={styles.infoText}>طرق الدفع المعروضة: آبل باي، مدى، وبطاقات الدفع</Text>
           </View>
         </View>
       </ScrollView>
@@ -237,7 +237,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   inputShell: {
-    flexDirection: 'row',
     alignItems: 'center',
     borderRadius: borderRadius.lg,
     backgroundColor: colors.cardSecondary,
@@ -257,7 +256,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontFamily: fonts.semiBold,
     fontSize: 15,
-    marginLeft: spacing.sm,
+    marginHorizontal: spacing.sm,
   },
   helperText: {
     ...typography.caption,

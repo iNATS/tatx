@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -34,6 +35,7 @@ const ActionSheet = ({
   cancelButtonIndex,
 }) => {
   const insets = useSafeAreaInsets();
+  const { rowDirection, textAlignStart } = useApp();
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const backdropAnim = useRef(new Animated.Value(0)).current;
 
@@ -134,6 +136,7 @@ const ActionSheet = ({
                 key={index}
                 style={[
                   styles.actionButton,
+                  { flexDirection: rowDirection },
                   isDestructive && styles.destructiveButton,
                   isCancel && styles.cancelButton,
                   !isLast && styles.actionSeparator,
@@ -152,6 +155,7 @@ const ActionSheet = ({
                 <Text
                   style={[
                     styles.actionText,
+                    { textAlign: textAlignStart },
                     isDestructive && styles.destructiveText,
                     isCancel && styles.cancelText,
                   ]}
@@ -216,7 +220,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   actionButton: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: spacing.md,
@@ -236,7 +239,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.borderLight,
   },
   actionIcon: {
-    marginRight: spacing.sm,
+    marginHorizontal: spacing.sm,
   },
   actionText: {
     fontSize: 17,

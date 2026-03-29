@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
+import AppListCard from '../components/AppListCard';
 
 const providerFilters = [
   { id: 'restaurant', label: 'مطاعم', icon: 'restaurant-outline' },
@@ -108,7 +109,7 @@ const providerConfigs = {
 };
 
 const VendorAppScreen = ({ navigation, route }) => {
-  const { rowDirection, textAlignStart } = useApp();
+  const { isRTL, rowDirection, textAlignStart } = useApp();
   const [selectedProvider, setSelectedProvider] = useState(route.params?.providerType || 'restaurant');
   const providerName = route.params?.providerName || 'واجهة مقدم الخدمة';
   const isOnboarded = route.params?.onboarded ?? false;
@@ -123,7 +124,7 @@ const VendorAppScreen = ({ navigation, route }) => {
       <PageHeader
         navigation={navigation}
         title="تطبيق مقدم الخدمة"
-        subtitle="واجهة واحدة تتغيّر حسب نوع النشاط داخل TATX"
+        subtitle="واجهة واحدة تتغيّر حسب نوع النشاط داخل التطبيق"
         filters={providerFilters}
         selectedFilter={selectedProvider}
         onSelectFilter={setSelectedProvider}
@@ -144,7 +145,7 @@ const VendorAppScreen = ({ navigation, route }) => {
           )}
         </View>
 
-        <View style={[styles.statsRow, { flexDirection: rowDirection }]}>
+        <View style={[styles.statsRow, { flexDirection: 'row-reverse' }]}>
           {config.stats.map((stat) => (
             <View key={stat.label} style={styles.statCard}>
               <Text style={styles.statValue}>{stat.value}</Text>
@@ -156,7 +157,7 @@ const VendorAppScreen = ({ navigation, route }) => {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { textAlign: textAlignStart }]}>مهام اليوم</Text>
           {config.tasks.map((task) => (
-            <View key={task} style={[styles.taskRow, { flexDirection: rowDirection }]}>
+            <View key={task} style={[styles.taskRow, { flexDirection: 'row-reverse' }]}>
               <Ionicons name="ellipse" size={8} color={colors.primary} />
               <Text style={[styles.taskText, { textAlign: textAlignStart }]}>{task}</Text>
             </View>
@@ -166,22 +167,17 @@ const VendorAppScreen = ({ navigation, route }) => {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { textAlign: textAlignStart }]}>أدوات الإدارة</Text>
           {config.actions.map((action) => (
-            <TouchableOpacity
+            <AppListCard
               key={action.id}
-              style={[styles.actionCard, { flexDirection: rowDirection }]}
+              title={action.label}
+              subtitle="افتح واجهة النشاط كما تظهر للمستخدم وراجع الأداء اليومي"
+              mediaIcon={action.icon}
+              mediaColor={colors.primary}
+              metaLabel="TOOL"
+              metaValue={config.title}
+              actionLabel="فتح الأداة"
               onPress={() => navigation.navigate(action.screen, action.params)}
-            >
-              <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-              <View style={styles.actionText}>
-                <Text style={[styles.actionTitle, { textAlign: textAlignStart }]}>{action.label}</Text>
-                <Text style={[styles.actionSubtitle, { textAlign: textAlignStart }]}>
-                  افتح واجهة النشاط كما تظهر للمستخدم وراجع الأداء اليومي
-                </Text>
-              </View>
-              <View style={styles.actionIconWrap}>
-                <Ionicons name={action.icon} size={22} color={colors.primary} />
-              </View>
-            </TouchableOpacity>
+            />
           ))}
         </View>
       </ScrollView>
@@ -199,24 +195,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     ...shadows.md,
   },
-  heroEyebrow: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13 },
-  heroTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.sm },
-  heroSubtitle: { color: colors.textSecondary, fontSize: 14, marginTop: spacing.sm, lineHeight: 22 },
-  heroButton: { marginTop: spacing.md, alignSelf: 'flex-start', backgroundColor: colors.primary, paddingHorizontal: spacing.lg, paddingVertical: 13, borderRadius: borderRadius.full },
+  heroEyebrow: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'right', alignSelf: 'stretch' },
+  heroTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.sm, textAlign: 'right', alignSelf: 'stretch' },
+  heroSubtitle: { color: colors.textSecondary, fontSize: 14, marginTop: spacing.sm, lineHeight: 22, textAlign: 'right', alignSelf: 'stretch' },
+  heroButton: { marginTop: spacing.md, alignSelf: 'flex-end', backgroundColor: colors.primary, paddingHorizontal: spacing.lg, paddingVertical: 13, borderRadius: borderRadius.full },
   heroButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14 },
   statsRow: { gap: spacing.sm, marginBottom: spacing.lg },
-  statCard: { flex: 1, backgroundColor: colors.card, borderRadius: 22, padding: spacing.md, ...shadows.sm },
+  statCard: { flex: 1, backgroundColor: colors.card, borderRadius: 22, padding: spacing.md, direction: 'rtl', ...shadows.sm },
   statValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 20, textAlign: 'right' },
   statLabel: { color: colors.textSecondary, fontSize: 12, marginTop: spacing.xs, textAlign: 'right' },
   section: { marginBottom: spacing.lg },
-  sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 18, marginBottom: spacing.md },
-  taskRow: { alignItems: 'center', gap: spacing.sm, backgroundColor: colors.card, borderRadius: 20, padding: spacing.md, marginBottom: spacing.sm, ...shadows.sm },
-  taskText: { flex: 1, color: colors.textSecondary, fontSize: 14, lineHeight: 21 },
-  actionCard: { alignItems: 'center', backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
-  actionText: { flex: 1, marginHorizontal: spacing.md },
-  actionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
-  actionSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 18 },
-  actionIconWrap: { width: 48, height: 48, borderRadius: 18, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
+  sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 18, marginBottom: spacing.md, textAlign: 'right' },
+  taskRow: { alignItems: 'center', gap: spacing.sm, backgroundColor: colors.card, borderRadius: 20, padding: spacing.md, direction: 'rtl', ...shadows.sm },
+  taskText: { flex: 1, color: colors.textSecondary, fontSize: 14, lineHeight: 21, textAlign: 'right' },
 });
 
 export default VendorAppScreen;

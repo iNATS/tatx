@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { homeServices } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
+import AppListCard from '../components/AppListCard';
 
 const serviceFilters = [
   { id: 'all', label: 'الكل', icon: 'apps-outline' },
@@ -15,6 +15,15 @@ const serviceFilters = [
   { id: 'support', label: 'الدعم', icon: 'help-buoy-outline' },
 ];
 
+const serviceGroupLabels = {
+  all: 'جميع الأقسام',
+  mobility: 'التنقل',
+  shopping: 'التسوق',
+  booking: 'الحجوزات',
+  business: 'الأعمال',
+  support: 'الدعم',
+};
+
 const extraServices = [
   { id: 'orders', name: 'طلباتي', subtitle: 'متابعة الطلبات وإعادة الطلب', icon: 'receipt-outline', screen: 'Orders', color: '#DA3C57', group: 'support' },
   { id: 'notifications', name: 'الإشعارات', subtitle: 'كل التحديثات والتنبيهات', icon: 'notifications-outline', screen: 'Notifications', color: '#FF8A5B', group: 'support' },
@@ -24,7 +33,9 @@ const extraServices = [
 const serviceGroups = {
   taxi: 'mobility',
   food: 'shopping',
+  cafes: 'shopping',
   market: 'shopping',
+  kids: 'shopping',
   pharmacy: 'shopping',
   gifts: 'shopping',
   wholesale: 'business',
@@ -36,24 +47,24 @@ const serviceGroups = {
 };
 
 const serviceSubtitles = {
-  taxi: 'اطلب سيارة مع تتبع مباشر للخريطة',
-  food: 'مطاعم ووجبات سريعة ومقاهي',
-  market: 'طلبات المنزل والسوبرماركت',
+  taxi: 'احجز مشوارك بسرعة مع تتبع مباشر',
+  food: 'مطاعم ووجبات متنوعة داخل مدينتك',
+  cafes: 'قهوة مختصة ومخبوزات وحلويات',
+  market: 'طلبات المنزل اليومية من السوبرماركيت',
+  kids: 'منتجات وألعاب مختارة للأطفال',
   pharmacy: 'أدوية ومنتجات عناية موثوقة',
-  gifts: 'هدايا وورد وتغليف مناسب للمناسبات',
-  wholesale: 'توريد للكميات والمكاتب والمتاجر',
+  gifts: 'عطور وهدايا وتغليف للمناسبات',
+  wholesale: 'توريد منظم حسب مجموعات الشراء',
   doctor: 'حجز طبيب واختيار الموعد المناسب',
-  hotel: 'حجز فنادق داخل المملكة',
-  chalet: 'شاليهات للرحلات والويكند',
-  hall: 'قاعات للمناسبات والاجتماعات',
-  'all-services': 'استعرض كل أقسام التطبيق',
+  hotel: 'احجز فندق مناسب لرحلتك',
+  chalet: 'شالية للرحلات والويكند',
+  hall: 'قاعة للمناسبات والاجتماعات',
 };
 
 const ServicesScreen = ({ navigation }) => {
-  const { isRTL, rowDirection, textAlignStart } = useApp();
+  const { rowDirection, textAlignStart } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
-  const chevronIcon = isRTL ? 'chevron-back' : 'chevron-forward';
 
   const services = useMemo(() => {
     return [...homeServices, ...extraServices].map((service) => ({
@@ -99,27 +110,23 @@ const ServicesScreen = ({ navigation }) => {
           <View style={styles.heroText}>
             <Text style={[styles.heroTitle, { textAlign: textAlignStart }]}>دائما معك</Text>
             <Text style={[styles.heroSubtitle, { textAlign: textAlignStart }]}>
-              تجربة موحدة للسوق السعودي تشمل المشاوير، التسوق، الحجوزات، والطلبات اليومية.
+              تصفح الأقسام الأساسية للتطبيق بالأسماء الجديدة التي تعكس الخدمات بشكل أوضح.
             </Text>
           </View>
         </View>
 
         {filteredServices.map((service) => (
-          <TouchableOpacity
+          <AppListCard
             key={service.id}
-            style={[styles.serviceCard, { flexDirection: rowDirection }]}
+            title={service.name}
+            subtitle={service.subtitle}
+            mediaIcon={service.icon}
+            mediaColor={service.color}
+            metaLabel="SECTION"
+            metaValue={serviceGroupLabels[service.group] || 'خدمة'}
+            actionLabel="فتح الخدمة"
             onPress={() => handleServicePress(service)}
-            activeOpacity={0.9}
-          >
-            <Ionicons name={chevronIcon} size={20} color={colors.textTertiary} />
-            <View style={styles.serviceText}>
-              <Text style={[styles.serviceTitle, { textAlign: textAlignStart }]}>{service.name}</Text>
-              <Text style={[styles.serviceSubtitle, { textAlign: textAlignStart }]}>{service.subtitle}</Text>
-            </View>
-            <View style={[styles.iconShell, { backgroundColor: `${service.color}18` }]}>
-              <Ionicons name={service.icon} size={24} color={service.color} />
-            </View>
-          </TouchableOpacity>
+          />
         ))}
       </ScrollView>
     </View>
@@ -141,24 +148,6 @@ const styles = StyleSheet.create({
   heroText: { flex: 1, marginHorizontal: spacing.md },
   heroTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 22 },
   heroSubtitle: { color: colors.textSecondary, marginTop: spacing.sm, lineHeight: 22 },
-  serviceCard: {
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 24,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-  },
-  iconShell: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  serviceText: { flex: 1, marginHorizontal: spacing.md },
-  serviceTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16 },
-  serviceSubtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 4, lineHeight: 20 },
 });
 
 export default ServicesScreen;

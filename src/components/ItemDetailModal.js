@@ -21,7 +21,7 @@ import PriceDisplay from './PriceDisplay';
  */
 const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
   const insets = useSafeAreaInsets();
-  const { formatCurrency } = useApp();
+  const { formatCurrency, rowDirection, textAlignStart } = useApp();
   const [quantity, setQuantity] = useState(1);
   const [selectedNotes, setSelectedNotes] = useState([]);
 
@@ -87,28 +87,28 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
 
         {/* Item Info */}
         <View style={styles.itemInfo}>
-          <Text style={styles.itemName}>{item.name}</Text>
+          <Text style={[styles.itemName, { textAlign: textAlignStart }]}>{item.name}</Text>
           
           {item.description && (
-            <Text style={styles.itemDescription}>{item.description}</Text>
+            <Text style={[styles.itemDescription, { textAlign: textAlignStart }]}>{item.description}</Text>
           )}
 
           {/* Rating & Time */}
-          <View style={styles.itemMeta}>
+          <View style={[styles.itemMeta, { flexDirection: rowDirection }]}>
             {item.rating && (
-              <View style={styles.metaItem}>
+              <View style={[styles.metaItem, { flexDirection: rowDirection }]}>
                 <Ionicons name="star" size={18} color={colors.warning} />
                 <Text style={styles.metaText}>{item.rating}</Text>
               </View>
             )}
             {item.time && (
-              <View style={styles.metaItem}>
+              <View style={[styles.metaItem, { flexDirection: rowDirection }]}>
                 <Ionicons name="time-outline" size={18} color={colors.textSecondary} />
                 <Text style={styles.metaText}>{item.time}</Text>
               </View>
             )}
             {item.deliveryFee && (
-              <View style={styles.metaItem}>
+              <View style={[styles.metaItem, { flexDirection: rowDirection }]}>
                 <Ionicons name="bicycle-outline" size={18} color={colors.textSecondary} />
                 <Text style={styles.metaText}>{formatCurrency(item.deliveryFee)}</Text>
               </View>
@@ -116,8 +116,8 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
           </View>
 
           {/* Price */}
-          <View style={styles.priceContainer}>
-            <PriceDisplay value={item.price} color={colors.primary} size={28} iconSize={20} bold />
+          <View style={[styles.priceContainer, { flexDirection: rowDirection }]}>
+            <PriceDisplay value={item.price} color={colors.primary} size={28} iconSize={20} bold align={rowDirection} />
             {item.oldPrice && <PriceDisplay value={item.oldPrice} muted strike size={18} iconSize={14} />}
           </View>
         </View>
@@ -128,7 +128,7 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
             <Text style={styles.sectionTitle}>الكمية</Text>
             <Text style={styles.sectionSubtitle}>اختر الكمية المطلوبة</Text>
           </View>
-          <View style={styles.quantityContainer}>
+          <View style={[styles.quantityContainer, { flexDirection: rowDirection }]}>
             <TouchableOpacity 
               style={[styles.quantityButton, quantity <= 1 && styles.quantityButtonDisabled]} 
               onPress={handleDecrement}
@@ -181,6 +181,7 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
                 </View>
                 <Text style={[
                   styles.noteText,
+                  { textAlign: textAlignStart },
                   selectedNotes.includes(note.id) && styles.noteTextSelected,
                 ]}>
                   {note.text}
@@ -195,10 +196,10 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
       </ScrollView>
 
       {/* Add to Cart Button */}
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md), flexDirection: rowDirection }]}>
         <View style={styles.totalContainer}>
-          <Text style={styles.totalLabel}>المجموع</Text>
-          <PriceDisplay value={totalPrice} color={colors.text} size={20} iconSize={16} bold align="row-reverse" />
+          <Text style={[styles.totalLabel, { textAlign: textAlignStart }]}>المجموع</Text>
+          <PriceDisplay value={totalPrice} color={colors.text} size={20} iconSize={16} bold align={rowDirection} />
         </View>
         <TouchableOpacity 
           style={styles.addToCartButton}
@@ -206,7 +207,7 @@ const ItemDetailModal = ({ visible, item, onClose, onAddToCart }) => {
           activeOpacity={0.8}
         >
           <LinearGradient colors={colors.primaryGradient} style={styles.addToCartGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-            <View style={styles.addToCartMain}>
+            <View style={[styles.addToCartMain, { flexDirection: rowDirection }]}>
               <Ionicons name="bag-add-outline" size={22} color={colors.white} />
               <View>
                 <Text style={styles.addToCartText}>إضافة للسلة</Text>
@@ -275,22 +276,18 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: colors.text,
     marginBottom: spacing.sm,
-    textAlign: 'right',
   },
   itemDescription: {
     fontSize: 15,
     color: colors.textSecondary,
     lineHeight: 24,
-    textAlign: 'right',
     marginBottom: spacing.md,
   },
   itemMeta: {
-    flexDirection: 'row',
     gap: spacing.md,
     marginBottom: spacing.md,
   },
   metaItem: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
@@ -300,7 +297,6 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   priceContainer: {
-    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: spacing.md,
   },
@@ -324,7 +320,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   quantityContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
     gap: spacing.md,
@@ -358,7 +353,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   noteItem: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.cardSecondary,
     padding: spacing.md,
@@ -385,7 +380,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: colors.textSecondary,
-    textAlign: 'right',
   },
   noteTextSelected: {
     color: colors.primary,
@@ -396,7 +390,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.card,
     borderTopWidth: 1,
@@ -405,13 +398,12 @@ const styles = StyleSheet.create({
   },
   totalContainer: {
     flex: 1,
-    paddingRight: spacing.md,
+    paddingHorizontal: spacing.md,
   },
   totalLabel: {
     fontSize: 13,
     color: colors.textSecondary,
     marginBottom: 2,
-    textAlign: 'right',
   },
   addToCartButton: {
     flex: 1.5,
@@ -420,14 +412,12 @@ const styles = StyleSheet.create({
     ...shadows.lg,
   },
   addToCartGradient: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
   },
   addToCartMain: {
-    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: spacing.sm,
   },
@@ -435,13 +425,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: colors.white,
-    textAlign: 'right',
   },
   addToCartSubtext: {
     fontSize: 11,
     color: 'rgba(255,255,255,0.78)',
     marginTop: 2,
-    textAlign: 'right',
   },
   quantityBadge: {
     backgroundColor: 'rgba(255,255,255,0.2)',

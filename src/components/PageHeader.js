@@ -13,6 +13,7 @@ const PageHeader = ({
   onBackPress,
   actionIcon,
   onActionPress,
+  onSearchPress,
   searchValue,
   onSearchChange,
   searchPlaceholder = 'ابحث',
@@ -27,6 +28,19 @@ const PageHeader = ({
   return (
     <View style={[styles.wrapper, { paddingTop: insets.top + spacing.sm }]}>
       <View style={[styles.topRow, { flexDirection: rowDirection }]}>
+        {actionIcon ? (
+          <TouchableOpacity onPress={onActionPress} style={styles.iconButton} activeOpacity={0.85}>
+            <Ionicons name={actionIcon} size={20} color={colors.primary} />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.iconSpacer} />
+        )}
+
+        <View style={styles.titleWrap}>
+          <Text style={[styles.title, { textAlign: textAlignStart }]} numberOfLines={1}>{title}</Text>
+          {!!subtitle && <Text style={[styles.subtitle, { textAlign: textAlignStart }]}>{subtitle}</Text>}
+        </View>
+
         {showBack ? (
           <TouchableOpacity
             onPress={onBackPress || (() => navigation?.goBack())}
@@ -38,49 +52,44 @@ const PageHeader = ({
         ) : (
           <View style={styles.iconSpacer} />
         )}
-
-        <View style={styles.titleWrap}>
-          <Text style={[styles.title, { textAlign: textAlignStart }]}>{title}</Text>
-          {!!subtitle && <Text style={[styles.subtitle, { textAlign: textAlignStart }]}>{subtitle}</Text>}
-        </View>
-
-        {actionIcon ? (
-          <TouchableOpacity onPress={onActionPress} style={styles.iconButton} activeOpacity={0.85}>
-            <Ionicons name={actionIcon} size={20} color={colors.primary} />
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.iconSpacer} />
-        )}
       </View>
 
-      {typeof onSearchChange === 'function' && (
-        <View style={[styles.searchBar, { flexDirection: rowDirection }]}>
-          <Ionicons name="search-outline" size={18} color={colors.textTertiary} />
+      {(typeof onSearchChange === 'function' || typeof onSearchPress === 'function') && (
+        <TouchableOpacity
+          activeOpacity={typeof onSearchPress === 'function' ? 0.86 : 1}
+          onPress={onSearchPress}
+          style={[styles.searchBar, { flexDirection: rowDirection }]}
+          disabled={typeof onSearchPress !== 'function'}
+        >
+          <TouchableOpacity style={styles.filterButton} activeOpacity={0.85}>
+            <Ionicons name="options-outline" size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
           <TextInput
             value={searchValue}
             onChangeText={onSearchChange}
             placeholder={searchPlaceholder}
             placeholderTextColor={colors.textTertiary}
             style={[styles.searchInput, { textAlign: textAlignStart }]}
+            editable={typeof onSearchChange === 'function'}
+            pointerEvents={typeof onSearchPress === 'function' && typeof onSearchChange !== 'function' ? 'none' : 'auto'}
           />
-          <TouchableOpacity style={styles.filterButton} activeOpacity={0.85}>
-            <Ionicons name="options-outline" size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
+          <Ionicons name="search-outline" size={18} color={colors.textTertiary} />
+        </TouchableOpacity>
       )}
 
       {!!filters.length && (
         <ScrollView
           horizontal
+          inverted={isRTL}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.filtersRow, { flexDirection: rowDirection }]}
+          contentContainerStyle={styles.filtersRow}
         >
           {filters.map((filter) => {
             const isActive = selectedFilter === filter.id;
             return (
               <TouchableOpacity
                 key={filter.id}
-                style={[styles.filterChip, isActive && styles.filterChipActive]}
+                style={[styles.filterChip, { flexDirection: rowDirection }, isActive && styles.filterChipActive]}
                 onPress={() => onSelectFilter?.(filter.id)}
                 activeOpacity={0.85}
               >
@@ -106,7 +115,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   topRow: {
     alignItems: 'center',
@@ -117,15 +126,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontFamily: fonts.bold,
     color: colors.text,
   },
   subtitle: {
-    marginTop: 2,
+    marginTop: 4,
     color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 20,
+    fontSize: 14,
+    lineHeight: 22,
   },
   iconButton: {
     width: 42,
@@ -142,8 +151,8 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     backgroundColor: colors.card,
-    borderRadius: 24,
-    minHeight: 54,
+    borderRadius: 18,
+    minHeight: 56,
     paddingHorizontal: spacing.md,
     alignItems: 'center',
     ...shadows.sm,
@@ -153,6 +162,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontFamily: fonts.regular,
     marginHorizontal: spacing.sm,
+    fontSize: 15,
   },
   filterButton: {
     width: 34,
@@ -164,9 +174,9 @@ const styles = StyleSheet.create({
   },
   filtersRow: {
     gap: spacing.sm,
+    paddingTop: spacing.xs,
   },
   filterChip: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
     paddingHorizontal: spacing.md,
@@ -182,6 +192,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontFamily: fonts.semiBold,
     fontSize: 13,
+    textAlign: 'center',
   },
   filterTextActive: {
     color: colors.white,

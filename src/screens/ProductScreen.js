@@ -82,7 +82,7 @@ const ProductScreen = ({ navigation }) => {
           <Ionicons name="search-outline" size={20} color={colors.textTertiary} />
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.filtersRow, { flexDirection: rowDirection }]}>
+        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtersRow}>
           {productFilters.map((filter) => (
             <TouchableOpacity
               key={filter.id}
@@ -95,24 +95,24 @@ const ProductScreen = ({ navigation }) => {
         </ScrollView>
 
         <View style={[styles.heroCard, { flexDirection: rowDirection }]}>
-          <View style={styles.heroBadge}>
-            <Ionicons name="sparkles-outline" size={18} color={colors.primary} />
-          </View>
           <View style={styles.heroBody}>
             <Text style={[styles.heroTitle, { textAlign: textAlignStart }]}>منتجات مختارة يوميًا</Text>
             <Text style={[styles.heroSubtitle, { textAlign: textAlignStart }]}>
               تصفح منتجات المنصة مباشرة بدون متاجر أو صفحات بائعين داخل هذه الشاشة.
             </Text>
           </View>
+          <View style={styles.heroBadge}>
+            <Ionicons name="sparkles-outline" size={18} color={colors.primary} />
+          </View>
         </View>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>عروض اليوم</Text>
           <TouchableOpacity onPress={() => setSelectedFilter('all')}>
             <Text style={styles.sectionLink}>إعادة ضبط</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>عروض اليوم</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalRow, { flexDirection: rowDirection }]}>
+        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalRow}>
           {featuredDeals.map((product) => (
             <TouchableOpacity
               key={`deal-${product.id}`}
@@ -125,13 +125,13 @@ const ProductScreen = ({ navigation }) => {
                 <Text style={[styles.dealName, { textAlign: textAlignStart }]} numberOfLines={2}>{product.name}</Text>
                 <Text style={[styles.dealMeta, { textAlign: textAlignStart }]}>{product.category}</Text>
                 <View style={[styles.dealFooter, { flexDirection: rowDirection }]}>
-                  <TouchableOpacity style={styles.dealButton} onPress={() => setSelectedProduct(product)}>
-                    <Ionicons name="bag-add-outline" size={16} color={colors.white} />
-                  </TouchableOpacity>
                   <View style={styles.dealPriceWrap}>
                     {!!product.oldPrice && <PriceDisplay value={product.oldPrice} muted strike size={12} iconSize={10} />}
                     <PriceDisplay value={product.price} color={colors.primary} size={16} iconSize={13} bold />
                   </View>
+                  <TouchableOpacity style={styles.dealButton} onPress={() => setSelectedProduct(product)}>
+                    <Ionicons name="bag-add-outline" size={16} color={colors.white} />
+                  </TouchableOpacity>
                 </View>
               </View>
             </TouchableOpacity>
@@ -139,10 +139,10 @@ const ProductScreen = ({ navigation }) => {
         </ScrollView>
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>منتجات المنصة</Text>
           <TouchableOpacity onPress={() => setSelectedFilter('all')}>
             <Text style={styles.sectionLink}>كل المنتجات</Text>
           </TouchableOpacity>
-          <Text style={styles.sectionTitle}>منتجات المنصة</Text>
         </View>
         {filteredProducts.map((product) => (
           <TouchableOpacity
@@ -154,25 +154,25 @@ const ProductScreen = ({ navigation }) => {
             <Image source={{ uri: product.image }} style={styles.productImage} />
             <View style={styles.productBody}>
               <View style={[styles.productTop, { flexDirection: rowDirection }]}>
-                <TouchableOpacity onPress={() => Alert.alert('المفضلة', 'تم حفظ المنتج في المفضلة.')}>
-                  <Ionicons name="heart-outline" size={20} color={colors.textTertiary} />
-                </TouchableOpacity>
                 <View style={styles.productInfo}>
                   <Text style={[styles.productName, { textAlign: textAlignStart }]}>{product.name}</Text>
                   <Text style={[styles.productCategory, { textAlign: textAlignStart }]}>
                     {product.category} • {product.unit}
                   </Text>
                 </View>
+                <TouchableOpacity onPress={() => Alert.alert('المفضلة', 'تم حفظ المنتج في المفضلة.')}>
+                  <Ionicons name="heart-outline" size={20} color={colors.textTertiary} />
+                </TouchableOpacity>
               </View>
               <View style={[styles.productBottom, { flexDirection: rowDirection }]}>
-                <TouchableOpacity style={styles.addButton} onPress={() => setSelectedProduct(product)}>
-                  <Ionicons name="bag-add-outline" size={18} color={colors.white} />
-                  <Text style={styles.addButtonText}>عرض وإضافة</Text>
-                </TouchableOpacity>
                 <View style={styles.priceWrap}>
                   {!!product.oldPrice && <PriceDisplay value={product.oldPrice} muted strike size={12} iconSize={10} />}
                   <PriceDisplay value={product.price} color={colors.primary} size={17} iconSize={14} bold />
                 </View>
+                <TouchableOpacity style={styles.addButton} onPress={() => setSelectedProduct(product)}>
+                  <Ionicons name="bag-add-outline" size={18} color={colors.white} />
+                  <Text style={styles.addButtonText}>عرض وإضافة</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </TouchableOpacity>
@@ -287,28 +287,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heroBody: { flex: 1, marginHorizontal: spacing.md },
-  heroTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17 },
-  heroSubtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 4, lineHeight: 21 },
+  heroBody: { flex: 1, width: '100%', marginHorizontal: spacing.md, alignItems: 'flex-end' },
+  heroTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17, textAlign: 'right', alignSelf: 'stretch' },
+  heroSubtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 4, lineHeight: 21, textAlign: 'right', alignSelf: 'stretch' },
   sectionHeader: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md, marginBottom: spacing.md },
-  sectionTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18 },
-  sectionLink: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13 },
+  sectionTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right' },
+  sectionLink: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'right' },
   horizontalRow: { gap: spacing.md, paddingBottom: spacing.sm },
-  dealCard: { width: 220, backgroundColor: colors.card, borderRadius: 24, overflow: 'hidden', ...shadows.sm },
+  dealCard: { width: 220, backgroundColor: colors.card, borderRadius: 24, overflow: 'hidden', direction: 'rtl', ...shadows.sm },
   dealImage: { width: '100%', height: 130, backgroundColor: colors.cardSecondary },
-  dealContent: { padding: spacing.md },
-  dealName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, lineHeight: 22 },
-  dealMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
+  dealContent: { width: '100%', padding: spacing.md, alignItems: 'flex-end' },
+  dealName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, lineHeight: 22, textAlign: 'right', alignSelf: 'stretch' },
+  dealMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
   dealFooter: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
   dealButton: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   dealPriceWrap: { alignItems: 'flex-end' },
-  productRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
+  productRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, direction: 'rtl', ...shadows.sm },
   productImage: { width: 96, height: 96, borderRadius: 20, backgroundColor: colors.cardSecondary },
-  productBody: { flex: 1, marginHorizontal: spacing.md, justifyContent: 'space-between' },
-  productTop: { justifyContent: 'space-between', alignItems: 'flex-start' },
-  productInfo: { flex: 1, marginHorizontal: spacing.sm },
-  productName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16 },
-  productCategory: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
+  productBody: { flex: 1, width: '100%', marginHorizontal: spacing.md, justifyContent: 'space-between', alignItems: 'flex-end' },
+  productTop: { justifyContent: 'space-between', alignItems: 'flex-end', width: '100%' },
+  productInfo: { flex: 1, width: '100%', marginHorizontal: spacing.sm, alignItems: 'flex-end' },
+  productName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, textAlign: 'right', alignSelf: 'stretch' },
+  productCategory: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
   productBottom: { justifyContent: 'space-between', alignItems: 'center' },
   addButton: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: 14, paddingVertical: 10 },
   addButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 13 },
@@ -328,8 +328,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...shadows.float,
   },
-  cartBarText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14 },
-  cartBarPrice: { color: colors.white, fontFamily: fonts.bold, fontSize: 16 },
+  cartBarText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right' },
+  cartBarPrice: { color: colors.white, fontFamily: fonts.bold, fontSize: 16, textAlign: 'right' },
 });
 
 export default ProductScreen;

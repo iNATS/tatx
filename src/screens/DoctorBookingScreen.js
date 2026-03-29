@@ -155,11 +155,11 @@ const DoctorBookingScreen = ({ navigation }) => {
                   {doctor.location} • {doctor.experience}
                 </Text>
               </View>
-              <Ionicons name="chevron-back" size={18} color={colors.textTertiary} />
+              <Ionicons name={rowDirection === 'row-reverse' ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.textTertiary} />
             </View>
 
             <View style={[styles.priceRow, { flexDirection: rowDirection }]}>
-              <View style={styles.priceMeta}>
+              <View style={[styles.priceMeta, { flexDirection: rowDirection }]}>
                 <Ionicons
                   name={doctor.consultationType === 'online' ? 'videocam-outline' : 'business-outline'}
                   size={16}
@@ -169,7 +169,7 @@ const DoctorBookingScreen = ({ navigation }) => {
                   {doctor.consultationType === 'online' ? 'استشارة أونلاين' : 'زيارة بالعيادة'}
                 </Text>
               </View>
-              <PriceDisplay value={doctor.fee} color={colors.primary} size={16} iconSize={13} bold />
+              <PriceDisplay value={doctor.fee} color={colors.primary} size={16} iconSize={13} bold align={rowDirection} />
             </View>
           </TouchableOpacity>
         ))}
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   name: { color: colors.text, fontFamily: fonts.bold, fontSize: 16 },
   metaLine: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
   priceRow: { justifyContent: 'space-between', marginTop: spacing.md, alignItems: 'center' },
-  priceMeta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  priceMeta: { alignItems: 'center', gap: spacing.xs },
   priceText: { color: colors.textSecondary, fontSize: 13 },
 });
 

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { I18nManager, ActivityIndicator, View } from 'react-native';
+import { I18nManager, ActivityIndicator, View, Platform } from 'react-native';
 import { AppProvider } from './src/context/AppContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { loadFonts } from './src/utils/loadFonts';
 
-// Allow RTL layouts without forcing them globally so English can stay LTR.
 I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
+I18nManager.swapLeftAndRightInRTL(true);
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -15,13 +16,24 @@ export default function App() {
     const loadAppFonts = async () => {
       try {
         await loadFonts();
-        setFontsLoaded(true);
       } catch (error) {
         console.error('Error loading fonts:', error);
-        setFontsLoaded(true); // Continue even if fonts fail to load
+      } finally {
+        setFontsLoaded(true);
       }
     };
+
     loadAppFonts();
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+    document.body.setAttribute('dir', 'rtl');
   }, []);
 
   if (!fontsLoaded) {

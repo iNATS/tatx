@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography, shadows } from '../constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useApp } from '../context/AppContext';
 
 /**
  * NativeHeader - A consistent header component for all screens
@@ -19,6 +20,8 @@ const NativeHeader = ({
   translucent = false,
 }) => {
   const insets = useSafeAreaInsets();
+  const { isRTL, rowDirection } = useApp();
+  const backIcon = isRTL ? 'arrow-forward' : 'arrow-back';
 
   return (
     <View
@@ -28,10 +31,10 @@ const NativeHeader = ({
         translucent && styles.translucent,
       ]}
     >
-      <View style={styles.headerContent}>
+      <View style={[styles.headerContent, { flexDirection: rowDirection }]}>
         {showBack ? (
           <TouchableOpacity onPress={onBack} style={styles.backButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-            <Ionicons name="arrow-back" size={24} color={titleColor} />
+            <Ionicons name={backIcon} size={24} color={titleColor} />
           </TouchableOpacity>
         ) : (
           <View style={styles.placeholder} />
@@ -71,7 +74,6 @@ const styles = StyleSheet.create({
     shadowColor: 'transparent',
   },
   headerContent: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
@@ -80,11 +82,11 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: spacing.xs,
-    marginLeft: -spacing.xs,
+    marginHorizontal: -spacing.xs,
   },
   rightButton: {
     padding: spacing.xs,
-    marginRight: -spacing.xs,
+    marginHorizontal: -spacing.xs,
   },
   placeholder: {
     width: 40,

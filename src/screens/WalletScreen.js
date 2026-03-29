@@ -8,7 +8,7 @@ import { useApp } from '../context/AppContext';
 
 const WalletScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { formatCurrency } = useApp();
+  const { formatCurrency, isRTL, rowDirection, textAlignStart } = useApp();
   const [activeTab, setActiveTab] = useState('all');
 
   const balance = 2450.00;
@@ -32,9 +32,9 @@ const WalletScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm), flexDirection: rowDirection }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
+          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>المحفظة</Text>
         <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('Payment')}>
@@ -46,14 +46,14 @@ const WalletScreen = ({ navigation }) => {
         {/* Balance Card */}
         <View style={styles.balanceCard}>
           <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.balanceGradient}>
-            <View style={styles.balanceHeader}>
-              <Text style={styles.balanceLabel}>الرصيد الحالي</Text>
+            <View style={[styles.balanceHeader, { flexDirection: 'row-reverse' }]}>
+              <Text style={[styles.balanceLabel, { textAlign: textAlignStart }]}>الرصيد الحالي</Text>
               <TouchableOpacity style={styles.infoButton} onPress={() => Alert.alert('المحفظة', 'يمكنك استخدام الرصيد في الطلبات أو استرداده وفق السياسة المعتمدة.')}>
                 <Ionicons name="information-circle-outline" size={20} color="rgba(255,255,255,0.8)" />
               </TouchableOpacity>
             </View>
             <Text style={styles.balanceAmount}>{formatCurrency(balance)}</Text>
-            <View style={styles.balanceActions}>
+            <View style={[styles.balanceActions, { flexDirection: 'row-reverse' }]}>
               {quickActions.map((action) => (
                 <TouchableOpacity
                   key={action.id}
@@ -72,13 +72,13 @@ const WalletScreen = ({ navigation }) => {
 
         {/* Points Card */}
         <View style={styles.pointsCard}>
-          <View style={styles.pointsContent}>
+          <View style={[styles.pointsContent, { flexDirection: 'row-reverse' }]}>
             <View style={styles.pointsIcon}>
               <Ionicons name="star" size={28} color={colors.warning} />
             </View>
             <View style={styles.pointsInfo}>
-              <Text style={styles.pointsLabel}>نقاط المكافآت</Text>
-              <Text style={styles.pointsAmount}>{points} نقطة</Text>
+              <Text style={[styles.pointsLabel, { textAlign: textAlignStart }]}>نقاط المكافآت</Text>
+              <Text style={[styles.pointsAmount, { textAlign: textAlignStart }]}>{points} نقطة</Text>
             </View>
             <TouchableOpacity style={styles.pointsButton} onPress={() => Alert.alert('استبدال النقاط', 'سيتم إتاحة استبدال النقاط على الطلب القادم.')}>
               <Text style={styles.pointsButtonText}>استبدال</Text>
@@ -87,7 +87,7 @@ const WalletScreen = ({ navigation }) => {
         </View>
 
         {/* Stats Row */}
-        <View style={styles.statsRow}>
+        <View style={[styles.statsRow, { flexDirection: 'row-reverse' }]}>
           <View style={styles.statCard}>
             <View style={[styles.statIcon, { backgroundColor: colors.success + '15' }]}>
               <Ionicons name="arrow-down" size={20} color={colors.success} />
@@ -113,7 +113,7 @@ const WalletScreen = ({ navigation }) => {
 
         {/* Transactions */}
         <View style={styles.transactionsCard}>
-          <View style={styles.transactionsHeader}>
+          <View style={[styles.transactionsHeader, { flexDirection: 'row-reverse' }]}>
             <Text style={styles.cardTitle}>المعاملات</Text>
             <TouchableOpacity onPress={() => setActiveTab('all')}>
               <Text style={styles.seeAll}>عرض الكل</Text>
@@ -121,8 +121,8 @@ const WalletScreen = ({ navigation }) => {
           </View>
 
           {/* Filter Tabs */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.filterTabs}>
+          <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false}>
+            <View style={[styles.filterTabs, { flexDirection: 'row-reverse' }]}>
               {['all', 'credit', 'debit'].map((tab) => (
                 <TouchableOpacity
                   key={tab}
@@ -147,7 +147,7 @@ const WalletScreen = ({ navigation }) => {
             {transactions
               .filter((t) => activeTab === 'all' || t.type === activeTab)
               .map((transaction) => (
-                <TouchableOpacity key={transaction.id} style={styles.transactionItem} onPress={() => Alert.alert(transaction.title, `${transaction.date}\n${formatCurrency(transaction.amount)}`)}>
+                <TouchableOpacity key={transaction.id} style={[styles.transactionItem, { flexDirection: 'row-reverse' }]} onPress={() => Alert.alert(transaction.title, `${transaction.date}\n${formatCurrency(transaction.amount)}`)}>
                   <View
                     style={[
                       styles.transactionIcon,
@@ -164,8 +164,8 @@ const WalletScreen = ({ navigation }) => {
                     />
                   </View>
                   <View style={styles.transactionInfo}>
-                    <Text style={styles.transactionTitle}>{transaction.title}</Text>
-                    <Text style={styles.transactionDate}>{transaction.date}</Text>
+                    <Text style={[styles.transactionTitle, { textAlign: textAlignStart }]}>{transaction.title}</Text>
+                    <Text style={[styles.transactionDate, { textAlign: textAlignStart }]}>{transaction.date}</Text>
                   </View>
                   <Text
                     style={[
@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
@@ -221,13 +220,13 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     marginBottom: spacing.md,
+    direction: 'rtl',
     ...shadows.lg,
   },
   balanceGradient: {
     padding: spacing.md,
   },
   balanceHeader: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.sm,
@@ -235,6 +234,7 @@ const styles = StyleSheet.create({
   balanceLabel: {
     fontSize: 14,
     color: 'rgba(255,255,255,0.8)',
+    textAlign: 'right',
   },
   infoButton: {
     width: 28,
@@ -249,9 +249,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: colors.white,
     marginBottom: spacing.md,
+    textAlign: 'right',
   },
   balanceActions: {
-    flexDirection: 'row',
     justifyContent: 'space-around',
     paddingTop: spacing.md,
     borderTopWidth: 1,
@@ -272,6 +272,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.white,
     fontWeight: '600',
+    textAlign: 'right',
   },
   // Points Card
   pointsCard: {
@@ -279,10 +280,10 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    direction: 'rtl',
     ...shadows.sm,
   },
   pointsContent: {
-    flexDirection: 'row',
     alignItems: 'center',
   },
   pointsIcon: {
@@ -295,17 +296,22 @@ const styles = StyleSheet.create({
   },
   pointsInfo: {
     flex: 1,
-    marginLeft: spacing.md,
+    marginHorizontal: spacing.md,
+    alignItems: 'flex-end',
   },
   pointsLabel: {
     fontSize: 14,
     color: colors.textSecondary,
     marginBottom: 4,
+    textAlign: 'right',
+    alignSelf: 'stretch',
   },
   pointsAmount: {
     fontSize: 24,
     fontWeight: '800',
     color: colors.text,
+    textAlign: 'right',
+    alignSelf: 'stretch',
   },
   pointsButton: {
     backgroundColor: colors.warning,
@@ -317,10 +323,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: colors.white,
+    textAlign: 'right',
   },
   // Stats Row
   statsRow: {
-    flexDirection: 'row',
     gap: spacing.sm,
     marginBottom: spacing.md,
   },
@@ -330,6 +336,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     alignItems: 'center',
+    direction: 'rtl',
     ...shadows.sm,
   },
   statIcon: {
@@ -344,21 +351,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
     marginBottom: 4,
+    textAlign: 'right',
   },
   statValue: {
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
+    textAlign: 'right',
   },
   // Transactions Card
   transactionsCard: {
     backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
     padding: spacing.md,
+    direction: 'rtl',
     ...shadows.sm,
   },
   transactionsHeader: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -367,14 +376,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
+    textAlign: 'right',
   },
   seeAll: {
     fontSize: 13,
     color: colors.primary,
     fontWeight: '600',
+    textAlign: 'right',
   },
   filterTabs: {
-    flexDirection: 'row',
     marginBottom: spacing.md,
     gap: spacing.sm,
   },
@@ -391,6 +401,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
     fontWeight: '600',
+    textAlign: 'right',
   },
   filterTabTextActive: {
     color: colors.white,
@@ -400,7 +411,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   transactionItem: {
-    flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
@@ -415,7 +425,7 @@ const styles = StyleSheet.create({
   },
   transactionInfo: {
     flex: 1,
-    marginLeft: spacing.md,
+    marginHorizontal: spacing.md,
   },
   transactionTitle: {
     fontSize: 15,

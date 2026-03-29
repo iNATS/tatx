@@ -43,7 +43,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, spacing.sm), flexDirection: rowDirection }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name={backIcon} size={24} color={colors.text} />
         </TouchableOpacity>
@@ -60,7 +60,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
         {/* Order Status Card */}
         <View style={styles.statusCard}>
           <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.statusGradient}>
-            <View style={styles.statusHeader}>
+            <View style={[styles.statusHeader, { flexDirection: rowDirection }]}>
               <Text style={styles.statusTitle}>رقم الطلب: {order.id}</Text>
               <View style={styles.statusBadge}>
                 <Text style={styles.statusText}>{order.statusAr || 'قيد التوصيل'}</Text>
@@ -78,7 +78,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
           <Text style={styles.cardTitle}>حالة الطلب</Text>
           <View style={styles.timeline}>
             {timelineSteps.map((step, index) => (
-              <View key={step.id} style={styles.timelineItem}>
+              <View key={step.id} style={[styles.timelineItem, { flexDirection: rowDirection }]}>
                 <View style={styles.timelineLeft}>
                   <View
                     style={[
@@ -101,15 +101,10 @@ const OrderDetailScreen = ({ route, navigation }) => {
                   )}
                 </View>
                 <View style={styles.timelineRight}>
-                  <Text
-                    style={[
-                      styles.timelineTitle,
-                      step.completed && styles.timelineTitleActive,
-                    ]}
-                  >
+                  <Text style={[styles.timelineTitle, step.completed && styles.timelineTitleActive, { textAlign: textAlignStart }]}>
                     {step.title}
                   </Text>
-                  <Text style={styles.timelineTime}>{step.time}</Text>
+                  <Text style={[styles.timelineTime, { textAlign: textAlignStart }]}>{step.time}</Text>
                 </View>
               </View>
             ))}
@@ -119,18 +114,18 @@ const OrderDetailScreen = ({ route, navigation }) => {
         {/* Driver Info */}
         <View style={styles.driverCard}>
           <Text style={styles.cardTitle}>معلومات السائق</Text>
-          <View style={styles.driverInfo}>
+          <View style={[styles.driverInfo, { flexDirection: rowDirection }]}>
             <View style={styles.driverAvatar}>
               <Text style={styles.driverAvatarText}>{driver.name.charAt(0)}</Text>
             </View>
             <View style={styles.driverDetails}>
-              <Text style={styles.driverName}>{driver.name}</Text>
-              <View style={styles.driverRating}>
+              <Text style={[styles.driverName, { textAlign: textAlignStart }]}>{driver.name}</Text>
+              <View style={[styles.driverRating, { flexDirection: rowDirection }]}>
                 <Ionicons name="star" size={14} color={colors.warning} />
                 <Text style={styles.driverRatingText}>{driver.rating}</Text>
               </View>
             </View>
-            <View style={styles.driverActions}>
+            <View style={[styles.driverActions, { flexDirection: rowDirection }]}>
               <TouchableOpacity style={[styles.driverActionButton, { backgroundColor: colors.success }]} onPress={() => Alert.alert('اتصال', `يمكنك التواصل مع السائق على ${driver.phone}`)}>
                 <Ionicons name="call" size={20} color={colors.white} />
               </TouchableOpacity>
@@ -139,8 +134,8 @@ const OrderDetailScreen = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.vehicleInfo}>
-            <View style={styles.vehicleDetail}>
+          <View style={[styles.vehicleInfo, { flexDirection: rowDirection }]}>
+            <View style={[styles.vehicleDetail, { flexDirection: rowDirection }]}>
               <Ionicons name="car" size={18} color={colors.textSecondary} />
               <Text style={styles.vehicleText}>{driver.vehicle}</Text>
             </View>
@@ -153,9 +148,9 @@ const OrderDetailScreen = ({ route, navigation }) => {
         {/* Delivery Address */}
         <View style={styles.addressCard}>
           <Text style={styles.cardTitle}>عنوان التوصيل</Text>
-          <View style={styles.addressInfo}>
+          <View style={[styles.addressInfo, { flexDirection: rowDirection }]}>
             <Ionicons name="location" size={20} color={colors.primary} />
-            <Text style={styles.addressText}>{order.address}</Text>
+            <Text style={[styles.addressText, { textAlign: textAlignStart }]}>{order.address}</Text>
           </View>
         </View>
 
@@ -163,11 +158,11 @@ const OrderDetailScreen = ({ route, navigation }) => {
         <View style={styles.itemsCard}>
           <Text style={styles.cardTitle}>المنتجات ({order.items.length})</Text>
           {order.items.map((item, index) => (
-            <View key={index} style={styles.orderItem}>
+            <View key={index} style={[styles.orderItem, { flexDirection: rowDirection }]}>
               <Image source={{ uri: item.image }} style={styles.itemImage} />
               <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemQuantity}>الكمية: {item.quantity}</Text>
+                <Text style={[styles.itemName, { textAlign: textAlignStart }]}>{item.name}</Text>
+                <Text style={[styles.itemQuantity, { textAlign: textAlignStart }]}>الكمية: {item.quantity}</Text>
               </View>
               <Text style={styles.itemPrice}>{formatCurrency(item.price * item.quantity)}</Text>
             </View>
@@ -177,28 +172,28 @@ const OrderDetailScreen = ({ route, navigation }) => {
         {/* Payment Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.cardTitle}>ملخص الدفع</Text>
-          <View style={styles.summaryRow}>
+          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
             <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
             <Text style={styles.summaryValue}>{formatCurrency(order.subtotal || order.total)}</Text>
           </View>
-          <View style={styles.summaryRow}>
+          <View style={[styles.summaryRow, { flexDirection: rowDirection }]}>
             <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
             <Text style={styles.summaryValue}>{formatCurrency(order.deliveryFee || 0)}</Text>
           </View>
-          <View style={[styles.summaryRow, styles.summaryTotal]}>
+          <View style={[styles.summaryRow, styles.summaryTotal, { flexDirection: rowDirection }]}>
             <Text style={styles.summaryTotalLabel}>المجموع الكلي</Text>
             <Text style={styles.summaryTotalValue}>{formatCurrency(order.total)}</Text>
           </View>
-          <View style={styles.paymentMethod}>
+          <View style={[styles.paymentMethod, { flexDirection: rowDirection }]}>
             <Ionicons name="wallet" size={18} color={colors.textSecondary} />
-            <Text style={styles.paymentText}>{order.paymentMethod || 'Apple Pay'}</Text>
+            <Text style={styles.paymentText}>{order.paymentMethod || 'آبل باي'}</Text>
           </View>
         </View>
 
         {/* Action Buttons */}
-        <View style={styles.actionButtons}>
+        <View style={[styles.actionButtons, { flexDirection: rowDirection }]}>
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, { flexDirection: rowDirection }]}
             onPress={() => {
               order.items.forEach((item) => addToCart(item));
               navigation.navigate('Cart');
@@ -207,7 +202,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
             <Ionicons name="refresh" size={18} color={colors.primary} />
             <Text style={styles.actionButtonText}>إعادة الطلب</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Chat')}>
+          <TouchableOpacity style={[styles.actionButton, { flexDirection: rowDirection }]} onPress={() => navigation.navigate('Chat')}>
             <Ionicons name="chatbubble-outline" size={18} color={colors.primary} />
             <Text style={styles.actionButtonText}>الدعم</Text>
           </TouchableOpacity>
@@ -226,7 +221,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
@@ -271,7 +265,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   statusHeader: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.sm,
@@ -318,10 +311,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   timeline: {
-    paddingLeft: spacing.sm,
+    paddingRight: spacing.sm,
   },
   timelineItem: {
-    flexDirection: 'row',
     paddingBottom: spacing.md,
   },
   timelineLeft: {
@@ -381,7 +373,6 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   driverInfo: {
-    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.md,
   },
@@ -400,7 +391,7 @@ const styles = StyleSheet.create({
   },
   driverDetails: {
     flex: 1,
-    marginLeft: spacing.md,
+    marginRight: spacing.md,
   },
   driverName: {
     fontSize: 16,
@@ -409,7 +400,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   driverRating: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
@@ -418,7 +408,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   driverActions: {
-    flexDirection: 'row',
     gap: spacing.sm,
   },
   driverActionButton: {
@@ -429,7 +418,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   vehicleInfo: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.cardSecondary,
@@ -437,7 +425,6 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
   },
   vehicleDetail: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
   },
@@ -466,7 +453,6 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   addressInfo: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
   },
@@ -484,7 +470,6 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   orderItem: {
-    flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
@@ -498,7 +483,7 @@ const styles = StyleSheet.create({
   },
   itemInfo: {
     flex: 1,
-    marginLeft: spacing.md,
+    marginRight: spacing.md,
   },
   itemName: {
     fontSize: 14,
@@ -524,7 +509,6 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   summaryRow: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: spacing.sm,
@@ -555,7 +539,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   paymentMethod: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
     paddingTop: spacing.md,
@@ -568,12 +551,10 @@ const styles = StyleSheet.create({
   },
   // Action Buttons
   actionButtons: {
-    flexDirection: 'row',
     gap: spacing.md,
   },
   actionButton: {
     flex: 1,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.card,

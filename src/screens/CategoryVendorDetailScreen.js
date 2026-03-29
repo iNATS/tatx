@@ -29,7 +29,7 @@ const CategoryVendorDetailScreen = ({ route, navigation }) => {
         subtitle={`${categoryName} • ${store.subtitle}`}
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder={categoryName === 'مطاعم' ? 'ابحث عن وجبة داخل المطعم' : 'ابحث عن هدية داخل المتجر'}
+        searchPlaceholder={categoryName === 'مطاعم' ? 'ابحث عن وجبة داخل المطعم' : categoryName === 'مقاهي' ? 'ابحث عن مشروب أو حلوى' : 'ابحث عن منتج داخل المتجر'}
       />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <Image source={{ uri: store.image }} style={styles.cover} />
@@ -41,11 +41,11 @@ const CategoryVendorDetailScreen = ({ route, navigation }) => {
               <Text style={[styles.itemName, { textAlign: textAlignStart }]}>{item.name}</Text>
               <Text style={[styles.itemDescription, { textAlign: textAlignStart }]}>{item.description}</Text>
               <View style={[styles.itemBottom, { flexDirection: rowDirection }]}>
+                <PriceDisplay value={item.price} color={colors.primary} size={18} iconSize={14} bold />
                 <TouchableOpacity style={styles.button} onPress={() => setSelectedItem(item)}>
                   <Ionicons name="bag-add-outline" size={18} color={colors.white} />
                   <Text style={styles.buttonText}>عرض</Text>
                 </TouchableOpacity>
-                <PriceDisplay value={item.price} color={colors.primary} size={18} iconSize={14} bold />
               </View>
             </View>
           </TouchableOpacity>
@@ -63,9 +63,9 @@ const styles = StyleSheet.create({
   cover: { width: '100%', height: 200, borderRadius: 26, backgroundColor: colors.cardSecondary, marginBottom: spacing.md },
   itemRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
   itemImage: { width: 100, height: 100, borderRadius: 20, backgroundColor: colors.cardSecondary },
-  itemBody: { flex: 1, marginHorizontal: spacing.md, justifyContent: 'space-between' },
-  itemName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16 },
-  itemDescription: { color: colors.textSecondary, fontSize: 12, lineHeight: 18, marginTop: spacing.xs },
+  itemBody: { flex: 1, width: '100%', marginHorizontal: spacing.md, justifyContent: 'space-between', alignItems: 'flex-end' },
+  itemName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, textAlign: 'right', alignSelf: 'stretch' },
+  itemDescription: { color: colors.textSecondary, fontSize: 12, lineHeight: 18, marginTop: spacing.xs, textAlign: 'right', alignSelf: 'stretch' },
   itemBottom: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
   button: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: 14, paddingVertical: 10 },
   buttonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 13 },

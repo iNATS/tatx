@@ -1,8 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import { colors, typography, spacing } from '../constants/theme';
+import { colors, typography, spacing, fonts } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const OTPScreen = ({ navigation, route }) => {
+  const { isRTL } = useApp();
   const [code, setCode] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(30);
   const inputRefs = useRef([]);
@@ -54,7 +56,7 @@ const OTPScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>→</Text>
+          <Text style={styles.backButton}>{isRTL ? '→' : '←'}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>تأكيد كود التفعيل</Text>
       </View>
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     padding: spacing.lg,
     paddingTop: spacing.xxl,
@@ -119,11 +121,11 @@ const styles = StyleSheet.create({
   backButton: {
     fontSize: 24,
     color: colors.text,
-    marginLeft: spacing.md,
+    marginHorizontal: spacing.md,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
     flex: 1,
     textAlign: 'right',
@@ -141,7 +143,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   codeContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     gap: spacing.md,
     marginBottom: spacing.lg,
   },
@@ -152,13 +154,13 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 12,
     fontSize: 24,
-    fontWeight: '600',
+    fontFamily: fonts.semiBold,
     color: colors.text,
     backgroundColor: colors.grayLight,
   },
   timer: {
     fontSize: 48,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: spacing.md,
   },
@@ -191,7 +193,7 @@ const styles = StyleSheet.create({
   },
   verifyButtonText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontFamily: fonts.semiBold,
     color: colors.gray,
   },
   verifyButtonTextActive: {

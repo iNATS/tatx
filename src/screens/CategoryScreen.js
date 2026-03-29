@@ -5,6 +5,7 @@ import { colors, spacing, borderRadius, shadows, fonts } from '../constants/them
 import { getCategoryImage } from '../utils/placeholderImages';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
+import OfferPromoCard from '../components/OfferPromoCard';
 import PriceDisplay from '../components/PriceDisplay';
 import PageHeader from '../components/PageHeader';
 
@@ -51,6 +52,28 @@ const vendorStores = {
       ],
     },
   ],
+  'مقاهي': [
+    {
+      id: 'c1',
+      name: 'كافيه الموج',
+      subtitle: 'قهوة مختصة وحلويات',
+      image: 'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=900',
+      items: [
+        { id: 'ci1', name: 'لاتيه زعفران', price: 19, image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400', description: 'مشروب ساخن بنكهة الزعفران', rating: 4.7, time: '14 دقيقة' },
+        { id: 'ci2', name: 'كوكيز شوكولاتة', price: 12, image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400', description: 'مخبوزات يومية طازجة', rating: 4.6, time: '16 دقيقة' },
+      ],
+    },
+    {
+      id: 'c2',
+      name: 'روستري الحي',
+      subtitle: 'مختبر قهوة ومخبوزات',
+      image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=900',
+      items: [
+        { id: 'ci3', name: 'كابتشينو', price: 18, image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400', description: 'رغوة حليب كثيفة ونكهة متوازنة', rating: 4.8, time: '13 دقيقة' },
+        { id: 'ci4', name: 'كرواسون زبدة', price: 11, image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400', description: 'طازج يوميًا', rating: 4.5, time: '15 دقيقة' },
+      ],
+    },
+  ],
   'هدايا': [
     {
       id: 'g1',
@@ -80,6 +103,9 @@ const categoryOffers = {
     { id: 'fo1', title: 'خصم 25%', subtitle: 'على مطاعم مختارة اليوم', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900', overlay: ['rgba(218,60,87,0.88)', 'rgba(255,128,146,0.52)'] },
     { id: 'fo2', title: 'توصيل مجاني', subtitle: 'على الطلبات فوق 60', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900', overlay: ['rgba(52,199,89,0.85)', 'rgba(137,216,121,0.45)'] },
   ],
+  'مقاهي': [
+    { id: 'co1', title: 'قهوة اليوم', subtitle: 'عروض على القهوة والحلويات المختارة', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900', overlay: ['rgba(111,78,55,0.88)', 'rgba(208,171,124,0.38)'] },
+  ],
   'صيدلية': [
     { id: 'po1', title: 'عناية يومية', subtitle: 'خصومات على منتجات الصحة والعناية', image: 'https://images.unsplash.com/photo-1576602976047-174e57a47881?w=900', overlay: ['rgba(218,60,87,0.88)', 'rgba(245,165,180,0.48)'] },
   ],
@@ -96,14 +122,15 @@ const sorters = [
 ];
 
 const CategoryScreen = ({ route, navigation }) => {
-  const { addToCart, rowDirection, textAlignStart } = useApp();
+  const { addToCart, isRTL, rowDirection, textAlignStart } = useApp();
   const { name = 'مطاعم' } = route.params || {};
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSorter, setSelectedSorter] = useState('all');
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const normalizedName = name === 'طعام' ? 'مطاعم' : name;
-  const isVendorCategory = normalizedName === 'مطاعم' || normalizedName === 'هدايا';
+  const normalizedName = name === 'طعام' ? 'مطاعم' : name === 'عطور وهدايا' ? 'هدايا' : name;
+  const displayName = name === 'طعام' ? 'مطاعم' : name;
+  const isVendorCategory = normalizedName === 'مطاعم' || normalizedName === 'هدايا' || normalizedName === 'مقاهي';
   const stores = vendorStores[normalizedName] || [];
   const offers = categoryOffers[normalizedName] || [];
 
@@ -123,11 +150,11 @@ const CategoryScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <PageHeader
         navigation={navigation}
-        title={normalizedName}
-        subtitle={normalizedName === 'مطاعم' ? 'اختر المطعم ثم الوجبة' : normalizedName === 'هدايا' ? 'اختر محل الهدية ثم المنتج' : 'منتجات مباشرة من الصيدلية'}
+        title={displayName}
+        subtitle={displayName === 'مطاعم' ? 'اختر المطعم ثم الوجبة' : displayName === 'مقاهي' ? 'اختر المقهى ثم الطلب' : displayName === 'عطور وهدايا' ? 'اختر المتجر ثم المنتج' : 'منتجات مباشرة من الصيدلية'}
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder={isVendorCategory ? `ابحث عن ${normalizedName === 'مطاعم' ? 'مطعم' : 'محل هدايا'}` : 'ابحث عن منتج'}
+        searchPlaceholder={isVendorCategory ? `ابحث عن ${displayName === 'مطاعم' ? 'مطعم' : displayName === 'مقاهي' ? 'مقهى' : 'متجر'}` : 'ابحث عن منتج'}
         filters={!isVendorCategory ? sorters : []}
         selectedFilter={selectedSorter}
         onSelectFilter={setSelectedSorter}
@@ -138,22 +165,16 @@ const CategoryScreen = ({ route, navigation }) => {
           <Image source={{ uri: getCategoryImage(normalizedName) }} style={styles.heroImage} />
           <LinearGradient colors={['rgba(17,16,17,0.5)', 'rgba(17,16,17,0.12)']} style={styles.heroOverlay} />
           <View style={styles.heroContent}>
-            <Text style={styles.heroTitle}>{normalizedName}</Text>
+            <Text style={styles.heroTitle}>{displayName}</Text>
             <Text style={styles.heroSubtitle}>
-              {normalizedName === 'مطاعم' ? 'مطاعم مختارة داخل المنصة' : normalizedName === 'هدايا' ? 'محلات هدايا وتنسيقات' : 'منتجات صحية وعناية منزلية'}
+              {displayName === 'مطاعم' ? 'مطاعم مختارة داخل المنصة' : displayName === 'مقاهي' ? 'مقاهي مختصة وحلويات يومية' : displayName === 'عطور وهدايا' ? 'متاجر عطور وهدايا وتنسيقات' : 'منتجات صحية وعناية منزلية'}
             </Text>
           </View>
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.offersRow, { flexDirection: rowDirection }]}>
+        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.offersRow}>
           {offers.map((offer) => (
-            <TouchableOpacity key={offer.id} style={styles.offerCard} activeOpacity={0.9}>
-              <Image source={{ uri: offer.image }} style={styles.offerImage} />
-              <LinearGradient colors={offer.overlay} style={styles.offerOverlay}>
-                <Text style={styles.offerTitle}>{offer.title}</Text>
-                <Text style={styles.offerSubtitle}>{offer.subtitle}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            <OfferPromoCard key={offer.id} offer={offer} compact />
           ))}
         </ScrollView>
 
@@ -170,10 +191,10 @@ const CategoryScreen = ({ route, navigation }) => {
                   <Text style={[styles.storeName, { textAlign: textAlignStart }]}>{store.name}</Text>
                   <Text style={[styles.storeSubtitle, { textAlign: textAlignStart }]}>{store.subtitle}</Text>
                   <View style={[styles.storeBottom, { flexDirection: rowDirection }]}>
+                    <Text style={styles.storeCount}>{store.items.length} عناصر</Text>
                     <TouchableOpacity style={styles.storeButton}>
                       <Text style={styles.storeButtonText}>دخول</Text>
                     </TouchableOpacity>
-                    <Text style={styles.storeCount}>{store.items.length} عناصر</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -185,10 +206,10 @@ const CategoryScreen = ({ route, navigation }) => {
                   <Text style={[styles.itemName, { textAlign: textAlignStart }]}>{item.name}</Text>
                   <Text style={[styles.itemDescription, { textAlign: textAlignStart }]}>{item.description}</Text>
                   <View style={[styles.itemBottom, { flexDirection: rowDirection }]}>
+                    <PriceDisplay value={item.price} color={colors.primary} size={18} iconSize={14} bold />
                     <TouchableOpacity style={styles.storeButton} onPress={() => setSelectedItem(item)}>
                       <Text style={styles.storeButtonText}>عرض</Text>
                     </TouchableOpacity>
-                    <PriceDisplay value={item.price} color={colors.primary} size={18} iconSize={14} bold />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -210,25 +231,20 @@ const styles = StyleSheet.create({
   heroSubtitle: { color: 'rgba(255,255,255,0.88)', textAlign: 'right', fontSize: 13 },
   content: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
   offersRow: { gap: spacing.md, paddingVertical: spacing.md },
-  offerCard: { width: 250, height: 150, borderRadius: 26, overflow: 'hidden', ...shadows.sm },
-  offerImage: { width: '100%', height: '100%' },
-  offerOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'flex-end', padding: spacing.md },
-  offerTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 22, textAlign: 'right' },
-  offerSubtitle: { color: 'rgba(255,255,255,0.9)', fontSize: 12, marginTop: 4, textAlign: 'right', lineHeight: 18 },
-  storeCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
+  storeCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, direction: 'rtl', ...shadows.sm },
   storeImage: { width: 104, height: 104, borderRadius: 22, backgroundColor: colors.cardSecondary },
-  storeBody: { flex: 1, marginHorizontal: spacing.md, justifyContent: 'space-between' },
-  storeName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 17 },
-  storeSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 18 },
+  storeBody: { flex: 1, width: '100%', marginHorizontal: spacing.md, justifyContent: 'space-between', alignItems: 'flex-end' },
+  storeName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 17, textAlign: 'right', alignSelf: 'stretch' },
+  storeSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 18, textAlign: 'right', alignSelf: 'stretch' },
   storeBottom: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
   storeButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: 18, paddingVertical: 10 },
   storeButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 13 },
-  storeCount: { color: colors.textSecondary, fontSize: 12 },
-  itemRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
+  storeCount: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', alignSelf: 'stretch' },
+  itemRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, direction: 'rtl', ...shadows.sm },
   itemImage: { width: 100, height: 100, borderRadius: 20, backgroundColor: colors.cardSecondary },
-  itemBody: { flex: 1, marginHorizontal: spacing.md, justifyContent: 'space-between' },
-  itemName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16 },
-  itemDescription: { color: colors.textSecondary, fontSize: 12, marginTop: spacing.xs, lineHeight: 18 },
+  itemBody: { flex: 1, width: '100%', marginHorizontal: spacing.md, justifyContent: 'space-between', alignItems: 'flex-end' },
+  itemName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, textAlign: 'right', alignSelf: 'stretch' },
+  itemDescription: { color: colors.textSecondary, fontSize: 12, marginTop: spacing.xs, lineHeight: 18, textAlign: 'right', alignSelf: 'stretch' },
   itemBottom: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
 });
 

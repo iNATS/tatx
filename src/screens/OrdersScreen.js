@@ -82,20 +82,20 @@ const OrdersScreen = ({ navigation }) => {
                 activeOpacity={0.92}
                 onPress={() => navigation.navigate('OrderDetail', { order })}
               >
-                <View style={[styles.orderHeader, { flexDirection: rowDirection }]}>
-                  <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
-                    <Text style={[styles.statusText, { color: statusConfig.color }]}>{statusConfig.label}</Text>
-                  </View>
+                <View style={[styles.orderHeader, { flexDirection: 'row-reverse' }]}>
+                  <Image source={{ uri: order.restaurantLogo }} style={styles.orderLogo} />
                   <View style={styles.restaurantWrap}>
                     <Text style={[styles.restaurantName, { textAlign: textAlignStart }]}>{order.restaurantName}</Text>
                     <Text style={[styles.orderMeta, { textAlign: textAlignStart }]}>{order.date} • {order.time}</Text>
                   </View>
-                  <Image source={{ uri: order.restaurantLogo }} style={styles.orderLogo} />
+                  <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
+                    <Text style={[styles.statusText, { color: statusConfig.color }]}>{statusConfig.label}</Text>
+                  </View>
                 </View>
 
                 <View style={styles.itemsWrap}>
                   {order.items.slice(0, 2).map((item) => (
-                    <View key={`${order.id}-${item.id}`} style={[styles.itemRow, { flexDirection: rowDirection }]}>
+                    <View key={`${order.id}-${item.id}`} style={[styles.itemRow, { flexDirection: 'row-reverse' }]}>
                       <Text style={styles.itemPrice}>{formatCurrency(item.price * item.quantity)}</Text>
                       <Text style={[styles.itemName, { textAlign: textAlignStart }]} numberOfLines={1}>
                         {item.quantity}x {item.name}
@@ -104,7 +104,7 @@ const OrdersScreen = ({ navigation }) => {
                   ))}
                 </View>
 
-                <View style={[styles.footerRow, { flexDirection: rowDirection }]}>
+                <View style={[styles.footerRow, { flexDirection: 'row-reverse' }]}>
                   <TouchableOpacity style={styles.secondaryButton} onPress={() => handleReorder(order)}>
                     <Ionicons name="refresh-outline" size={18} color={colors.primary} />
                     <Text style={styles.secondaryButtonText}>إعادة الطلب</Text>
@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     padding: spacing.md,
     marginBottom: spacing.md,
+    direction: 'rtl',
     ...shadows.sm,
   },
   orderHeader: { alignItems: 'center' },
@@ -155,15 +156,15 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: colors.cardSecondary,
   },
-  restaurantWrap: { flex: 1, marginHorizontal: spacing.md },
-  restaurantName: { color: colors.text, fontFamily: fonts.bold, fontSize: 16 },
-  orderMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4 },
+  restaurantWrap: { flex: 1, width: '100%', marginHorizontal: spacing.md, alignItems: 'flex-end' },
+  restaurantName: { color: colors.text, fontFamily: fonts.bold, fontSize: 16, textAlign: 'right', alignSelf: 'stretch' },
+  orderMeta: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
   statusBadge: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: borderRadius.full,
   },
-  statusText: { fontSize: 12, fontFamily: fonts.semiBold },
+  statusText: { fontSize: 12, fontFamily: fonts.semiBold, textAlign: 'right' },
   itemsWrap: {
     marginTop: spacing.md,
     borderTopWidth: 1,
@@ -172,12 +173,12 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   itemRow: { justifyContent: 'space-between', alignItems: 'center' },
-  itemName: { flex: 1, color: colors.textSecondary, fontSize: 13 },
-  itemPrice: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, marginHorizontal: spacing.md },
+  itemName: { flex: 1, color: colors.textSecondary, fontSize: 13, textAlign: 'right', alignSelf: 'stretch' },
+  itemPrice: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, marginHorizontal: spacing.md, textAlign: 'right' },
   footerRow: { alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.md },
   totalWrap: { minWidth: 78 },
-  totalLabel: { color: colors.textSecondary, fontSize: 12 },
-  totalValue: { color: colors.primary, fontFamily: fonts.bold, fontSize: 16, marginTop: 4 },
+  totalLabel: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', alignSelf: 'stretch' },
+  totalValue: { color: colors.primary, fontFamily: fonts.bold, fontSize: 16, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
   primaryButton: {
     backgroundColor: colors.primary,
     paddingHorizontal: spacing.lg,
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14 },
   secondaryButton: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: spacing.xs,
     backgroundColor: colors.cardSecondary,

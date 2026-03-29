@@ -8,9 +8,9 @@ import PageHeader from '../components/PageHeader';
 
 const bookingFilters = [
   { id: 'all', label: 'الكل', icon: 'apps-outline' },
-  { id: 'hotel', label: 'فنادق', icon: 'bed-outline' },
-  { id: 'chalet', label: 'شاليهات', icon: 'home-outline' },
-  { id: 'hall', label: 'قاعات', icon: 'business-outline' },
+  { id: 'hotel', label: 'فندق', icon: 'bed-outline' },
+  { id: 'chalet', label: 'شالية', icon: 'home-outline' },
+  { id: 'hall', label: 'قاعة', icon: 'business-outline' },
 ];
 
 const StayBookingScreen = ({ navigation, route }) => {
@@ -39,10 +39,10 @@ const StayBookingScreen = ({ navigation, route }) => {
       <PageHeader
         navigation={navigation}
         title="حجوزات الإقامة والمناسبات"
-        subtitle="فنادق، شاليهات، وقاعات داخل المملكة"
+        subtitle="فندق، شالية، وقاعة داخل المملكة"
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="ابحث عن فندق أو شاليه أو قاعة"
+        searchPlaceholder="ابحث عن فندق أو شالية أو قاعة"
         filters={bookingFilters}
         selectedFilter={selectedFilter}
         onSelectFilter={setSelectedFilter}
@@ -123,11 +123,12 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   topRow: {
-    alignItems: 'flex-start',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
   },
   titleWrap: {
     flex: 1,
+    alignItems: 'flex-end',
   },
   title: {
     color: colors.text,
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   ratingPill: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 4,
     backgroundColor: colors.warningLight,
@@ -174,6 +175,7 @@ const styles = StyleSheet.create({
   },
   priceWrap: {
     flex: 1,
+    alignItems: 'flex-end',
   },
   price: {
     color: colors.primary,
