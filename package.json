@@ -1,7 +1,7 @@
 {
   "name": "tatx-app",
   "version": "1.1.0",
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "index.js",
   "scripts": {
     "postinstall": "node scripts/fix-broken-debug.js",
     "start": "expo start --clear",
