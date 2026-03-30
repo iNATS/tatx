@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
-import { homeServices, homeOffers, products, demoMarket, restaurants } from '../data/staticData';
 import { vendorStores } from '../data/vendorCatalog';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
@@ -28,19 +27,32 @@ const pharmacyHighlights = [
   { id: 'ph6', name: 'موسمي', subtitle: 'حساسية وسعال', icon: 'thermometer-outline', image: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=900' },
 ];
 
-const marketHighlights = [...products.slice(0, 6)];
-
 const HomeScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { user, addToCart, cartCount, rowDirection, textAlignStart, isRTL } = useApp();
+  const {
+    user,
+    addToCart,
+    cartCount,
+    rowDirection,
+    textAlignStart,
+    isRTL,
+    homeServices,
+    homeOffers,
+    products,
+    demoMarket,
+    restaurants,
+    refreshContent,
+  } = useApp();
   const [selectedItem, setSelectedItem] = useState(null);
   const [showItemModal, setShowItemModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const marketHighlights = products.slice(0, 6);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 900);
-  }, []);
+    await refreshContent();
+    setRefreshing(false);
+  }, [refreshContent]);
 
   const handleServicePress = (service) => {
     if (service.screen === 'Shop') {
@@ -159,14 +171,16 @@ const HomeScreen = ({ navigation }) => {
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.heroOfferCard} activeOpacity={0.9} onPress={() => handleOfferPress(homeOffers[0])}>
-          <Image source={{ uri: homeOffers[0].image }} style={styles.offerImage} />
-          <LinearGradient colors={['rgba(12,10,11,0.06)', 'rgba(12,10,11,0.68)']} style={styles.offerGradient}>
-            <Text style={styles.offerVendor}>{homeOffers[0].vendor}</Text>
-            <Text style={styles.offerTitle}>{homeOffers[0].title}</Text>
-            <Text style={styles.offerSubtitle}>{homeOffers[0].subtitle}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        {!!homeOffers.length && (
+          <TouchableOpacity style={styles.heroOfferCard} activeOpacity={0.9} onPress={() => handleOfferPress(homeOffers[0])}>
+            <Image source={{ uri: homeOffers[0].image }} style={styles.offerImage} />
+            <LinearGradient colors={['rgba(12,10,11,0.06)', 'rgba(12,10,11,0.68)']} style={styles.offerGradient}>
+              <Text style={styles.offerVendor}>{homeOffers[0].vendor}</Text>
+              <Text style={styles.offerTitle}>{homeOffers[0].title}</Text>
+              <Text style={styles.offerSubtitle}>{homeOffers[0].subtitle}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
 
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
           <Text style={styles.sectionTitle}>الخدمات</Text>

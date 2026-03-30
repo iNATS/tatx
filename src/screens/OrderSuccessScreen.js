@@ -4,11 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
-import { orders } from '../data/staticData';
 
 const OrderSuccessScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
-  const { currentOrder, formatCurrency, rowDirection, textAlignStart } = useApp();
+  const { currentOrder, formatCurrency, rowDirection, textAlignStart, orders } = useApp();
   const order = route.params?.order || currentOrder || orders[0];
 
   return (

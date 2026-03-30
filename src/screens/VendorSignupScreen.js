@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import { submitVendorApplication } from '../services/vendorService';
 
 const VendorSignupScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -29,6 +30,7 @@ const VendorSignupScreen = ({ navigation }) => {
     iban: '',
   });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const categories = [
     { id: 'restaurant', name: 'مطعم', icon: 'restaurant' },
@@ -81,10 +83,21 @@ const VendorSignupScreen = ({ navigation }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setSubmitting(true);
+
+    const { data, error } = await submitVendorApplication(formData);
+
+    setSubmitting(false);
+
+    if (error) {
+      Alert.alert('تعذر إرسال الطلب', 'لم نتمكن من حفظ طلب الانضمام حالياً. حاول مرة أخرى.');
+      return;
+    }
+
     Alert.alert(
       'تم إرسال الطلب',
-      'سيتم مراجعة طلبك والتواصل معك خلال 24 ساعة',
+      'تم تسجيل طلب الانضمام بنجاح. سيظهر لك وضع الطلب داخل تطبيق مقدم الخدمة بعد مراجعة المشرف العام.',
       [
         {
           text: 'حسناً',
@@ -92,7 +105,8 @@ const VendorSignupScreen = ({ navigation }) => {
             navigation.replace('VendorApp', {
               providerType: formData.category || 'restaurant',
               providerName: formData.storeName || 'مقدم خدمة جديد',
-              onboarded: true,
+              vendorPhone: formData.phone,
+              applicationId: data?.id,
             }),
         },
       ]
@@ -392,11 +406,12 @@ const VendorSignupScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
         <TouchableOpacity 
-          style={[styles.nextButton, { opacity: step === 4 ? 0.8 : 1 }]}
+          style={[styles.nextButton, { opacity: submitting ? 0.7 : 1 }]}
           onPress={handleNext}
+          disabled={submitting}
         >
           <Text style={styles.nextButtonText}>
-            {step === 4 ? 'إرسال الطلب' : 'التالي'}
+            {submitting ? 'جارٍ الإرسال...' : step === 4 ? 'إرسال الطلب' : 'التالي'}
           </Text>
           <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={20} color={colors.white} />
         </TouchableOpacity>

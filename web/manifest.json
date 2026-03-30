@@ -1,6 +1,6 @@
 {
-  "name": "TATX",
-  "short_name": "TATX",
+  "name": "Tatx SA",
+  "short_name": "Tatx SA",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "/",
@@ -9,7 +9,7 @@
   "orientation": "portrait",
   "background_color": "#FFF6F8",
   "theme_color": "#E91E63",
-  "description": "تطبيق TATX كتجربة ويب قابلة للتثبيت بسلوك أقرب لتطبيق الموبايل.",
+  "description": "تطبيق Tatx SA كتجربة ويب قابلة للتثبيت بسلوك أقرب لتطبيق الموبايل.",
   "icons": [
     {
       "src": "/pwa-icon-192.png",

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import {
   Activity,
@@ -32,6 +32,175 @@ const appSummary = {
   uptime: '99.94%',
   activeServices: 8,
   pendingApprovals: 14,
+};
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey);
+const expectedContentSections = [
+  'demoAccounts',
+  'demoMarket',
+  'homeServices',
+  'homeOffers',
+  'restaurants',
+  'products',
+  'orders',
+  'paymentMethods',
+  'stayBookingOptions',
+  'walletTransactions',
+  'user',
+];
+
+const getSupabaseHeaders = (extra = {}) => ({
+  apikey: supabaseAnonKey,
+  Authorization: `Bearer ${supabaseAnonKey}`,
+  'Content-Type': 'application/json',
+  ...extra,
+});
+
+const fetchContentSections = async () => {
+  if (!hasSupabaseConfig) {
+    throw new Error('Missing Supabase configuration.');
+  }
+
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/app_content_sections?select=section_key,payload,is_active,updated_at&order=section_key.asc`,
+    {
+      headers: getSupabaseHeaders(),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to load content sections (${response.status}).`);
+  }
+
+  const rows = await response.json();
+  const rowMap = new Map(rows.map((row) => [row.section_key, row]));
+
+  return expectedContentSections.map((sectionKey) => {
+    const existing = rowMap.get(sectionKey);
+
+    return (
+      existing || {
+        section_key: sectionKey,
+        payload: {},
+        is_active: true,
+        updated_at: null,
+      }
+    );
+  });
+};
+
+const upsertContentSection = async (section) => {
+  if (!hasSupabaseConfig) {
+    throw new Error('Missing Supabase configuration.');
+  }
+
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/app_content_sections?on_conflict=section_key`,
+    {
+      method: 'POST',
+      headers: getSupabaseHeaders({
+        Prefer: 'resolution=merge-duplicates,return=representation',
+      }),
+      body: JSON.stringify([
+        {
+          section_key: section.section_key,
+          payload: section.payload,
+          is_active: section.is_active,
+        },
+      ]),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to save section (${response.status}).`);
+  }
+
+  const result = await response.json();
+  return result[0];
+};
+
+const fetchVendorApplications = async () => {
+  if (!hasSupabaseConfig) {
+    return [];
+  }
+
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/vendor_applications?select=*&order=created_at.desc`,
+    { headers: getSupabaseHeaders() }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to load vendor applications (${response.status}).`);
+  }
+
+  return response.json();
+};
+
+const updateVendorApplicationStatus = async (application, status) => {
+  if (!hasSupabaseConfig) {
+    throw new Error('Missing Supabase configuration.');
+  }
+
+  const now = new Date().toISOString();
+  const payload = {
+    status,
+    approved_at: status === 'approved' ? now : null,
+    rejected_at: status === 'rejected' ? now : null,
+    review_notes:
+      status === 'approved'
+        ? 'تمت الموافقة من المشرف العام. تم تفعيل بوابة البائع.'
+        : 'تم رفض الطلب مؤقتاً. يرجى تحديث البيانات أو المستندات وإعادة التقديم.',
+  };
+
+  const applicationResponse = await fetch(
+    `${supabaseUrl}/rest/v1/vendor_applications?id=eq.${application.id}`,
+    {
+      method: 'PATCH',
+      headers: getSupabaseHeaders({ Prefer: 'return=representation' }),
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!applicationResponse.ok) {
+    throw new Error(`Failed to update application (${applicationResponse.status}).`);
+  }
+
+  const [updatedApplication] = await applicationResponse.json();
+
+  if (status === 'approved') {
+    const profilePayload = {
+      application_id: application.id,
+      store_name: application.store_name,
+      owner_name: application.owner_name,
+      phone: application.phone,
+      email: application.email,
+      category: application.category,
+      description: application.description,
+      address: application.address,
+      city: application.city,
+      status: 'approved',
+      is_active: true,
+    };
+
+    const profileResponse = await fetch(
+      `${supabaseUrl}/rest/v1/vendor_profiles?on_conflict=phone`,
+      {
+        method: 'POST',
+        headers: getSupabaseHeaders({
+          Prefer: 'resolution=merge-duplicates,return=representation',
+        }),
+        body: JSON.stringify([profilePayload]),
+      }
+    );
+
+    if (!profileResponse.ok) {
+      throw new Error(`Failed to activate vendor profile (${profileResponse.status}).`);
+    }
+  }
+
+  return updatedApplication;
 };
 
 const dashboardStats = [
@@ -119,6 +288,7 @@ const statusClasses = {
   'مكتمل': 'bg-emerald-100 text-emerald-700',
   'منشور': 'bg-emerald-100 text-emerald-700',
   'مراجعة': 'bg-amber-100 text-amber-700',
+  'بانتظار الموافقة': 'bg-amber-100 text-amber-700',
   'ينقصه مستند': 'bg-amber-100 text-amber-700',
   'قيد التحضير': 'bg-sky-100 text-sky-700',
   'في التوصيل': 'bg-violet-100 text-violet-700',
@@ -126,6 +296,7 @@ const statusClasses = {
   'قيد المعالجة': 'bg-sky-100 text-sky-700',
   'تم الحل': 'bg-emerald-100 text-emerald-700',
   'ملغي': 'bg-rose-100 text-rose-700',
+  'مرفوض': 'bg-rose-100 text-rose-700',
   'موقوف مؤقتا': 'bg-rose-100 text-rose-700',
   'مقيد': 'bg-rose-100 text-rose-700',
   'حرج': 'bg-rose-100 text-rose-700',
@@ -480,27 +651,123 @@ const UsersTab = ({ search }) => {
 };
 
 const VendorsTab = ({ search }) => {
-  const rows = useMemo(() => vendorsSeed.filter((item) => [item.id, item.name, item.type, item.city].join(' ').includes(search)), [search]);
+  const [dbRows, setDbRows] = useState([]);
+  const [loading, setLoading] = useState(hasSupabaseConfig);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      if (!hasSupabaseConfig) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const applications = await fetchVendorApplications();
+
+        if (!cancelled) {
+          setDbRows(applications);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setErrorMessage(error.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const rows = useMemo(() => {
+    if (!hasSupabaseConfig) {
+      return vendorsSeed.filter((item) => [item.id, item.name, item.type, item.city].join(' ').includes(search));
+    }
+
+    return dbRows
+      .filter((item) =>
+        [item.id, item.store_name, item.owner_name, item.phone, item.city, item.category]
+          .join(' ')
+          .includes(search)
+      )
+      .map((item) => ({
+        id: item.id.slice(0, 8).toUpperCase(),
+        name: item.store_name,
+        owner: item.owner_name,
+        type: item.category,
+        city: item.city,
+        phone: item.phone,
+        orders: '0',
+        payout: '0 ر.س',
+        compliance: item.cr_number ? 'مكتمل' : 'ينقصه مستند',
+        status: item.status === 'approved' ? 'نشط' : item.status === 'rejected' ? 'مرفوض' : 'بانتظار الموافقة',
+        raw: item,
+      }));
+  }, [dbRows, search]);
+
+  const handleApplicationAction = async (vendor, status) => {
+    try {
+      const updated = await updateVendorApplicationStatus(vendor.raw, status);
+
+      setDbRows((prev) =>
+        prev.map((row) => (row.id === updated.id ? updated : row))
+      );
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <SectionHeading title="إدارة البائعين" subtitle="التحكم في اعتماد البائعين، حالة الامتثال، المستحقات، ونشاط المتاجر." actionLabel="اعتماد بائع جديد" />
+      {loading ? (
+        <Card>
+          <CardContent className="pt-6 text-sm text-slate-500">جارٍ تحميل طلبات الانضمام الحالية...</CardContent>
+        </Card>
+      ) : null}
+      {errorMessage ? (
+        <Card>
+          <CardContent className="pt-6 text-sm text-rose-600">{errorMessage}</CardContent>
+        </Card>
+      ) : null}
       <TableCard
         title="البائعون والمتاجر"
-        subtitle="مراجعة المتاجر حسب النوع والحالة والالتزام."
+        subtitle={hasSupabaseConfig ? 'طلبات الانضمام من التطبيق مع إجراءات الموافقة والتفعيل.' : 'مراجعة المتاجر حسب النوع والحالة والالتزام.'}
         actionLabel="فلترة متقدمة"
         columns={['المعرف', 'البائع', 'النوع', 'المدينة', 'الطلبات', 'المستحقات', 'الامتثال', 'الحالة']}
         rows={rows}
         renderRow={(vendor) => (
           <tr key={vendor.id} className="border-b border-slate-50 text-slate-700">
             <td className="px-4 py-4 font-semibold text-slate-900 first:pr-0">{vendor.id}</td>
-            <td className="px-4 py-4 font-semibold">{vendor.name}</td>
+            <td className="px-4 py-4">
+              <div className="font-semibold">{vendor.name}</div>
+              {vendor.owner ? <div className="mt-1 text-xs text-slate-400">{vendor.owner} • {vendor.phone}</div> : null}
+            </td>
             <td className="px-4 py-4">{vendor.type}</td>
             <td className="px-4 py-4">{vendor.city}</td>
             <td className="px-4 py-4">{vendor.orders}</td>
             <td className="px-4 py-4 font-semibold">{vendor.payout}</td>
             <td className="px-4 py-4"><Badge>{vendor.compliance}</Badge></td>
-            <td className="px-4 py-4 pl-0"><Badge>{vendor.status}</Badge></td>
+            <td className="px-4 py-4 pl-0">
+              <div className="flex items-center justify-end gap-2">
+                <Badge>{vendor.status}</Badge>
+                {hasSupabaseConfig && vendor.raw?.status === 'pending' ? (
+                  <>
+                    <Button size="sm" variant="soft" onClick={() => handleApplicationAction(vendor, 'approved')}>موافقة</Button>
+                    <Button size="sm" variant="outline" onClick={() => handleApplicationAction(vendor, 'rejected')}>رفض</Button>
+                  </>
+                ) : null}
+              </div>
+            </td>
           </tr>
         )}
       />
@@ -538,10 +805,147 @@ const OrdersTab = ({ search }) => {
 
 const ContentTab = ({ search }) => {
   const rows = useMemo(() => contentSeed.filter((item) => [item.id, item.title, item.owner, item.section].join(' ').includes(search)), [search]);
+  const [dbSections, setDbSections] = useState([]);
+  const [selectedSectionKey, setSelectedSectionKey] = useState('');
+  const [jsonValue, setJsonValue] = useState('');
+  const [loading, setLoading] = useState(hasSupabaseConfig);
+  const [saveState, setSaveState] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      if (!hasSupabaseConfig) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const sections = await fetchContentSections();
+
+        if (cancelled) {
+          return;
+        }
+
+        setDbSections(sections);
+
+        if (sections[0]) {
+          setSelectedSectionKey(sections[0].section_key);
+          setJsonValue(JSON.stringify(sections[0].payload, null, 2));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setErrorMessage(error.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selectedSection = dbSections.find((section) => section.section_key === selectedSectionKey);
+
+  const handleSectionChange = (sectionKey) => {
+    setSelectedSectionKey(sectionKey);
+    const section = dbSections.find((item) => item.section_key === sectionKey);
+    setJsonValue(section ? JSON.stringify(section.payload, null, 2) : '');
+    setSaveState('');
+    setErrorMessage('');
+  };
+
+  const handleSave = async () => {
+    if (!selectedSection) {
+      return;
+    }
+
+    try {
+      const nextPayload = JSON.parse(jsonValue);
+      setSaveState('saving');
+      setErrorMessage('');
+
+      const updatedSection = await upsertContentSection({
+        section_key: selectedSection.section_key,
+        payload: nextPayload,
+        is_active: selectedSection.is_active,
+      });
+
+      setDbSections((prev) =>
+        prev.map((section) =>
+          section.section_key === updatedSection.section_key ? updatedSection : section
+        )
+      );
+      setJsonValue(JSON.stringify(updatedSection.payload, null, 2));
+      setSaveState('saved');
+    } catch (error) {
+      setSaveState('');
+      setErrorMessage(error.message.includes('JSON') ? 'تأكد من صحة تنسيق JSON قبل الحفظ.' : error.message);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <SectionHeading title="المحتوى والخدمات" subtitle="إدارة الأقسام، العروض، والتنبيهات التحريرية الخاصة بالتطبيق." actionLabel="إنشاء حملة جديدة" />
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>ربط محتوى التطبيق بقاعدة البيانات</CardTitle>
+            <CardDescription>عدل أي قسم JSON هنا، ثم احفظه ليظهر داخل تطبيق Expo مباشرة من جدول `app_content_sections`.</CardDescription>
+          </div>
+          <Button variant="outline" onClick={handleSave} disabled={!selectedSection || saveState === 'saving'}>
+            {saveState === 'saving' ? 'جارٍ الحفظ...' : 'حفظ القسم'}
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!hasSupabaseConfig ? (
+            <div className="rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+              أضف `VITE_SUPABASE_URL` و `VITE_SUPABASE_ANON_KEY` داخل بيئة البوابة لتفعيل الربط المباشر.
+            </div>
+          ) : loading ? (
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">جارٍ تحميل أقسام قاعدة البيانات...</div>
+          ) : (
+            <div className="grid gap-4 xl:grid-cols-[280px_1fr]">
+              <div className="space-y-2">
+                {dbSections.map((section) => (
+                  <button
+                    key={section.section_key}
+                    onClick={() => handleSectionChange(section.section_key)}
+                    className={`w-full rounded-3xl border px-4 py-4 text-right transition ${selectedSectionKey === section.section_key ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-white'}`}
+                  >
+                    <div className="font-semibold">{section.section_key}</div>
+                    <div className={`mt-1 text-xs ${selectedSectionKey === section.section_key ? 'text-white/70' : 'text-slate-400'}`}>
+                      {section.updated_at ? new Date(section.updated_at).toLocaleString('ar-EG') : 'بدون تحديثات'}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="space-y-3">
+                <textarea
+                  value={jsonValue}
+                  onChange={(event) => setJsonValue(event.target.value)}
+                  spellCheck={false}
+                  className="min-h-[420px] w-full rounded-[28px] border border-slate-200 bg-slate-950 p-5 font-mono text-sm leading-7 text-slate-100 outline-none focus:border-rose-300"
+                />
+                {saveState === 'saved' ? (
+                  <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">تم حفظ القسم في قاعدة البيانات.</div>
+                ) : null}
+                {errorMessage ? (
+                  <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{errorMessage}</div>
+                ) : null}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
       <TableCard
         title="العناصر التحريرية"
         subtitle="العروض والتصنيفات والأقسام النشطة داخل التطبيق."

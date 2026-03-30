@@ -4,12 +4,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
-import { paymentMethods } from '../data/staticData';
 import PageHeader from '../components/PageHeader';
 
 const CheckoutScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { cart, cartTotal, clearCart, setCurrentOrder, user, formatCurrency, rowDirection, textAlignStart } = useApp();
+  const {
+    cart,
+    cartTotal,
+    clearCart,
+    setCurrentOrder,
+    user,
+    formatCurrency,
+    rowDirection,
+    textAlignStart,
+    paymentMethods,
+    submitOrder,
+  } = useApp();
   const addresses = user?.addresses || [];
   const [selectedAddress, setSelectedAddress] = useState(addresses[0]?.id || null);
   const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0]?.id || null);
@@ -33,7 +43,7 @@ const CheckoutScreen = ({ navigation }) => {
     Alert.alert('تم التطبيق', 'تم تطبيق كود الخصم على الطلب.');
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!cart.length) {
       Alert.alert('السلة فارغة', 'أضف عناصر إلى السلة قبل المتابعة.');
       navigation.goBack();
@@ -65,7 +75,16 @@ const CheckoutScreen = ({ navigation }) => {
       paymentMethod: paymentDetails?.name || 'آبل باي',
       notes,
       deliveryWindow,
+      customerName: user?.name,
+      customerPhone: user?.phone,
+      user,
     };
+
+    const { error } = await submitOrder(nextOrder);
+
+    if (error) {
+      Alert.alert('تعذر مزامنة الطلب', 'تم إنشاء الطلب محلياً، لكن لم نتمكن من حفظه في قاعدة البيانات حالياً.');
+    }
 
     setCurrentOrder(nextOrder);
     clearCart();

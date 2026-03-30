@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
-import { orders } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 
@@ -23,7 +22,7 @@ const orderStatusConfig = {
 };
 
 const OrdersScreen = ({ navigation }) => {
-  const { addToCart, formatCurrency, rowDirection, textAlignStart } = useApp();
+  const { addToCart, formatCurrency, rowDirection, textAlignStart, orders } = useApp();
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -37,7 +36,7 @@ const OrdersScreen = ({ navigation }) => {
 
       return matchesFilter && matchesSearch;
     });
-  }, [searchQuery, selectedFilter]);
+  }, [orders, searchQuery, selectedFilter]);
 
   const handleReorder = (order) => {
     order.items.forEach((item) => {

@@ -5,7 +5,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
-import { demoAccounts, demoMarket } from '../data/staticData';
 
 const roles = [
   { id: 'user', label: 'عميل', subtitle: 'تصفح واطلب من المتاجر', icon: 'person-outline' },
@@ -15,7 +14,7 @@ const roles = [
 
 const LoginScreen = () => {
   const insets = useSafeAreaInsets();
-  const { setIsAuthenticated, setUser, rowDirection, textAlignStart } = useApp();
+  const { setIsAuthenticated, setUser, rowDirection, textAlignStart, demoAccounts, demoMarket } = useApp();
   const [selectedRole, setSelectedRole] = useState('user');
   const [phone, setPhone] = useState(demoAccounts.user.phone);
   const [loading, setLoading] = useState(false);
@@ -36,6 +35,7 @@ const LoginScreen = () => {
         phone: activeAccount.phone,
         role: selectedRole,
         city: activeAccount.city,
+        district: activeAccount.district || demoMarket.district,
         walletBalance: 300,
       });
       setIsAuthenticated(true);

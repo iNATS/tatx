@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
-import { stayBookingOptions } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 
@@ -14,7 +13,7 @@ const bookingFilters = [
 ];
 
 const StayBookingScreen = ({ navigation, route }) => {
-  const { formatCurrency, rowDirection, textAlignStart } = useApp();
+  const { formatCurrency, rowDirection, textAlignStart, stayBookingOptions } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState(route.params?.bookingType || 'all');
 
@@ -28,7 +27,7 @@ const StayBookingScreen = ({ navigation, route }) => {
 
       return matchesFilter && matchesSearch;
     });
-  }, [searchQuery, selectedFilter]);
+  }, [searchQuery, selectedFilter, stayBookingOptions]);
 
   const handleBooking = (option) => {
     navigation.navigate('StayBookingDetail', { booking: option });

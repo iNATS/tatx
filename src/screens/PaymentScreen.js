@@ -13,12 +13,39 @@ const initialMethods = [
 
 const PaymentScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { isRTL, rowDirection, textAlignStart } = useApp();
-  const [methods, setMethods] = useState(initialMethods);
-  const [selectedMethod, setSelectedMethod] = useState(initialMethods.find((item) => item.isDefault)?.id || initialMethods[0].id);
+  const { isRTL, rowDirection, textAlignStart, paymentMethods } = useApp();
+  const normalizedRemoteMethods = useMemo(
+    () =>
+      (paymentMethods || []).map((method, index) => ({
+        id: method.id,
+        title: method.name,
+        subtitle: method.subtitle || (index === 0 ? 'الدفع الافتراضي' : 'متاح لهذا الطلب'),
+        icon: method.icon || 'card-outline',
+        color: method.color || colors.primary,
+        isDefault: Boolean(method.isDefault || index === 0),
+      })),
+    [paymentMethods]
+  );
+  const [methods, setMethods] = useState(
+    normalizedRemoteMethods.length ? normalizedRemoteMethods : initialMethods
+  );
+  const [selectedMethod, setSelectedMethod] = useState(
+    (normalizedRemoteMethods.find((item) => item.isDefault) || normalizedRemoteMethods[0] || initialMethods.find((item) => item.isDefault) || initialMethods[0]).id
+  );
   const [showModal, setShowModal] = useState(false);
   const [saveCard, setSaveCard] = useState(true);
   const [form, setForm] = useState({ number: '', name: '', expiry: '', cvv: '' });
+
+  React.useEffect(() => {
+    if (!normalizedRemoteMethods.length) {
+      return;
+    }
+
+    setMethods(normalizedRemoteMethods);
+    setSelectedMethod(
+      (normalizedRemoteMethods.find((item) => item.isDefault) || normalizedRemoteMethods[0]).id
+    );
+  }, [normalizedRemoteMethods]);
 
   const activeMethod = useMemo(() => methods.find((item) => item.id === selectedMethod), [methods, selectedMethod]);
 

@@ -8,19 +8,20 @@ import { useApp } from '../context/AppContext';
 
 const WalletScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { formatCurrency, isRTL, rowDirection, textAlignStart } = useApp();
+  const { formatCurrency, isRTL, rowDirection, textAlignStart, walletTransactions, user } = useApp();
   const [activeTab, setActiveTab] = useState('all');
 
-  const balance = 2450.00;
+  const balance = Number(user?.walletBalance || 0);
   const points = 320;
 
-  const transactions = [
-    { id: '1', type: 'credit', title: 'إضافة رصيد', date: 'اليوم، 10:30 ص', amount: 500, icon: 'wallet' },
-    { id: '2', type: 'debit', title: 'طلب #ORD-123', date: 'أمس، 2:15 م', amount: -85, icon: 'receipt' },
-    { id: '3', type: 'debit', title: 'طلب #ORD-122', date: '15 مارس، 11:00 ص', amount: -120, icon: 'receipt' },
-    { id: '4', type: 'credit', title: 'استرجاع مبلغ', date: '14 مارس، 4:30 م', amount: 45, icon: 'return-up-back' },
-    { id: '5', type: 'debit', title: 'طلب #ORD-121', date: '12 مارس، 1:00 م', amount: -65, icon: 'receipt' },
-  ];
+  const transactions = (walletTransactions || []).map((transaction) => ({
+    id: transaction.id,
+    type: transaction.isCredit ? 'credit' : 'debit',
+    title: transaction.typeAr || transaction.typeEn || transaction.type,
+    date: [transaction.date, transaction.time].filter(Boolean).join('، '),
+    amount: transaction.isCredit ? Number(transaction.amount || 0) : -Math.abs(Number(transaction.amount || 0)),
+    icon: transaction.isCredit ? 'wallet' : 'receipt',
+  }));
 
   const quickActions = [
     { id: 'add', title: 'إضافة رصيد', icon: 'add-circle', color: colors.success },

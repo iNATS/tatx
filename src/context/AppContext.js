@@ -1,19 +1,50 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
-import { demoMarket, translations, user as defaultUser } from '../data/staticData';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { translations } from '../data/staticData';
+import {
+  createOrderInSupabase,
+  defaultAppContent,
+  fetchAppContent,
+} from '../services/appContentService';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [user, setUser] = useState(defaultUser);
+  const [content, setContent] = useState(defaultAppContent);
+  const [contentSource, setContentSource] = useState(isSupabaseConfigured ? 'loading' : 'static');
+  const [contentError, setContentError] = useState(null);
+  const [contentLoading, setContentLoading] = useState(isSupabaseConfigured);
+  const [user, setUser] = useState(defaultAppContent.user);
   const [cart, setCart] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
 
+  const refreshContent = async () => {
+    setContentLoading(true);
+
+    const result = await fetchAppContent();
+
+    setContent(result.content);
+    setContentSource(result.source);
+    setContentError(result.error);
+    setContentLoading(false);
+  };
+
+  useEffect(() => {
+    refreshContent();
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUser(content.user || defaultAppContent.user);
+    }
+  }, [content.user, isAuthenticated]);
+
   const language = 'ar';
   const setLanguage = () => {};
   const isRTL = true;
-  const locale = 'ar-SA';
-  const currencySymbol = demoMarket.currency || '﷼';
+  const locale = content.demoMarket?.locale || 'ar-SA';
+  const currencySymbol = content.demoMarket?.currency || '﷼';
   const rowDirection = isRTL ? 'row-reverse' : 'row';
   const textAlignStart = isRTL ? 'right' : 'left';
   const textAlignEnd = isRTL ? 'left' : 'right';
@@ -91,6 +122,19 @@ export const AppProvider = ({ children }) => {
     setCart([]);
   };
 
+  const submitOrder = async (order) => {
+    const { data, error } = await createOrderInSupabase(order);
+
+    if (!error) {
+      setContent((prev) => ({
+        ...prev,
+        orders: [order, ...(prev.orders || [])],
+      }));
+    }
+
+    return { data, error };
+  };
+
   const cartTotal = useMemo(
     () => cart.reduce((sum, item) => sum + getCartItemUnitPrice(item) * item.quantity, 0),
     [cart]
@@ -123,6 +167,23 @@ export const AppProvider = ({ children }) => {
         textAlignEnd,
         t,
         formatCurrency,
+        content,
+        contentSource,
+        contentError,
+        contentLoading,
+        refreshContent,
+        isSupabaseConfigured,
+        demoAccounts: content.demoAccounts || defaultAppContent.demoAccounts,
+        demoMarket: content.demoMarket || defaultAppContent.demoMarket,
+        homeServices: content.homeServices || defaultAppContent.homeServices,
+        homeOffers: content.homeOffers || defaultAppContent.homeOffers,
+        restaurants: content.restaurants || defaultAppContent.restaurants,
+        products: content.products || defaultAppContent.products,
+        orders: content.orders || defaultAppContent.orders,
+        paymentMethods: content.paymentMethods || defaultAppContent.paymentMethods,
+        stayBookingOptions: content.stayBookingOptions || defaultAppContent.stayBookingOptions,
+        walletTransactions: content.walletTransactions || defaultAppContent.walletTransactions,
+        submitOrder,
       }}
     >
       {children}

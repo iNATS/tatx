@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
-import { homeServices } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 import AppListCard from '../components/AppListCard';
@@ -52,7 +51,7 @@ const serviceSubtitles = {
 };
 
 const ServicesScreen = ({ navigation }) => {
-  const { rowDirection, textAlignStart } = useApp();
+  const { rowDirection, textAlignStart, homeServices } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
 

@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput,
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
-import { products } from '../data/staticData';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
 import PriceDisplay from '../components/PriceDisplay';
@@ -19,7 +18,16 @@ const productFilters = [
 
 const ProductScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { addToCart, cartCount, cartTotal, formatCurrency, rowDirection, textAlignStart, isRTL } = useApp();
+  const {
+    addToCart,
+    cartCount,
+    cartTotal,
+    formatCurrency,
+    rowDirection,
+    textAlignStart,
+    isRTL,
+    products,
+  } = useApp();
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -27,7 +35,7 @@ const ProductScreen = ({ navigation }) => {
 
   const featuredDeals = useMemo(
     () => products.filter((product) => product.oldPrice).concat(products.filter((product) => !product.oldPrice)).slice(0, 6),
-    []
+    [products]
   );
 
   const filteredProducts = useMemo(() => {
@@ -40,7 +48,7 @@ const ProductScreen = ({ navigation }) => {
 
       return matchesFilter && matchesSearch;
     });
-  }, [searchQuery, selectedFilter]);
+  }, [products, searchQuery, selectedFilter]);
 
   return (
     <View style={styles.container}>
