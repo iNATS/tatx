@@ -42,11 +42,14 @@ const expectedContentSections = [
   'demoMarket',
   'homeServices',
   'homeOffers',
+  'onboardingSlides',
+  'notifications',
   'restaurants',
   'products',
   'orders',
   'paymentMethods',
   'stayBookingOptions',
+  'supportTopics',
   'walletTransactions',
   'user',
 ];
@@ -138,6 +141,57 @@ const fetchVendorApplications = async () => {
   return response.json();
 };
 
+const fetchVendorProfiles = async () => {
+  if (!hasSupabaseConfig) {
+    return [];
+  }
+
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/vendor_profiles?select=*&order=created_at.desc`,
+    { headers: getSupabaseHeaders() }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to load vendor profiles (${response.status}).`);
+  }
+
+  return response.json();
+};
+
+const fetchVendorServices = async () => {
+  if (!hasSupabaseConfig) {
+    return [];
+  }
+
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/vendor_services?select=*&order=created_at.desc`,
+    { headers: getSupabaseHeaders() }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to load vendor services (${response.status}).`);
+  }
+
+  return response.json();
+};
+
+const fetchOrders = async () => {
+  if (!hasSupabaseConfig) {
+    return [];
+  }
+
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/customer_orders?select=*&order=created_at.desc`,
+    { headers: getSupabaseHeaders() }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to load orders (${response.status}).`);
+  }
+
+  return response.json();
+};
+
 const updateVendorApplicationStatus = async (application, status) => {
   if (!hasSupabaseConfig) {
     throw new Error('Missing Supabase configuration.');
@@ -201,6 +255,25 @@ const updateVendorApplicationStatus = async (application, status) => {
   }
 
   return updatedApplication;
+};
+
+const formatSarAmount = (value) =>
+  `${new Intl.NumberFormat('ar-SA', { maximumFractionDigits: 0 }).format(Number(value || 0))} ر.س`;
+
+const normalizeOrderStatus = (status) => {
+  const value = String(status || '').toLowerCase();
+
+  if (value.includes('deliver')) return 'في التوصيل';
+  if (value.includes('prepar') || value.includes('progress')) return 'قيد التحضير';
+  if (value.includes('complete') || value.includes('success')) return 'مكتمل';
+  if (value.includes('cancel') || value.includes('reject')) return 'ملغي';
+  return 'بانتظار التنفيذ';
+};
+
+const getRiskLabel = (order) => {
+  if (Number(order.total || 0) >= 300) return 'مرتفع';
+  if (Number(order.total || 0) >= 120) return 'متوسط';
+  return 'منخفض';
 };
 
 const dashboardStats = [
@@ -533,87 +606,256 @@ const Header = ({ onMenuClick, search, setSearch, title }) => (
   </header>
 );
 
-const DashboardTab = () => (
-  <div className="space-y-6">
-    <SectionHeading title="الرؤية العامة" subtitle="متابعة الأداء الحي للتطبيق والمستخدمين والبائعين من شاشة واحدة" actionLabel="تصدير التقرير اليومي" />
+const DashboardTab = () => {
+  const [state, setState] = useState({
+    loading: hasSupabaseConfig,
+    error: '',
+    stats: dashboardStats,
+    services: serviceHealth,
+    interventions: [],
+  });
 
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      {dashboardStats.map((item) => (
-        <StatCard key={item.id} {...item} />
-      ))}
-    </div>
+  useEffect(() => {
+    let cancelled = false;
 
-    <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-      <Card>
-        <CardHeader>
-          <div>
-            <CardTitle>صحة الخدمات</CardTitle>
-            <CardDescription>تعطيك مؤشرا مباشرا عن الضغط التشغيلي، جودة التنفيذ، وعدد المشاكل الحالية.</CardDescription>
-          </div>
-          <Button variant="outline">عرض السجل التشغيلي</Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {serviceHealth.map((service) => (
-            <div key={service.id} className="rounded-3xl border border-slate-100 bg-slate-50/70 p-4">
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold text-slate-900">{service.name}</p>
-                    <Badge tone={service.tone}>{service.status}</Badge>
-                  </div>
-                  <p className="mt-1 text-sm text-slate-500">{service.orders} • {service.issueCount} ملاحظات مفتوحة</p>
-                </div>
-                <div className="w-full max-w-xs">
-                  <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
-                    <span>أداء التشغيل</span>
-                    <span>{service.fill}%</span>
-                  </div>
-                  <div className="h-2.5 rounded-full bg-slate-200">
-                    <div className={`h-2.5 rounded-full ${service.tone === 'emerald' ? 'bg-emerald-500' : service.tone === 'amber' ? 'bg-amber-500' : service.tone === 'sky' ? 'bg-sky-500' : 'bg-rose-500'}`} style={{ width: `${service.fill}%` }} />
-                  </div>
-                </div>
-              </div>
+    const load = async () => {
+      if (!hasSupabaseConfig) {
+        return;
+      }
+
+      try {
+        const [orders, applications, profiles, services, sections] = await Promise.all([
+          fetchOrders(),
+          fetchVendorApplications(),
+          fetchVendorProfiles(),
+          fetchVendorServices(),
+          fetchContentSections(),
+        ]);
+
+        if (cancelled) {
+          return;
+        }
+
+        const totalSales = orders.reduce((sum, item) => sum + Number(item.total || 0), 0);
+        const pendingApprovals = applications.filter((item) => item.status === 'pending').length;
+        const recentOrders = orders.filter((item) => {
+          const createdAt = new Date(item.created_at).getTime();
+          return Number.isFinite(createdAt) && Date.now() - createdAt <= 24 * 60 * 60 * 1000;
+        }).length;
+        const activeVendors = profiles.filter((item) => item.is_active).length;
+        const uniqueCustomers = new Set(
+          orders.map((item) => item.customer_phone || item.customer_name).filter(Boolean)
+        ).size;
+
+        const serviceMap = new Map();
+        services.forEach((item) => {
+          const key = item.category || 'غير مصنف';
+          const current = serviceMap.get(key) || { id: key, name: key, serviceCount: 0, activeCount: 0 };
+          current.serviceCount += 1;
+          current.activeCount += item.is_active ? 1 : 0;
+          serviceMap.set(key, current);
+        });
+
+        const serviceRows = Array.from(serviceMap.values()).map((item) => {
+          const fill = item.serviceCount ? Math.round((item.activeCount / item.serviceCount) * 100) : 0;
+          return {
+            id: item.id,
+            name: item.name,
+            status: fill >= 80 ? 'مستقر' : fill >= 50 ? 'ضغط مرتفع' : 'متابعة مطلوبة',
+            orders: `${item.serviceCount} خدمة`,
+            issueCount: item.serviceCount - item.activeCount,
+            fill,
+            tone: fill >= 80 ? 'emerald' : fill >= 50 ? 'amber' : 'rose',
+          };
+        });
+
+        setState({
+          loading: false,
+          error: '',
+          stats: [
+            { id: 'gmv', title: 'إجمالي المبيعات', value: formatSarAmount(totalSales), change: `${orders.length} طلب`, trend: 'up', icon: CreditCard, color: 'from-rose-500 to-pink-500' },
+            { id: 'orders', title: 'الطلبات الحالية', value: String(recentOrders), change: `${orders.length} إجمالي الطلبات`, trend: 'up', icon: ShoppingBag, color: 'from-sky-500 to-cyan-500' },
+            { id: 'vendors', title: 'البائعون النشطون', value: String(activeVendors), change: `${services.length} خدمة مسجلة`, trend: 'up', icon: Store, color: 'from-emerald-500 to-green-500' },
+            { id: 'users', title: 'العملاء النشطون', value: String(uniqueCustomers), change: `${pendingApprovals} طلب اعتماد`, trend: pendingApprovals ? 'up' : 'down', icon: Users, color: 'from-violet-500 to-purple-500' },
+          ],
+          services: serviceRows.length ? serviceRows : serviceHealth,
+          interventions: [
+            { title: `${pendingApprovals} طلب اعتماد بائع جديد`, tone: pendingApprovals ? 'amber' : 'emerald', icon: Store },
+            { title: `${sections.filter((section) => !section.updated_at).length} أقسام محتوى تحتاج تعبئة`, tone: 'sky', icon: Gift },
+            { title: `${orders.filter((item) => getRiskLabel(item) === 'مرتفع').length} طلبات عالية القيمة تحتاج متابعة`, tone: 'rose', icon: LifeBuoy },
+            { title: `إجمالي عمولات تقديري ${formatSarAmount(totalSales * 0.12)}`, tone: 'emerald', icon: Wallet },
+          ],
+        });
+      } catch (error) {
+        if (!cancelled) {
+          setState((prev) => ({ ...prev, loading: false, error: error.message }));
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <SectionHeading title="الرؤية العامة" subtitle="متابعة الأداء الحي للتطبيق والمستخدمين والبائعين من شاشة واحدة" actionLabel="تصدير التقرير اليومي" />
+      {state.error ? (
+        <Card>
+          <CardContent className="pt-6 text-sm text-rose-600">{state.error}</CardContent>
+        </Card>
+      ) : null}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {state.stats.map((item) => (
+          <StatCard key={item.id} {...item} />
+        ))}
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <Card>
+          <CardHeader>
+            <div>
+              <CardTitle>صحة الخدمات</CardTitle>
+              <CardDescription>تعطيك مؤشرا مباشرا عن الضغط التشغيلي، جودة التنفيذ، وعدد المشاكل الحالية.</CardDescription>
             </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <div>
-            <CardTitle>نقاط تحتاج تدخل</CardTitle>
-            <CardDescription>العناصر التي تستحق مراجعة فورية من الإدارة.</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {[
-            { title: '14 طلب اعتماد بائع جديد', tone: 'amber', icon: Store },
-            { title: '6 تذاكر تصعيد دعم مفتوحة', tone: 'rose', icon: LifeBuoy },
-            { title: '3 عروض بانتظار النشر', tone: 'sky', icon: Gift },
-            { title: 'مراجعة تسوية مالية أسبوعية', tone: 'emerald', icon: Wallet },
-          ].map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.title} className="flex items-center gap-3 rounded-3xl border border-slate-100 p-4">
-                <div className={`rounded-2xl p-3 ${toneClasses[item.tone]}`}>
-                  <Icon className="h-5 w-5" />
+            <Button variant="outline">{state.loading ? 'جارٍ المزامنة...' : 'بيانات مباشرة'}</Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {state.services.map((service) => (
+              <div key={service.id} className="rounded-3xl border border-slate-100 bg-slate-50/70 p-4">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-slate-900">{service.name}</p>
+                      <Badge tone={service.tone}>{service.status}</Badge>
+                    </div>
+                    <p className="mt-1 text-sm text-slate-500">{service.orders} • {service.issueCount} عناصر غير نشطة</p>
+                  </div>
+                  <div className="w-full max-w-xs">
+                    <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
+                      <span>جاهزية التشغيل</span>
+                      <span>{service.fill}%</span>
+                    </div>
+                    <div className="h-2.5 rounded-full bg-slate-200">
+                      <div className={`h-2.5 rounded-full ${service.tone === 'emerald' ? 'bg-emerald-500' : service.tone === 'amber' ? 'bg-amber-500' : service.tone === 'sky' ? 'bg-sky-500' : 'bg-rose-500'}`} style={{ width: `${service.fill}%` }} />
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 text-sm font-medium text-slate-700">{item.title}</div>
               </div>
-            );
-          })}
-        </CardContent>
-      </Card>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div>
+              <CardTitle>نقاط تحتاج تدخل</CardTitle>
+              <CardDescription>العناصر التي تستحق مراجعة فورية من الإدارة.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {state.interventions.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="flex items-center gap-3 rounded-3xl border border-slate-100 p-4">
+                  <div className={`rounded-2xl p-3 ${toneClasses[item.tone]}`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 text-sm font-medium text-slate-700">{item.title}</div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const UsersTab = ({ search }) => {
-  const rows = useMemo(() => usersSeed.filter((item) => [item.id, item.name, item.phone, item.city].join(' ').includes(search)), [search]);
+  const [dbRows, setDbRows] = useState([]);
+  const [loading, setLoading] = useState(hasSupabaseConfig);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      if (!hasSupabaseConfig) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const orders = await fetchOrders();
+        const customerMap = new Map();
+
+        orders.forEach((item, index) => {
+          const key = item.customer_phone || item.customer_name || `guest-${index}`;
+          const current = customerMap.get(key) || {
+            id: `USR-${String(customerMap.size + 1).padStart(4, '0')}`,
+            name: item.customer_name || 'عميل التطبيق',
+            phone: item.customer_phone || 'غير متوفر',
+            city: item.raw_order?.user?.city || item.raw_order?.city || 'غير محدد',
+            orders: 0,
+            wallet: '0 ر.س',
+            status: 'نشط',
+            segment: 'عادي',
+            totalSpent: 0,
+          };
+          current.orders += 1;
+          current.totalSpent += Number(item.total || 0);
+          current.segment = current.orders >= 5 ? 'VIP' : current.orders >= 2 ? 'متكرر' : 'جديد';
+          customerMap.set(key, current);
+        });
+
+        if (!cancelled) {
+          setDbRows(
+            Array.from(customerMap.values()).map((item) => ({
+              ...item,
+              wallet: formatSarAmount(item.totalSpent),
+            }))
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setErrorMessage(error.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const rows = useMemo(() => {
+    const source = hasSupabaseConfig ? dbRows : usersSeed;
+    return source.filter((item) => [item.id, item.name, item.phone, item.city].join(' ').includes(search));
+  }, [dbRows, search]);
 
   return (
     <div className="space-y-6">
       <SectionHeading title="إدارة المستخدمين" subtitle="عرض الحسابات، حالة النشاط، الرصيد، وعدد الطلبات مع إجراءات الإدارة." actionLabel="إضافة مستخدم" />
+      {loading ? (
+        <Card>
+          <CardContent className="pt-6 text-sm text-slate-500">جارٍ تحميل المستخدمين من الطلبات المسجلة...</CardContent>
+        </Card>
+      ) : null}
+      {errorMessage ? (
+        <Card>
+          <CardContent className="pt-6 text-sm text-rose-600">{errorMessage}</CardContent>
+        </Card>
+      ) : null}
       <TableCard
         title="قائمة المستخدمين"
         subtitle="إدارة الحسابات الفردية، الحالة، والمحفظة."
@@ -776,11 +1018,71 @@ const VendorsTab = ({ search }) => {
 };
 
 const OrdersTab = ({ search }) => {
-  const rows = useMemo(() => ordersSeed.filter((item) => [item.id, item.customer, item.vendor, item.service].join(' ').includes(search)), [search]);
+  const [dbRows, setDbRows] = useState([]);
+  const [loading, setLoading] = useState(hasSupabaseConfig);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      if (!hasSupabaseConfig) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const orders = await fetchOrders();
+
+        if (!cancelled) {
+          setDbRows(
+            orders.map((item) => ({
+              id: item.order_number || item.id.slice(0, 8).toUpperCase(),
+              customer: item.customer_name || 'عميل التطبيق',
+              vendor: item.vendor_name || 'غير محدد',
+              service: item.raw_order?.serviceType || item.raw_order?.category || 'خدمة عامة',
+              total: formatSarAmount(item.total),
+              status: normalizeOrderStatus(item.status),
+              risk: getRiskLabel(item),
+            }))
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setErrorMessage(error.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const rows = useMemo(() => {
+    const source = hasSupabaseConfig ? dbRows : ordersSeed;
+    return source.filter((item) => [item.id, item.customer, item.vendor, item.service].join(' ').includes(search));
+  }, [dbRows, search]);
 
   return (
     <div className="space-y-6">
       <SectionHeading title="إدارة الطلبات" subtitle="مراقبة الطلبات لحظيا، معرفة مستوى الخطورة، والتدخل السريع عند الحاجة." actionLabel="تشغيل المراقبة الحية" />
+      {loading ? (
+        <Card>
+          <CardContent className="pt-6 text-sm text-slate-500">جارٍ تحميل الطلبات الحالية...</CardContent>
+        </Card>
+      ) : null}
+      {errorMessage ? (
+        <Card>
+          <CardContent className="pt-6 text-sm text-rose-600">{errorMessage}</CardContent>
+        </Card>
+      ) : null}
       <TableCard
         title="سجل الطلبات"
         subtitle="يشمل حالة الطلب الحالية ومؤشر الخطورة."
@@ -804,7 +1106,6 @@ const OrdersTab = ({ search }) => {
 };
 
 const ContentTab = ({ search }) => {
-  const rows = useMemo(() => contentSeed.filter((item) => [item.id, item.title, item.owner, item.section].join(' ').includes(search)), [search]);
   const [dbSections, setDbSections] = useState([]);
   const [selectedSectionKey, setSelectedSectionKey] = useState('');
   const [jsonValue, setJsonValue] = useState('');
@@ -853,6 +1154,22 @@ const ContentTab = ({ search }) => {
   }, []);
 
   const selectedSection = dbSections.find((section) => section.section_key === selectedSectionKey);
+  const rows = useMemo(() => {
+    if (!hasSupabaseConfig) {
+      return contentSeed.filter((item) => [item.id, item.title, item.owner, item.section].join(' ').includes(search));
+    }
+
+    return dbSections
+      .map((section, index) => ({
+        id: `CNT-${index + 1}`,
+        section: section.section_key,
+        title: section.section_key,
+        owner: 'بوابة المشرف',
+        state: section.is_active ? 'منشور' : 'مراجعة',
+        updatedAt: section.updated_at ? new Date(section.updated_at).toLocaleString('ar-EG') : 'بدون تحديث',
+      }))
+      .filter((item) => [item.id, item.title, item.owner, item.section].join(' ').includes(search));
+  }, [dbSections, search]);
 
   const handleSectionChange = (sectionKey) => {
     setSelectedSectionKey(sectionKey);

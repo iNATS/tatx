@@ -1,15 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
-
-const initialNotifications = [
-  { id: '1', type: 'order', title: 'تم قبول طلبك', message: 'مطعم برجر السرايا بدأ تجهيز الطلب الآن.', time: 'قبل 8 دقائق', unread: true, icon: 'bag-handle-outline' },
-  { id: '2', type: 'ride', title: 'السائق في الطريق', message: 'الكابتن أحمد يبعد 4 دقائق عن موقعك.', time: 'قبل 15 دقيقة', unread: true, icon: 'car-outline' },
-  { id: '3', type: 'offer', title: 'عرض جديد', message: 'خصم 20% على طلبات الجملة اليوم فقط.', time: 'اليوم', unread: false, icon: 'pricetag-outline' },
-];
 
 const filters = [
   { id: 'all', label: 'الكل', icon: 'apps-outline' },
@@ -19,10 +13,14 @@ const filters = [
 ];
 
 const NotificationsScreen = ({ navigation }) => {
-  const { rowDirection, textAlignStart } = useApp();
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const { rowDirection, textAlignStart, notifications: contentNotifications = [] } = useApp();
+  const [notifications, setNotifications] = useState(contentNotifications);
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    setNotifications(contentNotifications);
+  }, [contentNotifications]);
 
   const filteredNotifications = useMemo(() => {
     return notifications.filter((item) => {

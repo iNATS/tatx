@@ -1,24 +1,31 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
-const defaultAddresses = [
-  { id: '1', label: 'المنزل', address: 'الرياض، حي الياسمين', details: 'شارع 12، مبنى 7', isDefault: true, icon: 'home-outline' },
-  { id: '2', label: 'العمل', address: 'الرياض، مركز الملك عبدالله المالي', details: 'برج 3، الدور 11', isDefault: false, icon: 'business-outline' },
-];
-
 const LocationScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { isRTL, rowDirection, textAlignStart } = useApp();
-  const [addresses, setAddresses] = useState(defaultAddresses);
+  const { isRTL, rowDirection, textAlignStart, user, setUser } = useApp();
+  const [addresses, setAddresses] = useState(user?.addresses || []);
   const [editingId, setEditingId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ label: '', address: '', details: '', icon: 'home-outline' });
 
   const selected = useMemo(() => addresses.find((item) => item.isDefault), [addresses]);
+
+  useEffect(() => {
+    setAddresses(user?.addresses || []);
+  }, [user?.addresses]);
+
+  const syncAddresses = (nextAddresses) => {
+    setAddresses(nextAddresses);
+    setUser((prev) => ({
+      ...prev,
+      addresses: nextAddresses,
+    }));
+  };
 
   const openNewModal = () => {
     setEditingId(null);
@@ -39,15 +46,15 @@ const LocationScreen = ({ navigation }) => {
     }
 
     if (editingId) {
-      setAddresses((prev) => prev.map((item) => (item.id === editingId ? { ...item, ...form } : item)));
+      syncAddresses(addresses.map((item) => (item.id === editingId ? { ...item, ...form } : item)));
     } else {
-      setAddresses((prev) => [...prev, { id: Date.now().toString(), ...form, isDefault: false }]);
+      syncAddresses([...addresses, { id: Date.now().toString(), ...form, isDefault: false }]);
     }
     setShowModal(false);
   };
 
   const makeDefault = (id) => {
-    setAddresses((prev) => prev.map((item) => ({ ...item, isDefault: item.id === id })));
+    syncAddresses(addresses.map((item) => ({ ...item, isDefault: item.id === id })));
   };
 
   const removeAddress = (id) => {
@@ -56,7 +63,7 @@ const LocationScreen = ({ navigation }) => {
       {
         text: 'حذف',
         style: 'destructive',
-        onPress: () => setAddresses((prev) => prev.filter((item) => item.id !== id)),
+        onPress: () => syncAddresses(addresses.filter((item) => item.id !== id)),
       },
     ]);
   };

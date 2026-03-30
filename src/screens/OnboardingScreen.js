@@ -6,42 +6,22 @@ import { useApp } from '../context/AppContext';
 
 const { width } = Dimensions.get('window');
 
-const onboardingData = [
-  {
-    id: '1',
-    title: 'تنقل واضح وسهل من أول لحظة',
-    subtitle: 'الوصول إلى الخدمات الأساسية والطلبات يتم بخطوات بسيطة وواضحة.',
-    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800',
-  },
-  {
-    id: '2',
-    title: 'خدمات يومية للسوق السعودي',
-    subtitle: 'مطاعم، مشاوير، ومتاجر محلية بعملة الريال ومحتوى مناسب للمستخدم السعودي.',
-    image: 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=800',
-  },
-  {
-    id: '3',
-    title: 'متابعة أسهل للطلبات والحساب',
-    subtitle: 'العناوين، الدفع، والطلبات محفوظة في مكان واحد لتجربة استخدام أكثر سلاسة.',
-    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800',
-  },
-];
-
 const OnboardingScreen = ({ navigation }) => {
-  const { isRTL } = useApp();
+  const { isRTL, onboardingSlides } = useApp();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef(null);
+  const slides = onboardingSlides?.length ? onboardingSlides : [];
 
   const handleScroll = (event) => {
     const rawIndex = Math.round(event.nativeEvent.contentOffset.x / width);
-    const index = isRTL ? onboardingData.length - 1 - rawIndex : rawIndex;
+    const index = isRTL ? slides.length - 1 - rawIndex : rawIndex;
     setCurrentIndex(index);
   };
 
   const handleNext = () => {
-    if (currentIndex < onboardingData.length - 1) {
+    if (currentIndex < slides.length - 1) {
       const nextIndex = currentIndex + 1;
-      const targetX = isRTL ? (onboardingData.length - 1 - nextIndex) * width : nextIndex * width;
+      const targetX = isRTL ? (slides.length - 1 - nextIndex) * width : nextIndex * width;
       scrollViewRef.current?.scrollTo({ x: targetX, animated: true });
       return;
     }
@@ -59,7 +39,7 @@ const OnboardingScreen = ({ navigation }) => {
         onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        {onboardingData.map((item) => (
+        {slides.map((item) => (
           <View key={item.id} style={[styles.slide, { width }]}>
             <View style={styles.card}>
               <Image source={{ uri: item.image }} style={styles.image} />
@@ -78,13 +58,13 @@ const OnboardingScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={styles.pagination}>
-          {onboardingData.map((item, index) => (
+          {slides.map((item, index) => (
             <View key={item.id} style={[styles.dot, index === currentIndex && styles.dotActive]} />
           ))}
         </View>
 
         <TouchableOpacity onPress={handleNext} style={styles.primaryButton} activeOpacity={0.9}>
-          <Text style={styles.primaryButtonText}>{currentIndex === onboardingData.length - 1 ? 'ابدأ' : 'التالي'}</Text>
+          <Text style={styles.primaryButtonText}>{currentIndex === slides.length - 1 ? 'ابدأ' : 'التالي'}</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>

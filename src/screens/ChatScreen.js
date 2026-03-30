@@ -5,8 +5,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
-const quickTopics = ['تتبع الطلب', 'استرجاع مبلغ', 'مشكلة في الرحلة', 'الدفع', 'الاشتراك كتاجر'];
-
 const getMessageDirectionStyle = (value) => {
   const content = String(value || '').trim();
 
@@ -27,7 +25,7 @@ const getMessageDirectionStyle = (value) => {
 
 const ChatScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { isRTL, rowDirection, textAlignStart } = useApp();
+  const { isRTL, rowDirection, textAlignStart, supportTopics = [] } = useApp();
   const scrollViewRef = useRef(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
@@ -68,7 +66,7 @@ const ChatScreen = ({ navigation }) => {
         </View>
 
         <View style={[styles.topicsWrap, { flexDirection: rowDirection }]}>
-          {quickTopics.map((topic) => (
+          {supportTopics.map((topic) => (
             <TouchableOpacity key={topic} style={styles.topicChip} onPress={() => setMessage(topic)}>
               <Text style={[styles.topicText, { textAlign: textAlignStart }]}>{topic}</Text>
             </TouchableOpacity>

@@ -14,7 +14,7 @@ const roles = [
 
 const LoginScreen = () => {
   const insets = useSafeAreaInsets();
-  const { setIsAuthenticated, setUser, rowDirection, textAlignStart, demoAccounts, demoMarket } = useApp();
+  const { setIsAuthenticated, setUser, rowDirection, textAlignStart, demoAccounts, demoMarket, user } = useApp();
   const [selectedRole, setSelectedRole] = useState('user');
   const [phone, setPhone] = useState(demoAccounts.user.phone);
   const [loading, setLoading] = useState(false);
@@ -37,6 +37,7 @@ const LoginScreen = () => {
         city: activeAccount.city,
         district: activeAccount.district || demoMarket.district,
         walletBalance: 300,
+        addresses: user?.addresses || [],
       });
       setIsAuthenticated(true);
       setLoading(false);

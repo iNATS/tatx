@@ -85,6 +85,27 @@ export const homeOffers = [
   },
 ];
 
+export const onboardingSlides = [
+  {
+    id: '1',
+    title: 'تنقل واضح وسهل من أول لحظة',
+    subtitle: 'الوصول إلى الخدمات الأساسية والطلبات يتم بخطوات بسيطة وواضحة.',
+    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800',
+  },
+  {
+    id: '2',
+    title: 'خدمات يومية للسوق السعودي',
+    subtitle: 'مطاعم، مشاوير، ومتاجر محلية بعملة الريال ومحتوى مناسب للمستخدم السعودي.',
+    image: 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=800',
+  },
+  {
+    id: '3',
+    title: 'متابعة أسهل للطلبات والحساب',
+    subtitle: 'العناوين، الدفع، والطلبات محفوظة في مكان واحد لتجربة استخدام أكثر سلاسة.',
+    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800',
+  },
+];
+
 export const restaurants = [
   {
     id: '1',
@@ -432,6 +453,38 @@ export const chatMessages = [
     text: 'أبغى أتأكد من وقت وصول الطلب الحالي',
     textEn: 'I want to confirm the ETA for my current order',
     timestamp: '09:32 AM',
+  },
+];
+
+export const supportTopics = ['تتبع الطلب', 'استرجاع مبلغ', 'مشكلة في الرحلة', 'الدفع', 'الاشتراك كتاجر'];
+
+export const notifications = [
+  {
+    id: '1',
+    type: 'order',
+    title: 'تم قبول طلبك',
+    message: 'مطعم برجر السرايا بدأ تجهيز الطلب الآن.',
+    time: 'قبل 8 دقائق',
+    unread: true,
+    icon: 'bag-handle-outline',
+  },
+  {
+    id: '2',
+    type: 'ride',
+    title: 'السائق في الطريق',
+    message: 'الكابتن أحمد يبعد 4 دقائق عن موقعك.',
+    time: 'قبل 15 دقيقة',
+    unread: true,
+    icon: 'car-outline',
+  },
+  {
+    id: '3',
+    type: 'offer',
+    title: 'عرض جديد',
+    message: 'خصم 20% على طلبات الجملة اليوم فقط.',
+    time: 'اليوم',
+    unread: false,
+    icon: 'pricetag-outline',
   },
 ];
 
