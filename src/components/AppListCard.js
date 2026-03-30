@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { borderRadius, colors, fonts, shadows, spacing } from '../constants/theme';
+import { useApp } from '../context/AppContext';
 
 const AppListCard = ({
   title,
@@ -15,44 +16,78 @@ const AppListCard = ({
   onPress,
   metaLabel,
   metaValue,
+  footerNote,
+  badge,
+  secondaryMeta,
+  actionIcon = 'chevron-back',
 }) => {
-  const mediaFill = mediaBackground || `${mediaColor}18`;
+  const { rowDirection, textAlignStart } = useApp();
+  const mediaFill = mediaBackground || colors.grayLight;
+  const isAddAction = actionLabel === 'إضافة';
 
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.92} onPress={onPress || onActionPress}>
+    <TouchableOpacity style={[styles.card, { flexDirection: rowDirection }]} activeOpacity={0.9} onPress={onPress || onActionPress}>
+      <View style={[styles.thumbnailWrap, { backgroundColor: mediaFill }]}>
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.thumbnail} resizeMode="cover" />
+        ) : (
+          <View style={styles.iconWrap}>
+            <Ionicons name={mediaIcon || 'apps-outline'} size={24} color={mediaColor} />
+          </View>
+        )}
+      </View>
+
       <View style={styles.contentSection}>
-        <View style={styles.textBlock}>
-          <Text style={styles.title} numberOfLines={2}>
-            {title}
-          </Text>
+        <View style={styles.topBlock}>
+          <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
+            <Text style={[styles.title, { textAlign: textAlignStart }]} numberOfLines={1}>
+              {title}
+            </Text>
+            {!!badge && (
+              <View style={styles.badgeWrap}>
+                <Text style={styles.badgeText}>{badge}</Text>
+              </View>
+            )}
+          </View>
+
           {!!subtitle && (
-            <Text style={styles.subtitle} numberOfLines={3}>
+            <Text style={[styles.subtitle, { textAlign: textAlignStart }]} numberOfLines={2}>
               {subtitle}
             </Text>
           )}
+
+          <View style={[styles.infoRow, { flexDirection: rowDirection }]}>
+            {!!secondaryMeta && (
+              <View style={styles.infoChip}>
+                <Text style={[styles.infoChipText, { textAlign: textAlignStart }]} numberOfLines={1}>
+                  {secondaryMeta}
+                </Text>
+              </View>
+            )}
+            {!!footerNote && (
+              <View style={styles.infoChip}>
+                <Text style={[styles.infoChipText, { textAlign: textAlignStart }]} numberOfLines={1}>
+                  {footerNote}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
 
-        <View style={styles.footerRow}>
-          <View style={styles.metaBlock}>
-            {!!metaLabel && <Text style={styles.metaLabel}>{metaLabel}</Text>}
-            {!!metaValue && <Text style={styles.metaValue}>{metaValue}</Text>}
+        <View style={[styles.bottomRow, { flexDirection: rowDirection }]}>
+          <View style={styles.metaPanel}>
+            {!!metaLabel && <Text style={[styles.metaLabel, { textAlign: textAlignStart }]}>{metaLabel}</Text>}
+            {!!metaValue && <Text style={[styles.metaValue, { textAlign: textAlignStart }]}>{metaValue}</Text>}
           </View>
 
-          <TouchableOpacity style={styles.actionButton} activeOpacity={0.88} onPress={onActionPress || onPress}>
-            <Ionicons name="open-outline" size={18} color={colors.white} />
-            <Text style={styles.actionText}>{actionLabel}</Text>
+          <TouchableOpacity style={[styles.accessoryButton, isAddAction && styles.addButton]} activeOpacity={0.8} onPress={onActionPress || onPress}>
+            <Ionicons
+              name={isAddAction ? 'add' : actionIcon}
+              size={isAddAction ? 18 : 16}
+              color={isAddAction ? colors.primary : colors.textTertiary}
+            />
           </TouchableOpacity>
         </View>
-      </View>
-
-      <View style={[styles.mediaSection, { backgroundColor: mediaFill }]}>
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.mediaImage} resizeMode="cover" />
-        ) : (
-          <View style={[styles.mediaIconWrap, { backgroundColor: colors.white }]}>
-            <Ionicons name={mediaIcon || 'apps-outline'} size={34} color={mediaColor} />
-          </View>
-        )}
       </View>
     </TouchableOpacity>
   );
@@ -60,99 +95,127 @@ const AppListCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    minHeight: 188,
-    flexDirection: 'row',
+    minHeight: 126,
     backgroundColor: colors.card,
-    borderRadius: 30,
-    overflow: 'hidden',
+    borderRadius: 24,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: '#E9EDF5',
-    ...shadows.md,
+    borderColor: colors.borderLight,
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    ...shadows.sm,
+  },
+  thumbnailWrap: {
+    width: 86,
+    height: 86,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+  },
+  iconWrap: {
+    width: 58,
+    height: 58,
+    borderRadius: 18,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   contentSection: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
     justifyContent: 'space-between',
-    backgroundColor: colors.card,
+    paddingHorizontal: 14,
+    minHeight: 86,
   },
-  textBlock: {
+  topBlock: {
     alignItems: 'stretch',
   },
+  titleRow: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
   title: {
-    color: '#182033',
+    flex: 1,
+    color: colors.text,
     fontFamily: fonts.bold,
-    fontSize: 20,
-    lineHeight: 30,
-    textAlign: 'center',
+    fontSize: 17,
+    lineHeight: 22,
+  },
+  badgeWrap: {
+    backgroundColor: colors.infoLight,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  badgeText: {
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
+    fontSize: 10,
+    textAlign: 'right',
   },
   subtitle: {
-    color: '#6E7787',
-    fontSize: 13,
-    lineHeight: 22,
-    marginTop: spacing.md,
-    textAlign: 'center',
-  },
-  footerRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    marginTop: spacing.lg,
-    gap: spacing.md,
-  },
-  metaBlock: {
-    flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  metaLabel: {
-    color: '#A0A8B7',
-    fontFamily: fonts.bold,
+    color: colors.textSecondary,
     fontSize: 12,
-    letterSpacing: 0.8,
-  },
-  metaValue: {
-    color: '#182033',
-    fontFamily: fonts.bold,
-    fontSize: 18,
+    lineHeight: 18,
     marginTop: 6,
   },
-  actionButton: {
-    minWidth: 140,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    backgroundColor: '#141C30',
-    borderRadius: 22,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    ...shadows.sm,
+  infoRow: {
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 8,
   },
-  actionText: {
-    color: colors.white,
+  infoChip: {
+    backgroundColor: colors.grayLight,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  infoChipText: {
+    color: colors.textSecondary,
+    fontSize: 10,
     fontFamily: fonts.semiBold,
-    fontSize: 15,
   },
-  mediaSection: {
-    width: 138,
+  bottomRow: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    gap: 12,
+  },
+  metaPanel: {
+    flex: 1,
+    alignItems: 'flex-end',
+    backgroundColor: colors.grayLight,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  metaLabel: {
+    color: colors.textTertiary,
+    fontFamily: fonts.semiBold,
+    fontSize: 10,
+  },
+  metaValue: {
+    color: colors.text,
+    fontFamily: fonts.bold,
+    fontSize: 14,
+    marginTop: 2,
+  },
+  accessoryButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.grayLight,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.md,
   },
-  mediaIconWrap: {
-    width: 88,
-    height: 88,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.sm,
-  },
-  mediaImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 0,
+  addButton: {
+    backgroundColor: colors.infoLight,
   },
 });
 

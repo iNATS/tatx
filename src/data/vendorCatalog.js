@@ -4,22 +4,29 @@ export const vendorStores = {
       id: 'r1',
       name: 'برجر السرايا',
       subtitle: 'برجر ووجبات سريعة',
+      cuisine: 'برجر • وجبات سريعة',
+      rating: 4.8,
+      deliveryTime: '25-35 دقيقة',
+      deliveryFee: 7,
+      minimumOrder: 25,
+      promo: 'خصم 20% على أول طلب',
+      badges: ['الأكثر طلبًا', 'توصيل سريع'],
       image: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=900',
       menuGroups: [
         {
           id: 'burgers',
           title: 'البرجر',
           items: [
-            { id: 'ri1', name: 'برجر دبل انجس', price: 29, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', description: 'وجبة كاملة مع بطاطس ومشروب', rating: 4.8, time: '25 دقيقة' },
-            { id: 'ri2', name: 'تشيز برجر كلاسيك', price: 23, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400', description: 'برجر لحم مع جبنة وصوص خاص', rating: 4.6, time: '21 دقيقة' },
+            { id: 'ri1', name: 'برجر دبل انجس', price: 29, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', description: 'وجبة كاملة مع بطاطس ومشروب', rating: 4.8, time: '25 دقيقة', tag: 'الأكثر طلبًا' },
+            { id: 'ri2', name: 'تشيز برجر كلاسيك', price: 23, image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400', description: 'برجر لحم مع جبنة وصوص خاص', rating: 4.6, time: '21 دقيقة', tag: 'عرض اليوم' },
           ],
         },
         {
           id: 'chicken',
           title: 'الدجاج',
           items: [
-            { id: 'ri3', name: 'تشيكن كرسبي', price: 24, image: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400', description: 'ساندوتش دجاج مقرمش مع صوص رانش', rating: 4.7, time: '22 دقيقة' },
-            { id: 'ri4', name: 'ستربس 6 قطع', price: 27, image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400', description: 'قطع دجاج مقلية مع صوصين', rating: 4.5, time: '20 دقيقة' },
+            { id: 'ri3', name: 'تشيكن كرسبي', price: 24, image: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400', description: 'ساندوتش دجاج مقرمش مع صوص رانش', rating: 4.7, time: '22 دقيقة', tag: 'مميز' },
+            { id: 'ri4', name: 'ستربس 6 قطع', price: 27, image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400', description: 'قطع دجاج مقلية مع صوصين', rating: 4.5, time: '20 دقيقة', tag: 'جديد' },
           ],
         },
         {
@@ -36,14 +43,21 @@ export const vendorStores = {
       id: 'r2',
       name: 'بيتزا البيت',
       subtitle: 'بيتزا ومقبلات',
+      cuisine: 'بيتزا • مقبلات',
+      rating: 4.7,
+      deliveryTime: '30-40 دقيقة',
+      deliveryFee: 9,
+      minimumOrder: 30,
+      promo: 'اطلب 2 بيتزا والثالثة بنصف السعر',
+      badges: ['عائلي', 'عروض مستمرة'],
       image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=900',
       menuGroups: [
         {
           id: 'pizza',
           title: 'البيتزا',
           items: [
-            { id: 'ri7', name: 'بيتزا مارجريتا', price: 34, image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400', description: 'حجم متوسط مع جبنة موزاريلا طازجة', rating: 4.6, time: '30 دقيقة' },
-            { id: 'ri8', name: 'بيتزا بيبروني', price: 42, image: 'https://images.unsplash.com/photo-1594007654729-407eedc4be65?w=400', description: 'حجم كبير مع بيبروني ولحم بقري', rating: 4.8, time: '35 دقيقة' },
+            { id: 'ri7', name: 'بيتزا مارجريتا', price: 34, image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400', description: 'حجم متوسط مع جبنة موزاريلا طازجة', rating: 4.6, time: '30 دقيقة', tag: 'اقتصادي' },
+            { id: 'ri8', name: 'بيتزا بيبروني', price: 42, image: 'https://images.unsplash.com/photo-1594007654729-407eedc4be65?w=400', description: 'حجم كبير مع بيبروني ولحم بقري', rating: 4.8, time: '35 دقيقة', tag: 'الأكثر طلبًا' },
           ],
         },
         {
@@ -60,21 +74,28 @@ export const vendorStores = {
       id: 'r3',
       name: 'مذاق نجد',
       subtitle: 'أكلات سعودية',
+      cuisine: 'أطباق سعودية • عائلي',
+      rating: 4.9,
+      deliveryTime: '35-50 دقيقة',
+      deliveryFee: 11,
+      minimumOrder: 40,
+      promo: 'وجبات عائلية بعروض نهاية الأسبوع',
+      badges: ['عائلي', 'مفضلة العملاء'],
       image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=900',
       menuGroups: [
         {
           id: 'main',
           title: 'الأطباق الرئيسية',
           items: [
-            { id: 'ri11', name: 'وجبة مندي', price: 58, image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400', description: 'مندي لحم أو دجاج مع رز', rating: 4.9, time: '40 دقيقة' },
-            { id: 'ri12', name: 'قرصان', price: 36, image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400', description: 'وجبة فردية بطابع نجدي أصيل', rating: 4.5, time: '32 دقيقة' },
+            { id: 'ri11', name: 'وجبة مندي', price: 58, image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400', description: 'مندي لحم أو دجاج مع رز', rating: 4.9, time: '40 دقيقة', tag: 'توقيع المطعم' },
+            { id: 'ri12', name: 'قرصان', price: 36, image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400', description: 'وجبة فردية بطابع نجدي أصيل', rating: 4.5, time: '32 دقيقة', tag: 'محلي' },
           ],
         },
         {
           id: 'family',
           title: 'العائلي',
           items: [
-            { id: 'ri13', name: 'صينية عائلية', price: 129, image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400', description: 'تكفي 4 إلى 5 أشخاص', rating: 4.8, time: '48 دقيقة' },
+            { id: 'ri13', name: 'صينية عائلية', price: 129, image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400', description: 'تكفي 4 إلى 5 أشخاص', rating: 4.8, time: '48 دقيقة', tag: 'عائلي' },
           ],
         },
       ],

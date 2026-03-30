@@ -9,6 +9,7 @@ import ItemDetailModal from '../components/ItemDetailModal';
 import OfferPromoCard from '../components/OfferPromoCard';
 import PriceDisplay from '../components/PriceDisplay';
 import PageHeader from '../components/PageHeader';
+import AppListCard from '../components/AppListCard';
 
 const pharmacyItems = [
   { id: '1', name: 'مسكن ألم', price: 15, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400', rating: 4.6, time: '20 دقيقة', description: 'مسكن ألم سريع المفعول', tag: 'أساسي' },
@@ -56,7 +57,15 @@ const CategoryScreen = ({ route, navigation }) => {
   const offers = categoryOffers[normalizedName] || [];
 
   const filteredStores = useMemo(() => {
-    return stores.filter((store) => store.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const normalizedSearch = searchQuery.toLowerCase();
+
+    return stores.filter((store) => {
+      return (
+        store.name.toLowerCase().includes(normalizedSearch) ||
+        (store.subtitle || '').toLowerCase().includes(normalizedSearch) ||
+        (store.cuisine || '').toLowerCase().includes(normalizedSearch)
+      );
+    });
   }, [stores, searchQuery]);
 
   const filteredItems = useMemo(() => {
@@ -101,24 +110,21 @@ const CategoryScreen = ({ route, navigation }) => {
 
         {isVendorCategory
           ? filteredStores.map((store) => (
-              <TouchableOpacity
+              <AppListCard
                 key={store.id}
-                style={[styles.storeCard, { flexDirection: rowDirection }]}
-                activeOpacity={0.92}
+                title={store.name}
+                subtitle={normalizedName === 'مطاعم' ? store.cuisine || store.subtitle : store.subtitle}
+                secondaryMeta={normalizedName === 'مطاعم' ? `${store.deliveryTime} • ${store.deliveryFee || 0} ر.س توصيل` : undefined}
+                badge={normalizedName === 'مطاعم' ? store.promo : undefined}
+                metaLabel={normalizedName === 'مطاعم' ? 'الحد الأدنى' : 'العناصر'}
+                metaValue={normalizedName === 'مطاعم' ? `${store.minimumOrder || 0} ر.س` : `${getStoreItemCount(store)} عناصر`}
+                footerNote={normalizedName === 'مطاعم' ? `التقييم ${store.rating} • ${getStoreItemCount(store)} صنف` : undefined}
+                imageUri={store.image}
+                actionLabel={normalizedName === 'مطاعم' ? 'عرض المنيو' : 'دخول'}
+                actionIcon={normalizedName === 'مطاعم' ? 'restaurant-outline' : 'open-outline'}
                 onPress={() => navigation.navigate('CategoryVendorDetail', { store, categoryName: normalizedName })}
-              >
-                <Image source={{ uri: store.image }} style={styles.storeImage} />
-                <View style={styles.storeBody}>
-                  <Text style={[styles.storeName, { textAlign: textAlignStart }]}>{store.name}</Text>
-                  <Text style={[styles.storeSubtitle, { textAlign: textAlignStart }]}>{store.subtitle}</Text>
-                  <View style={[styles.storeBottom, { flexDirection: rowDirection }]}>
-                    <Text style={styles.storeCount}>{getStoreItemCount(store)} عناصر</Text>
-                    <TouchableOpacity style={styles.storeButton}>
-                      <Text style={styles.storeButtonText}>دخول</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </TouchableOpacity>
+                onActionPress={() => navigation.navigate('CategoryVendorDetail', { store, categoryName: normalizedName })}
+              />
             ))
           : filteredItems.map((item) => (
               <TouchableOpacity key={item.id} style={[styles.itemRow, { flexDirection: rowDirection }]} onPress={() => setSelectedItem(item)} activeOpacity={0.92}>
@@ -152,12 +158,27 @@ const styles = StyleSheet.create({
   heroSubtitle: { color: 'rgba(255,255,255,0.88)', textAlign: 'right', fontSize: 13 },
   content: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
   offersRow: { gap: spacing.md, paddingVertical: spacing.md },
+  restaurantCard: { backgroundColor: colors.card, borderRadius: 30, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight, overflow: 'hidden', ...shadows.md },
+  restaurantImageWrap: { position: 'relative' },
+  restaurantImage: { width: '100%', height: 178, backgroundColor: colors.cardSecondary },
+  offerPillOverlay: { position: 'absolute', top: spacing.md, right: spacing.md, alignSelf: 'flex-end', backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: 12, paddingVertical: 7, ...shadows.sm },
   storeCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', ...shadows.sm },
   storeImage: { width: 104, height: 104, borderRadius: 22, backgroundColor: colors.cardSecondary },
+  restaurantBody: { padding: spacing.md },
+  restaurantTitleRow: { justifyContent: 'space-between', alignItems: 'flex-start', gap: spacing.sm },
+  restaurantTitleBlock: { flex: 1, alignItems: 'flex-end' },
+  ratingPill: { alignItems: 'center', gap: 5, backgroundColor: colors.grayLight, borderRadius: borderRadius.full, paddingHorizontal: 10, paddingVertical: 7 },
+  ratingPillText: { color: colors.text, fontFamily: fonts.bold, fontSize: 12 },
   storeBody: { flex: 1, width: '100%', marginHorizontal: spacing.md, justifyContent: 'space-between', alignItems: 'flex-end' },
+  offerPill: { alignSelf: 'flex-end', backgroundColor: colors.infoLight, borderRadius: borderRadius.full, paddingHorizontal: 12, paddingVertical: 6, marginBottom: spacing.sm },
+  offerPillText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 11, textAlign: 'right' },
   storeName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 17, textAlign: 'right', alignSelf: 'stretch' },
   storeSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 18, textAlign: 'right', alignSelf: 'stretch' },
+  restaurantMetaRow: { gap: spacing.sm, marginTop: spacing.md, alignSelf: 'stretch', flexWrap: 'wrap' },
+  metaChip: { alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 7, backgroundColor: colors.grayLight, borderRadius: borderRadius.full },
+  metaChipText: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 12 },
   storeBottom: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
+  restaurantFooter: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md, paddingTop: spacing.md, borderTopWidth: 1, borderTopColor: colors.borderLight },
   storeButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: 18, paddingVertical: 10 },
   storeButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 13 },
   storeCount: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', alignSelf: 'stretch' },
