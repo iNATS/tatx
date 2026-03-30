@@ -4,7 +4,7 @@ const path = require('path');
 
 const host = process.env.HOST || '0.0.0.0';
 const port = Number(process.env.PORT || 3000);
-const distDir = path.join(__dirname, process.env.DIST_DIR || 'dist-web');
+const distDir = path.join(__dirname, process.env.DIST_DIR || 'dist');
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',

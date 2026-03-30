@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const distDir = path.join(process.cwd(), process.env.DIST_DIR || 'dist-web');
+const distDir = path.join(process.cwd(), process.env.DIST_DIR || 'dist');
 const webDir = path.join(process.cwd(), 'web');
 
 const assetsToCopy = ['manifest.json', 'sw.js', 'pwa-icon-192.png', 'pwa-icon-512.png'];

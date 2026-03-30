@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const indexPath = path.join(process.cwd(), 'dist-web', 'index.html');
+const indexPath = path.join(process.cwd(), process.env.DIST_DIR || 'dist', 'index.html');
 
 if (!fs.existsSync(indexPath)) {
   process.exit(0);

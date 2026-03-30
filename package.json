@@ -10,7 +10,7 @@
     "ios": "expo run:ios",
     "web": "npm run build:web && HOST=0.0.0.0 node server.js",
     "web:dev": "expo start --web",
-    "build:web": "expo export --platform web --output-dir dist-web && node scripts/fix-web-rtl.js && node scripts/copy-pwa-assets.js",
+    "build:web": "expo export --platform web --output-dir dist && node scripts/fix-web-rtl.js && node scripts/copy-pwa-assets.js",
     "serve:web": "HOST=0.0.0.0 node server.js"
   },
   "dependencies": {
