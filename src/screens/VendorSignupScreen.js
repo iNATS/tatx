@@ -63,12 +63,8 @@ const VendorSignupScreen = ({ navigation }) => {
       }
     }
     if (step === 4) {
-      if (!formData.bankName || !formData.accountNumber || !formData.iban) {
-        Alert.alert('تنبيه', 'يرجى إدخال البيانات البنكية');
-        return false;
-      }
       if (!acceptedTerms) {
-        Alert.alert('تنبيه', 'يرجى الموافقة على الشروط والأحكام');
+        Alert.alert('تنبيه', 'يرجى الموافقة على الاتفاق والتعهد قبل إرسال الطلب');
         return false;
       }
     }
@@ -324,56 +320,28 @@ const VendorSignupScreen = ({ navigation }) => {
 
   const renderStep4 = () => (
     <View style={styles.formSection}>
-      <Text style={styles.sectionTitle}>البيانات البنكية</Text>
-      
-      <View style={styles.bankInfo}>
-        <Ionicons name="shield-checkmark" size={20} color={colors.success} />
-        <Text style={styles.bankInfoText}>
-          بياناتك البنكية مشفرة وآمنة تماماً
+      <Text style={styles.sectionTitle}>اتفاق وتعهد</Text>
+
+      <View style={styles.pledgeInfo}>
+        <Ionicons name="document-text-outline" size={20} color={colors.primary} />
+        <Text style={styles.pledgeInfoText}>
+          تمثل هذه الصفحة موافقة صريحة من البائع على شروط الانضمام والتشغيل داخل منصة تاتكس.
         </Text>
       </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>اسم البنك <Text style={styles.required}>*</Text></Text>
-        <View style={styles.inputContainer}>
-          <Ionicons name="business" size={20} color={colors.textSecondary} />
-          <TextInput
-            style={styles.input}
-            placeholder="أدخل اسم البنك"
-            placeholderTextColor={colors.textSecondary}
-            value={formData.bankName}
-            onChangeText={(value) => updateField('bankName', value)}
-          />
-        </View>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>رقم الحساب <Text style={styles.required}>*</Text></Text>
-        <View style={styles.inputContainer}>
-          <Ionicons name="cash" size={20} color={colors.textSecondary} />
-          <TextInput
-            style={styles.input}
-            placeholder="أدخل رقم الحساب"
-            placeholderTextColor={colors.textSecondary}
-            keyboardType="numeric"
-            value={formData.accountNumber}
-            onChangeText={(value) => updateField('accountNumber', value)}
-          />
-        </View>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>الآيبان <Text style={styles.required}>*</Text></Text>
-        <View style={styles.inputContainer}>
-          <Ionicons name="swap-horizontal" size={20} color={colors.textSecondary} />
-          <TextInput
-            style={styles.input}
-            placeholder="SAxx xxxx xxxx xxxx xxxx xxxx"
-            placeholderTextColor={colors.textSecondary}
-            value={formData.iban}
-            onChangeText={(value) => updateField('iban', value)}
-          />
-        </View>
+      <View style={styles.pledgeCard}>
+        <Text style={styles.pledgeParagraph}>
+          أقر أنا مقدم الطلب بأن جميع البيانات والمستندات المرفوعة إلى منصة تاتكس صحيحة وسارية، وأتحمل كامل المسؤولية النظامية عن دقتها وعن أي معلومات غير صحيحة أو مضللة.
+        </Text>
+        <Text style={styles.pledgeParagraph}>
+          وأتعهد بالالتزام بسياسات المنصة التشغيلية والتجارية، بما في ذلك جودة الخدمة، الالتزام بالأسعار المعلنة، تحديث التوفر، سرعة الاستجابة للطلبات، واحترام حقوق العملاء وعدم إساءة استخدام المنصة أو بياناتها.
+        </Text>
+        <Text style={styles.pledgeParagraph}>
+          كما أوافق على منح المنصة حق مراجعة الطلب وقبول أو رفض أو تعليق النشاط عند الحاجة، وعلى تطبيق أي إجراءات تنظيمية أو تشغيلية لازمة للحفاظ على جودة الخدمة والامتثال والسمعة العامة للمنصة.
+        </Text>
+        <Text style={styles.pledgeParagraph}>
+          وبالضغط على زر الموافقة والإرسال، أؤكد قبولي الكامل لهذه الشروط والبنود، وأوافق على الانضمام إلى المنصة والعمل وفق الأنظمة والسياسات المعتمدة لديها.
+        </Text>
       </View>
 
       <View style={styles.termsContainer}>
@@ -381,8 +349,7 @@ const VendorSignupScreen = ({ navigation }) => {
           <Ionicons name={acceptedTerms ? 'checkbox' : 'square-outline'} size={22} color={acceptedTerms ? colors.primary : colors.textSecondary} />
         </TouchableOpacity>
         <Text style={styles.termsText}>
-          أوافق على <Text style={styles.termsLink}>الشروط والأحكام</Text> و
-          <Text style={styles.termsLink}> سياسة الخصوصية</Text>
+          أقر بأنني قرأت <Text style={styles.termsLink}>الاتفاق والتعهد</Text> بالكامل وأوافق على جميع الشروط والبنود الخاصة بالانضمام إلى المنصة والعمل من خلالها.
         </Text>
       </View>
     </View>
@@ -617,21 +584,34 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: spacing.sm,
   },
-  // Bank Info
-  bankInfo: {
+  pledgeInfo: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    backgroundColor: colors.success + '15',
+    backgroundColor: colors.primary + '12',
     padding: spacing.sm,
     borderRadius: borderRadius.lg,
     marginBottom: spacing.md,
   },
-  bankInfoText: {
+  pledgeInfoText: {
     fontSize: 13,
-    color: colors.success,
+    color: colors.primary,
     marginRight: spacing.sm,
     flex: 1,
     textAlign: 'right',
+  },
+  pledgeCard: {
+    backgroundColor: colors.grayLight + '70',
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.grayLight,
+  },
+  pledgeParagraph: {
+    fontSize: 14,
+    color: colors.text,
+    lineHeight: 25,
+    textAlign: 'right',
+    marginBottom: spacing.md,
   },
   // Terms
   termsContainer: {

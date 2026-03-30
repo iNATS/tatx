@@ -71,6 +71,23 @@ const OrdersScreen = ({ navigation }) => {
       />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <View style={[styles.snapshotCard, { flexDirection: rowDirection }]}>
+          <View style={styles.snapshotMetric}>
+            <Text style={styles.snapshotValue}>{filteredOrders.length}</Text>
+            <Text style={styles.snapshotLabel}>الطلبات المعروضة</Text>
+          </View>
+          <View style={styles.snapshotDivider} />
+          <View style={styles.snapshotMetric}>
+            <Text style={styles.snapshotValue}>{filteredOrders.filter((item) => item.status === 'delivery').length}</Text>
+            <Text style={styles.snapshotLabel}>في التوصيل</Text>
+          </View>
+          <View style={styles.snapshotDivider} />
+          <View style={styles.snapshotMetric}>
+            <Text style={styles.snapshotValue}>{filteredOrders.filter((item) => item.status === 'completed').length}</Text>
+            <Text style={styles.snapshotLabel}>مكتملة</Text>
+          </View>
+        </View>
+
         {filteredOrders.length ? (
           filteredOrders.map((order) => {
             const statusConfig = orderStatusConfig[order.status] || orderStatusConfig.pending;
@@ -141,6 +158,11 @@ const OrdersScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: spacing.md, paddingBottom: 140 },
+  snapshotCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.md, ...shadows.sm },
+  snapshotMetric: { flex: 1, alignItems: 'center' },
+  snapshotValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 22 },
+  snapshotLabel: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'center' },
+  snapshotDivider: { width: 1, alignSelf: 'stretch', backgroundColor: colors.borderLight, marginHorizontal: spacing.sm },
   orderCard: {
     backgroundColor: colors.card,
     borderRadius: 26,

@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
 import { homeServices, homeOffers, products, demoMarket, restaurants } from '../data/staticData';
+import { vendorStores } from '../data/vendorCatalog';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
 import PriceDisplay from '../components/PriceDisplay';
@@ -67,6 +68,18 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const marketBackgroundCards = marketHighlights.slice(0, 4);
+  const restaurantStores = vendorStores['مطاعم'] || [];
+
+  const openRestaurantMenu = (restaurantName) => {
+    const matchedStore = restaurantStores.find((store) => store.name === restaurantName);
+
+    if (matchedStore) {
+      navigation.navigate('CategoryVendorDetail', { store: matchedStore, categoryName: 'مطاعم' });
+      return;
+    }
+
+    navigation.navigate('Category', { name: 'مطاعم' });
+  };
 
   const renderMiniScroller = (items, onPress, type = 'icon') => (
     <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
@@ -201,7 +214,7 @@ const HomeScreen = ({ navigation }) => {
               key={restaurant.id}
               style={[styles.hotRestaurantCard, index === 0 && styles.hotRestaurantCardFeatured, { flexDirection: rowDirection }]}
               activeOpacity={0.9}
-              onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}
+              onPress={() => openRestaurantMenu(restaurant.name)}
             >
               <Image source={{ uri: restaurant.logo }} style={styles.hotRestaurantImage} />
               <View style={styles.hotRestaurantBody}>
@@ -250,6 +263,14 @@ const HomeScreen = ({ navigation }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <Text style={styles.sectionTitle}>سوق الجملة</Text>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Wholesale')}>
+            <Text style={styles.sectionLink}>عرض الكل</Text>
+          </TouchableOpacity>
+        </View>
+        {renderMiniScroller(wholesaleHighlights, () => navigation.navigate('Wholesale'))}
 
         <TouchableOpacity style={styles.taxiPromoCard} activeOpacity={0.9} onPress={() => navigation.navigate('Taxi')}>
           <Image source={{ uri: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1200' }} style={styles.taxiPromoImage} />

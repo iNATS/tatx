@@ -51,6 +51,23 @@ const AccountScreen = ({ navigation }) => {
           </View>
         </View>
 
+        <View style={[styles.quickStatsCard, { flexDirection: rowDirection }]}>
+          <View style={styles.quickStat}>
+            <Text style={styles.quickStatValue}>3</Text>
+            <Text style={styles.quickStatLabel}>عناوين محفوظة</Text>
+          </View>
+          <View style={styles.quickDivider} />
+          <View style={styles.quickStat}>
+            <Text style={styles.quickStatValue}>2</Text>
+            <Text style={styles.quickStatLabel}>بطاقات دفع</Text>
+          </View>
+          <View style={styles.quickDivider} />
+          <View style={styles.quickStat}>
+            <Text style={styles.quickStatValue}>12</Text>
+            <Text style={styles.quickStatLabel}>طلبات مكتملة</Text>
+          </View>
+        </View>
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>الحساب</Text>
         </View>
@@ -107,6 +124,11 @@ const styles = StyleSheet.create({
   identityBody: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   identityTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
   identitySubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 20 },
+  quickStatsCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.md, ...shadows.sm },
+  quickStat: { flex: 1, alignItems: 'center' },
+  quickStatValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 20 },
+  quickStatLabel: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'center' },
+  quickDivider: { width: 1, alignSelf: 'stretch', backgroundColor: colors.borderLight, marginHorizontal: spacing.sm },
   sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md },
   sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 18, textAlign: 'right' },
   menuCard: { backgroundColor: colors.card, borderRadius: 24, paddingHorizontal: spacing.md, ...shadows.sm },

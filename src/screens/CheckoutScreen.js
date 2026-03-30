@@ -5,10 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { paymentMethods } from '../data/staticData';
+import PageHeader from '../components/PageHeader';
 
 const CheckoutScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { cart, cartTotal, clearCart, setCurrentOrder, user, formatCurrency, rowDirection, textAlignStart, isRTL } = useApp();
+  const { cart, cartTotal, clearCart, setCurrentOrder, user, formatCurrency, rowDirection, textAlignStart } = useApp();
   const addresses = user?.addresses || [];
   const [selectedAddress, setSelectedAddress] = useState(addresses[0]?.id || null);
   const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0]?.id || null);
@@ -72,19 +73,24 @@ const CheckoutScreen = ({ navigation }) => {
   };
 
   const paymentLabel = useMemo(() => paymentDetails?.name || 'غير محدد', [paymentDetails]);
-  const closeIcon = isRTL ? 'close' : 'close';
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm, flexDirection: rowDirection }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name={closeIcon} size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>إتمام الطلب</Text>
-        <View style={styles.headerButton} />
-      </View>
+      <PageHeader navigation={navigation} title="إتمام الطلب" subtitle="راجع العنوان والدفع والملخص قبل التأكيد" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <View style={[styles.checkoutHero, { flexDirection: rowDirection }]}>
+          <View style={styles.checkoutHeroBadge}>
+            <Ionicons name="shield-checkmark-outline" size={22} color={colors.primary} />
+          </View>
+          <View style={styles.checkoutHeroText}>
+            <Text style={[styles.checkoutHeroTitle, { textAlign: textAlignStart }]}>دفع آمن وتأكيد سريع</Text>
+            <Text style={[styles.checkoutHeroSubtitle, { textAlign: textAlignStart }]}>
+              سيتم إرسال الطلب بعد مراجعة العنوان وطريقة الدفع وتأكيد الملخص النهائي.
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>موعد التوصيل</Text>
           <View style={[styles.inputShell, { flexDirection: rowDirection }]}>
@@ -196,17 +202,13 @@ const CheckoutScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: {
-    backgroundColor: colors.card,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-  },
-  headerButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md, paddingBottom: spacing.xxl },
-  card: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
+  checkoutHero: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, alignItems: 'center', marginBottom: spacing.md, ...shadows.sm },
+  checkoutHeroBadge: { width: 54, height: 54, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
+  checkoutHeroText: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
+  checkoutHeroTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17, alignSelf: 'stretch' },
+  checkoutHeroSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 20, alignSelf: 'stretch' },
+  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
   sectionHeader: { justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
   sectionTitle: { fontSize: 17, fontFamily: fonts.semiBold, color: colors.text, textAlign: 'right', marginBottom: spacing.md },
   linkText: { color: colors.primary, fontSize: 13, fontFamily: fonts.semiBold },

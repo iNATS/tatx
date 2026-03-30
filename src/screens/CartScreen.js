@@ -4,14 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import PageHeader from '../components/PageHeader';
 
 const CartScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { cart, updateQuantity, removeFromCart, clearCart, cartTotal, formatCurrency, rowDirection, textAlignStart, isRTL } = useApp();
+  const { cart, updateQuantity, removeFromCart, clearCart, cartTotal, formatCurrency, rowDirection, textAlignStart } = useApp();
   const deliveryFee = cart.length ? 12 : 0;
   const total = cartTotal + deliveryFee;
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const closeIcon = isRTL ? 'close' : 'close';
 
   const handleClearCart = () => {
     Alert.alert('تفريغ السلة', 'هل تريد حذف جميع العناصر من السلة؟', [
@@ -38,13 +38,7 @@ const CartScreen = ({ navigation }) => {
   if (!cart.length) {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-            <Ionicons name={closeIcon} size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>السلة</Text>
-          <View style={styles.headerButton} />
-        </View>
+        <PageHeader navigation={navigation} title="السلة" subtitle="راجع المنتجات قبل الانتقال إلى الدفع" />
 
         <View style={styles.emptyState}>
           <View style={styles.emptyIcon}>
@@ -62,20 +56,13 @@ const CartScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name={closeIcon} size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>السلة</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity onPress={handleShareCart} style={styles.headerButton}>
-            <Ionicons name="share-social-outline" size={20} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleClearCart} style={styles.headerButton}>
-            <Ionicons name="trash-outline" size={22} color={colors.error} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <PageHeader
+        navigation={navigation}
+        title="السلة"
+        subtitle="راجع المنتجات، شارك الرابط، ثم أكمل الدفع"
+        actionIcon="trash-outline"
+        onActionPress={handleClearCart}
+      />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.summaryCard}>
@@ -142,28 +129,10 @@ const CartScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: {
-    backgroundColor: colors.card,
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.cardSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerActions: { flexDirection: 'row-reverse', gap: spacing.xs },
-  headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md },
   summaryCard: {
     backgroundColor: colors.card,
-    borderRadius: borderRadius.xl,
+    borderRadius: 26,
     padding: spacing.md,
     marginBottom: spacing.md,
     ...shadows.sm,
@@ -188,7 +157,7 @@ const styles = StyleSheet.create({
   summaryValue: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right' },
   itemCard: {
     backgroundColor: colors.card,
-    borderRadius: borderRadius.xl,
+    borderRadius: 26,
     padding: spacing.md,
     marginBottom: spacing.md,
     flexDirection: 'row-reverse',
@@ -211,8 +180,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: colors.card,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     flexDirection: 'row-reverse',
