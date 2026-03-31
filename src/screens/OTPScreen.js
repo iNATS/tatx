@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, I18nManager } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, fonts, borderRadius } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { verifyAuthCode, requestAuthCode } from '../services/authService';
+import { validateOTP, getBackArrow } from '../utils/rtlHelpers';
 
 const OTPScreen = ({ navigation, route }) => {
   const { isRTL, setIsAuthenticated, setUser } = useApp();
@@ -13,6 +14,7 @@ const OTPScreen = ({ navigation, route }) => {
   const [timer, setTimer] = useState(30);
   const [loading, setLoading] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
+  const [otpError, setOtpError] = useState('');
   const inputRefs = useRef([]);
   const phone = route.params?.phone || '';
   const authMode = route.params?.authMode || 'login';
@@ -53,9 +55,15 @@ const OTPScreen = ({ navigation, route }) => {
 
   const handleVerify = async () => {
     const fullCode = code.join('');
-    if (fullCode.length !== 4) {
+    
+    // Validate OTP
+    const validation = validateOTP(fullCode);
+    if (!validation.valid) {
+      setOtpError(validation.error);
+      Alert.alert('رمز التحقق غير صحيح', validation.error);
       return;
     }
+    setOtpError('');
 
     setButtonPressed(true);
     setLoading(true);
@@ -110,8 +118,8 @@ const OTPScreen = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>{isRTL ? '→' : '←'}</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButtonWrap}>
+            <Text style={styles.backButton}>{getBackArrow()}</Text>
           </TouchableOpacity>
           <Text style={styles.title}>تأكيد كود التفعيل</Text>
         </View>
@@ -127,7 +135,7 @@ const OTPScreen = ({ navigation, route }) => {
               <TextInput
                 key={index}
                 ref={(ref) => (inputRefs.current[index] = ref)}
-                style={styles.codeInput}
+                style={[styles.codeInput, otpError && styles.codeInputError]}
                 value={digit}
                 onChangeText={(text) => handleCodeChange(text, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
@@ -139,6 +147,7 @@ const OTPScreen = ({ navigation, route }) => {
               />
             ))}
           </View>
+          {otpError ? <Text style={styles.otpErrorText}>{otpError}</Text> : null}
 
           <Text style={styles.timer}>{String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}</Text>
 
@@ -194,10 +203,13 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     paddingBottom: spacing.lg,
   },
+  backButtonWrap: {
+    padding: spacing.sm,
+    marginLeft: spacing.sm,
+  },
   backButton: {
     fontSize: 24,
     color: colors.text,
-    marginHorizontal: spacing.md,
   },
   title: {
     fontSize: 20,
@@ -224,11 +236,12 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: spacing.lg,
     fontFamily: fonts.semiBold,
+    textAlign: 'center',
   },
   codeContainer: {
     flexDirection: 'row-reverse',
     gap: spacing.md,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.sm,
   },
   codeInput: {
     width: 60,
@@ -240,6 +253,17 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
     color: colors.text,
     backgroundColor: colors.grayLight,
+  },
+  codeInputError: {
+    borderColor: colors.error,
+    borderWidth: 2,
+  },
+  otpErrorText: {
+    color: colors.error,
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    textAlign: 'center',
+    marginBottom: spacing.md,
   },
   timer: {
     fontSize: 48,

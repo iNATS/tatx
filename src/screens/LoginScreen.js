@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Alert, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Alert, Platform, KeyboardAvoidingView, I18nManager } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
 import { requestAuthCode } from '../services/authService';
+import { validateSaudiPhone, validateName, RTL_TEXT, RTL_ROW } from '../utils/rtlHelpers';
 
 const authModes = [
   { id: 'login', label: 'تسجيل الدخول', subtitle: 'ادخل برقم الجوال إذا كان لديك حساب' },
@@ -14,7 +15,7 @@ const authModes = [
 const LoginScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { demoMarket } = useApp();
-  
+
   const [authMode, setAuthMode] = useState('login');
   const [form, setForm] = useState({
     name: '',
@@ -23,31 +24,35 @@ const LoginScreen = ({ navigation }) => {
   });
   const [loading, setLoading] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const [nameError, setNameError] = useState('');
 
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    // Clear errors when user starts typing
+    if (field === 'phone') setPhoneError('');
+    if (field === 'name') setNameError('');
   };
 
   const validateForm = () => {
-    if (!form.phone.trim()) {
-      Alert.alert('رقم الجوال مطلوب', 'أدخل رقم الجوال للمتابعة.');
+    // Validate phone number first
+    const phoneValidation = validateSaudiPhone(form.phone);
+    if (!phoneValidation.valid) {
+      setPhoneError(phoneValidation.error);
+      Alert.alert('رقم الجوال غير صحيح', phoneValidation.error);
       return false;
     }
+    setPhoneError('');
 
-    const phoneRegex = /^05[0-9]{8}$/;
-    if (!phoneRegex.test(form.phone.trim())) {
-      Alert.alert('رقم الجوال غير صحيح', 'أدخل رقم جوال سعودي صحيح (يبدأ بـ 05).');
-      return false;
-    }
-
-    if (authMode === 'register' && !form.name.trim()) {
-      Alert.alert('الاسم مطلوب', 'أدخل الاسم الكامل لإنشاء الحساب.');
-      return false;
-    }
-
-    if (authMode === 'register' && form.name.trim().length < 3) {
-      Alert.alert('الاسم قصير جداً', 'أدخل اسمًا كاملاً من 3 أحرف على الأقل.');
-      return false;
+    // Validate name for registration
+    if (authMode === 'register') {
+      const nameValidation = validateName(form.name);
+      if (!nameValidation.valid) {
+        setNameError(nameValidation.error);
+        Alert.alert('الاسم غير صحيح', nameValidation.error);
+        return false;
+      }
+      setNameError('');
     }
 
     return true;
@@ -146,7 +151,7 @@ const LoginScreen = ({ navigation }) => {
           {authMode === 'register' ? (
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>الاسم الكامل</Text>
-              <View style={styles.inputShell}>
+              <View style={[styles.inputShell, nameError && styles.inputError]}>
                 <TextInput
                   style={styles.input}
                   placeholder="أدخل الاسم الكامل"
@@ -157,12 +162,13 @@ const LoginScreen = ({ navigation }) => {
                   autoCapitalize="words"
                 />
               </View>
+              {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
             </View>
           ) : null}
 
           <View style={styles.fieldGroup}>
             <Text style={styles.fieldLabel}>رقم الجوال</Text>
-            <View style={styles.inputShell}>
+            <View style={[styles.inputShell, phoneError && styles.inputError]}>
               <TextInput
                 style={styles.input}
                 placeholder="05XXXXXXXX"
@@ -174,6 +180,7 @@ const LoginScreen = ({ navigation }) => {
                 maxLength={10}
               />
             </View>
+            {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
           </View>
 
           {authMode === 'register' ? (
@@ -221,13 +228,13 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl },
-  hero: { marginBottom: spacing.xl, alignItems: 'flex-end' },
+  hero: { marginBottom: spacing.xl, alignItems: 'center' },
   logoWrap: { alignSelf: 'center', marginBottom: spacing.md },
   logoShell: { width: 78, height: 78, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   heroLogo: { width: 48, height: 48 },
-  heroBrand: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right', marginBottom: spacing.xs },
-  heroTitle: { ...typography.display, color: colors.text, textAlign: 'right' },
-  heroSubtitle: { ...typography.body, color: colors.textSecondary, textAlign: 'right', marginTop: spacing.sm },
+  heroBrand: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'center', marginBottom: spacing.xs },
+  heroTitle: { ...typography.display, color: colors.text, textAlign: 'center' },
+  heroSubtitle: { ...typography.body, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.sm },
   card: { backgroundColor: colors.card, borderRadius: 32, padding: spacing.lg, ...shadows.xl },
   modeList: { gap: spacing.sm, marginBottom: spacing.lg },
   modeCard: { backgroundColor: colors.cardSecondary, borderRadius: 20, padding: spacing.md, borderWidth: 1, borderColor: 'transparent' },
@@ -238,8 +245,10 @@ const styles = StyleSheet.create({
   modeSubtitleSelected: { color: colors.text },
   fieldGroup: { marginBottom: spacing.md },
   fieldLabel: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right', marginBottom: spacing.sm },
-  inputShell: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md },
+  inputShell: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md, minHeight: 52 },
+  inputError: { borderColor: colors.error, borderWidth: 1 },
   input: { minHeight: 52, color: colors.text, textAlign: 'right', fontFamily: fonts.regular },
+  errorText: { color: colors.error, fontSize: 12, fontFamily: fonts.regular, textAlign: 'right', marginTop: 4 },
   primaryButton: { marginTop: spacing.sm, transform: [{ scale: 1 }] },
   primaryButtonPressed: { transform: [{ scale: 0.98 }] },
   primaryButtonGradient: { borderRadius: borderRadius.full, alignItems: 'center', justifyContent: 'center', minHeight: 54 },
