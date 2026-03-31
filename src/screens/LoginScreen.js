@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
@@ -14,70 +14,105 @@ const authModes = [
 const LoginScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { demoMarket } = useApp();
+  
   const [authMode, setAuthMode] = useState('login');
   const [form, setForm] = useState({
     name: '',
     phone: '',
-    city: demoMarket.city || 'الرياض',
+    city: demoMarket?.city || 'الرياض',
   });
   const [loading, setLoading] = useState(false);
+  const [buttonPressed, setButtonPressed] = useState(false);
 
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleContinue = async () => {
+  const validateForm = () => {
     if (!form.phone.trim()) {
       Alert.alert('رقم الجوال مطلوب', 'أدخل رقم الجوال للمتابعة.');
-      return;
+      return false;
+    }
+
+    const phoneRegex = /^05[0-9]{8}$/;
+    if (!phoneRegex.test(form.phone.trim())) {
+      Alert.alert('رقم الجوال غير صحيح', 'أدخل رقم جوال سعودي صحيح (يبدأ بـ 05).');
+      return false;
     }
 
     if (authMode === 'register' && !form.name.trim()) {
       Alert.alert('الاسم مطلوب', 'أدخل الاسم الكامل لإنشاء الحساب.');
+      return false;
+    }
+
+    if (authMode === 'register' && form.name.trim().length < 3) {
+      Alert.alert('الاسم قصير جداً', 'أدخل اسمًا كاملاً من 3 أحرف على الأقل.');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleContinue = async () => {
+    if (!validateForm()) {
       return;
     }
 
+    setButtonPressed(true);
     setLoading(true);
 
-    const { data, error } = await requestAuthCode({
-      phone: form.phone.trim(),
-      mode: authMode,
-      profile: {
-        name: form.name.trim(),
-        city: form.city.trim() || demoMarket.city,
-      },
-    });
+    const cityValue = form.city?.trim() || 'الرياض';
 
-    setLoading(false);
-
-    if (error) {
-      Alert.alert('تعذر إرسال الرمز', 'حاول مرة أخرى بعد قليل.');
-      return;
-    }
-
-    Alert.alert(
-      'تم إرسال رمز التحقق',
-      `للاختبار الحالي استخدم الرمز: ${data?.code || '1234'}`,
-      [
-        {
-          text: 'متابعة',
-          onPress: () =>
-            navigation.navigate('OTP', {
-              phone: form.phone.trim(),
-              authMode,
-              profile: {
-                name: form.name.trim(),
-                city: form.city.trim() || demoMarket.city,
-              },
-            }),
+    try {
+      const { data, error } = await requestAuthCode({
+        phone: form.phone.trim(),
+        mode: authMode,
+        profile: {
+          name: form.name.trim(),
+          city: cityValue,
         },
-      ]
-    );
+      });
+
+      if (error) {
+        console.error('Auth error:', error);
+        Alert.alert('تعذر إرسال الرمز', error.message || 'حاول مرة أخرى بعد قليل.');
+        setLoading(false);
+        setButtonPressed(false);
+        return;
+      }
+
+      setLoading(false);
+      setButtonPressed(false);
+
+      navigation.navigate('OTP', {
+        phone: form.phone.trim(),
+        authMode,
+        profile: {
+          name: form.name.trim(),
+          city: cityValue,
+        },
+        otpCode: data?.code || '1234',
+      });
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      setLoading(false);
+      setButtonPressed(false);
+      Alert.alert('حدث خطأ', 'يرجى المحاولة مرة أخرى.');
+    }
   };
 
   return (
-    <LinearGradient colors={['#FBF6F8', '#FFF9FA']} style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + spacing.lg }]}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={insets.top}
+    >
+      <LinearGradient colors={['#FBF6F8', '#FFF9FA']} style={styles.container}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.xxxl }]}
+          keyboardShouldPersistTaps="handled"
+        >
         <View style={styles.hero}>
           <View style={styles.logoWrap}>
             <LinearGradient colors={['#FCE2E7', '#FFF7F8']} style={styles.logoShell}>
@@ -118,6 +153,8 @@ const LoginScreen = ({ navigation }) => {
                   placeholderTextColor={colors.textTertiary}
                   value={form.name}
                   onChangeText={(value) => updateField('name', value)}
+                  returnKeyType="next"
+                  autoCapitalize="words"
                 />
               </View>
             </View>
@@ -133,6 +170,8 @@ const LoginScreen = ({ navigation }) => {
                 keyboardType="phone-pad"
                 value={form.phone}
                 onChangeText={(value) => updateField('phone', value)}
+                returnKeyType="done"
+                maxLength={10}
               />
             </View>
           </View>
@@ -147,19 +186,35 @@ const LoginScreen = ({ navigation }) => {
                   placeholderTextColor={colors.textTertiary}
                   value={form.city}
                   onChangeText={(value) => updateField('city', value)}
+                  returnKeyType="done"
                 />
               </View>
             </View>
           ) : null}
 
-          <TouchableOpacity style={styles.primaryButton} onPress={handleContinue} activeOpacity={0.9} disabled={loading}>
-            <LinearGradient colors={colors.primaryGradient} style={styles.primaryButtonGradient}>
-              {loading ? <ActivityIndicator color={colors.white} /> : <Text style={styles.primaryButtonText}>إرسال رمز التحقق</Text>}
+          <TouchableOpacity
+            style={[styles.primaryButton, buttonPressed && styles.primaryButtonPressed]}
+            onPress={handleContinue}
+            activeOpacity={0.8}
+            disabled={loading}
+          >
+            <LinearGradient
+              colors={loading ? [colors.primaryLight, colors.primaryLight] : colors.primaryGradient}
+              style={styles.primaryButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              {loading ? (
+                <ActivityIndicator color={colors.white} size="small" />
+              ) : (
+                <Text style={styles.primaryButtonText}>إرسال رمز التحقق</Text>
+              )}
             </LinearGradient>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </LinearGradient>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -185,9 +240,10 @@ const styles = StyleSheet.create({
   fieldLabel: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right', marginBottom: spacing.sm },
   inputShell: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md },
   input: { minHeight: 52, color: colors.text, textAlign: 'right', fontFamily: fonts.regular },
-  primaryButton: { marginTop: spacing.sm },
+  primaryButton: { marginTop: spacing.sm, transform: [{ scale: 1 }] },
+  primaryButtonPressed: { transform: [{ scale: 0.98 }] },
   primaryButtonGradient: { borderRadius: borderRadius.full, alignItems: 'center', justifyContent: 'center', minHeight: 54 },
-  primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 16 },
+  primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 16, letterSpacing: 0.5 },
 });
 
 export default LoginScreen;

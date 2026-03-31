@@ -1,18 +1,23 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { colors, typography, spacing, fonts } from '../constants/theme';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, typography, spacing, fonts, borderRadius } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { verifyAuthCode, requestAuthCode } from '../services/authService';
 
 const OTPScreen = ({ navigation, route }) => {
   const { isRTL, setIsAuthenticated, setUser } = useApp();
+  const insets = useSafeAreaInsets();
   const [code, setCode] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(30);
   const [loading, setLoading] = useState(false);
+  const [buttonPressed, setButtonPressed] = useState(false);
   const inputRefs = useRef([]);
   const phone = route.params?.phone || '';
   const authMode = route.params?.authMode || 'login';
   const profile = route.params?.profile || {};
+  const otpCode = route.params?.otpCode || '1234';
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -44,30 +49,39 @@ const OTPScreen = ({ navigation, route }) => {
     }
   };
 
+  const isCodeComplete = code.join('').length === 4;
+
   const handleVerify = async () => {
     const fullCode = code.join('');
     if (fullCode.length !== 4) {
       return;
     }
 
+    setButtonPressed(true);
     setLoading(true);
 
-    const { data, error } = await verifyAuthCode({
-      phone,
-      code: fullCode,
-      mode: authMode,
-      profile,
-    });
+    try {
+      const { data, error } = await verifyAuthCode({
+        phone,
+        code: fullCode,
+        mode: authMode,
+        profile,
+      });
 
-    setLoading(false);
+      if (error) {
+        Alert.alert('تعذر التحقق', error.message || 'رمز التحقق غير صحيح.');
+        setLoading(false);
+        setButtonPressed(false);
+        return;
+      }
 
-    if (error) {
-      Alert.alert('تعذر التحقق', error.message || 'رمز التحقق غير صحيح.');
-      return;
+      setUser(data?.user || null);
+      setIsAuthenticated(true);
+    } catch (err) {
+      Alert.alert('حدث خطأ', 'يرجى المحاولة مرة أخرى.');
+      setLoading(false);
+      setButtonPressed(false);
     }
-
-    setUser(data?.user || null);
-    setIsAuthenticated(true);
   };
 
   const handleResend = async () => {
@@ -85,59 +99,83 @@ const OTPScreen = ({ navigation, route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>{isRTL ? '→' : '←'}</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>تأكيد كود التفعيل</Text>
-      </View>
-
-      <View style={styles.content}>
-        <Text style={styles.subtitle}>
-          قم بإدخال الكود الذي وصلك عبر خدمة الرسائل القصيرة
-        </Text>
-        <Text style={styles.phoneText}>{phone}</Text>
-
-        <View style={styles.codeContainer}>
-          {code.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => (inputRefs.current[index] = ref)}
-              style={styles.codeInput}
-              value={digit}
-              onChangeText={(text) => handleCodeChange(text, index)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
-              keyboardType="number-pad"
-              maxLength={1}
-              textAlign="center"
-            />
-          ))}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={insets.top}
+    >
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + spacing.lg }]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backButton}>{isRTL ? '→' : '←'}</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>تأكيد كود التفعيل</Text>
         </View>
 
-        <Text style={styles.timer}>{String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}</Text>
-
-        <Text style={styles.resendText}>
-          لم يصلك الكود؟ قم بإعادة ارسال الرمز بعد انتهاء الزمن
-        </Text>
-
-        <TouchableOpacity onPress={handleResend} disabled={timer > 0}>
-          <Text style={[styles.resendButton, timer > 0 && styles.resendButtonDisabled]}>
-            إعادة ارسال الرمز
+        <View style={styles.content}>
+          <Text style={styles.subtitle}>
+            قم بإدخال الكود الذي وصلك عبر خدمة الرسائل القصيرة
           </Text>
-        </TouchableOpacity>
+          <Text style={styles.phoneText}>{phone}</Text>
 
-        <TouchableOpacity
-          style={[styles.verifyButton, code.join('').length === 4 && styles.verifyButtonActive]}
-          onPress={handleVerify}
-          disabled={loading}
-        >
-          <Text style={[styles.verifyButtonText, code.join('').length === 4 && styles.verifyButtonTextActive]}>
-            {loading ? 'جارٍ التحقق...' : 'تأكيد'}
+          <View style={styles.codeContainer}>
+            {code.map((digit, index) => (
+              <TextInput
+                key={index}
+                ref={(ref) => (inputRefs.current[index] = ref)}
+                style={styles.codeInput}
+                value={digit}
+                onChangeText={(text) => handleCodeChange(text, index)}
+                onKeyPress={(e) => handleKeyPress(e, index)}
+                keyboardType="number-pad"
+                maxLength={1}
+                textAlign="center"
+                returnKeyType={index < 3 ? 'next' : 'done'}
+                selectTextOnFocus
+              />
+            ))}
+          </View>
+
+          <Text style={styles.timer}>{String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}</Text>
+
+          <Text style={styles.resendText}>
+            لم يصلك الكود؟ قم بإعادة ارسال الرمز بعد انتهاء الزمن
           </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+
+          <TouchableOpacity onPress={handleResend} disabled={timer > 0}>
+            <Text style={[styles.resendButton, timer > 0 && styles.resendButtonDisabled]}>
+              إعادة ارسال الرمز
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.verifyButton, isCodeComplete && styles.verifyButtonActive, buttonPressed && styles.verifyButtonPressed]}
+            onPress={handleVerify}
+            disabled={loading || !isCodeComplete}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={isCodeComplete ? colors.primaryGradient : [colors.grayLight, colors.grayLight]}
+              style={styles.verifyButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              {loading ? (
+                <ActivityIndicator color={colors.white} size="small" />
+              ) : (
+                <Text style={[styles.verifyButtonText, isCodeComplete && styles.verifyButtonTextActive]}>
+                  تأكيد
+                </Text>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -146,11 +184,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   header: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    padding: spacing.lg,
-    paddingTop: spacing.xxl,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.lg,
   },
   backButton: {
     fontSize: 24,
@@ -166,7 +208,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
     alignItems: 'center',
   },
   subtitle: {
@@ -221,20 +264,27 @@ const styles = StyleSheet.create({
     color: colors.gray,
   },
   verifyButton: {
-    backgroundColor: colors.grayLight,
+    borderRadius: borderRadius.full,
+    minWidth: 200,
+    overflow: 'hidden',
+    transform: [{ scale: 1 }],
+  },
+  verifyButtonPressed: {
+    transform: [{ scale: 0.98 }],
+  },
+  verifyButtonGradient: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
-    borderRadius: 12,
-    minWidth: 200,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
-  },
-  verifyButtonActive: {
-    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    minHeight: 50,
   },
   verifyButtonText: {
     fontSize: 18,
     fontFamily: fonts.semiBold,
     color: colors.gray,
+    letterSpacing: 0.5,
   },
   verifyButtonTextActive: {
     color: colors.white,
