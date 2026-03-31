@@ -5,7 +5,7 @@ import { CategorySlider } from '@/components/home/CategorySlider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, Clock, Heart, ArrowLeft, Search, Zap, MapPin, Car, ArrowRight } from 'lucide-react';
+import { Star, Clock, Heart, ArrowLeft, Search, Zap, MapPin, Car, ArrowRight, Smartphone } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FEATURED_ITEMS, PROVIDERS, CATEGORIES, MENU_ITEMS } from '@/lib/data';
@@ -26,89 +26,84 @@ export default function Home() {
     <>
       <Navbar />
       <main className="flex-1 bg-background">
-        {/* Material Design 3 Hero Section - Redesigned 2 Columns Layout */}
-        <section className="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden bg-gradient-to-b from-primary/[0.03] to-transparent">
-          {/* Decorative Background Element */}
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-          
+        {/* Mobile App Landing Hero Section */}
+        <section className="relative pt-12 pb-24 lg:pt-20 lg:pb-32 overflow-hidden bg-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               
-              {/* Right Column: Content */}
+              {/* Right Column: Text Content */}
               <div className="text-right order-1 flex flex-col items-end">
                 <Badge className="bg-primary/10 text-primary border-none font-black px-5 py-2 rounded-full mb-8 text-sm md-elevation-1">
-                  أهلاً بك في عالم تاتكس الجديد ✨
+                  تطبيق Tatx الجديد متاح الآن 🚀
                 </Badge>
                 
                 <h1 className="text-5xl md:text-7xl font-black mb-8 leading-[1.1] tracking-tight text-foreground">
-                  كل احتياجاتك..<br />
-                  <span className="text-primary relative inline-block">
-                    بلمسة واحدة.
-                    <div className="absolute bottom-2 left-0 w-full h-3 bg-primary/10 -z-10 rounded-full" />
-                  </span>
+                  كل ما تحتاجه<br />
+                  <span className="text-primary">في تطبيق واحد.</span>
                 </h1>
                 
                 <p className="text-xl md:text-2xl mb-12 text-muted-foreground font-bold max-w-xl leading-relaxed">
-                  من وجبتك المفضلة إلى حجز قاعتك الخاصة.. كل ما تحتاجه في مكان واحد بأمان وسرعة فائقة.
+                  اطلب وجباتك، تسوق احتياجاتك، احجز مشاويرك، أو استأجر شاليهك المفضل.. كل ذلك وأكثر من خلال تطبيق Tatx.
                 </p>
 
-                {/* MD3 Tonal Search Bar - Pill Shaped */}
-                <div className="relative w-full max-w-xl">
+                {/* App Store Buttons - Landing Page Style */}
+                <div className="flex flex-wrap gap-4 justify-end mb-12 flex-row-reverse">
+                  <Button 
+                    className="h-[64px] px-8 rounded-2xl bg-black text-white gap-4 shadow-xl hover:scale-105 transition-transform border-none"
+                  >
+                    <div className="text-right flex flex-col items-end leading-none">
+                      <span className="text-[10px] opacity-60">Download on the</span>
+                      <span className="text-lg font-black">App Store</span>
+                    </div>
+                    <Smartphone className="w-8 h-8" />
+                  </Button>
+                  <Button 
+                    className="h-[64px] px-8 rounded-2xl bg-black text-white gap-4 shadow-xl hover:scale-105 transition-transform border-none"
+                  >
+                    <div className="text-right flex flex-col items-end leading-none">
+                      <span className="text-[10px] opacity-60">Get it on</span>
+                      <span className="text-lg font-black">Google Play</span>
+                    </div>
+                    <Zap className="w-8 h-8" />
+                  </Button>
+                </div>
+
+                {/* Tonal Search for Quick Web Access */}
+                <div className="relative w-full max-w-lg">
                   <div 
-                    className="bg-white p-2 rounded-full shadow-xl border border-border flex items-center flex-row-reverse group transition-all focus-within:ring-4 focus-within:ring-primary/10 cursor-pointer md-elevation-2 hover:md-elevation-3" 
+                    className="bg-secondary/30 p-1.5 rounded-full border border-transparent flex items-center flex-row-reverse group transition-all focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/10 cursor-pointer" 
                     onClick={() => router.push('/search')}
                   >
                     <div className="flex-1 px-6">
                       <Input 
-                        placeholder="ابحث عن مطعم أو خدمة..." 
-                        className="border-none bg-transparent h-14 text-xl font-black placeholder:text-muted-foreground/40 focus-visible:ring-0 shadow-none text-right cursor-pointer"
+                        placeholder="أو ابحث عن خدمة سريعة هنا..." 
+                        className="border-none bg-transparent h-12 text-lg font-bold placeholder:text-muted-foreground focus-visible:ring-0 shadow-none text-right cursor-pointer"
                         readOnly
                       />
                     </div>
-                    <Button className="h-14 w-14 rounded-full bg-primary hover:bg-primary/90 text-white p-0 shrink-0 shadow-none border-none group-hover:scale-105 transition-transform">
-                      <Search className="w-7 h-7" />
+                    <Button className="h-12 w-12 rounded-full bg-primary text-white p-0 shrink-0 shadow-none border-none">
+                      <Search className="w-6 h-6" />
                     </Button>
-                  </div>
-                </div>
-
-                {/* Trust Badges */}
-                <div className="mt-12 flex flex-wrap justify-end gap-8 opacity-60 grayscale hover:grayscale-0 transition-all">
-                  <div className="flex items-center gap-2 flex-row-reverse">
-                    <Zap className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-black">توصيل برق</span>
-                  </div>
-                  <div className="flex items-center gap-2 flex-row-reverse">
-                    <MapPin className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-black">تغطية شاملة</span>
                   </div>
                 </div>
               </div>
 
-              {/* Left Column: Mobile Mockup - Professional Frame */}
-              <div className="order-2 flex justify-center lg:justify-start">
-                <div className="relative w-full max-w-[340px] perspective-1000">
-                  {/* Glowing Aura behind the phone */}
-                  <div className="absolute inset-0 bg-primary/20 rounded-[4rem] blur-[60px] animate-pulse pointer-events-none" />
+              {/* Left Column: Premium Mobile Mockup */}
+              <div className="order-2 flex justify-center lg:justify-start relative">
+                <div className="relative w-full max-w-[320px]">
+                  {/* Decorative Glow */}
+                  <div className="absolute inset-0 bg-primary/10 blur-[100px] rounded-full scale-150 -z-10" />
                   
-                  <div className="relative w-full aspect-[9/18.5] bg-foreground rounded-[3.5rem] p-3 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] border-[10px] border-foreground overflow-hidden md-elevation-3">
-                    {/* Inner Screen Content */}
+                  <div className="relative aspect-[9/19] w-full bg-foreground rounded-[3.5rem] p-3 shadow-2xl border-[10px] border-foreground overflow-hidden">
                     <div className="relative w-full h-full rounded-[2.8rem] overflow-hidden bg-white">
                       <Image 
-                        src="https://picsum.photos/seed/tatx-app-hero/600/1200" 
-                        alt="تطبيق تاتكس" 
+                        src="https://picsum.photos/seed/tatx-mockup/600/1200" 
+                        alt="Tatx App Mockup" 
                         fill 
                         className="object-cover"
-                        data-ai-hint="mobile app"
+                        data-ai-hint="mobile app interface"
                         priority
                       />
-                      {/* Fake Status Bar */}
-                      <div className="absolute top-0 left-0 w-full h-8 bg-black/10 backdrop-blur-sm flex justify-between items-center px-6 text-[10px] text-white font-bold z-10">
-                        <span>9:41</span>
-                        <div className="flex gap-1">
-                          <div className="w-3 h-3 rounded-full bg-white/20" />
-                          <div className="w-3 h-3 rounded-full bg-white/20" />
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -119,26 +114,26 @@ export default function Home() {
         </section>
 
         <div className="container mx-auto px-4 py-8">
-          {/* Categories Slider (MD3 Tonal Chips) */}
+          {/* Categories Slider */}
           <div className="mb-12">
             <div className="text-right mb-6">
-              <h2 className="text-2xl md:text-3xl font-black mb-1 tracking-tight">تصفح حسب الفئة</h2>
-              <p className="text-sm text-muted-foreground font-bold">كل الخدمات التي تحتاجها في تصنيفات واضحة</p>
+              <h2 className="text-2xl md:text-3xl font-black mb-1 tracking-tight">خدماتنا الشاملة</h2>
+              <p className="text-sm text-muted-foreground font-bold">تصفح الفئات المتاحة في Tatx</p>
             </div>
             <CategorySlider />
           </div>
 
-          {/* Taxi Service CTA Banner */}
+          {/* Taxi Service Banner */}
           <section className="mb-16">
             <Link href="/taxi">
               <Card className="relative overflow-hidden bg-black rounded-[2.5rem] min-h-[280px] flex items-center group cursor-pointer border-none md-elevation-2">
                 <div className="absolute inset-0 opacity-40 group-hover:scale-105 transition-transform duration-700">
                   <Image 
                     src="https://picsum.photos/seed/taxi-bg/1200/400" 
-                    alt="تاكسي تاتكس" 
+                    alt="Tatx Taxi" 
                     fill 
                     className="object-cover"
-                    data-ai-hint="taxi city"
+                    data-ai-hint="city taxi"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
@@ -149,8 +144,8 @@ export default function Home() {
                       <Car className="w-4 h-4" />
                       جديد
                     </div>
-                    <h2 className="text-3xl md:text-5xl font-black text-white mb-4">تاكسي تاتكس</h2>
-                    <p className="text-white/70 text-lg font-bold max-w-md">مشاويرك اليومية صارت أسهل وأسرع.. اطلب سيارتك الآن واستمتع برحلة آمنة ومريحة.</p>
+                    <h2 className="text-3xl md:text-5xl font-black text-white mb-4">تاكسي Tatx</h2>
+                    <p className="text-white/70 text-lg font-bold max-w-md">مشاويرك اليومية صارت أسهل وأسرع.. اطلب سيارتك الآن واستمتع برحلة آمنة.</p>
                   </div>
                   <Button size="lg" className="h-16 px-10 rounded-2xl bg-white text-black hover:bg-primary hover:text-white font-black text-xl gap-3 transition-all">
                     احجز مشوارك الآن
@@ -161,12 +156,12 @@ export default function Home() {
             </Link>
           </section>
 
-          {/* Featured Items (MD3 Elevated Cards) */}
+          {/* Featured Items */}
           <section className="mb-16">
-            <div className="flex items-center justify-between mb-8 flex-row-reverse">
-              <div className="text-right">
-                <h2 className="text-3xl md:text-4xl font-black mb-1 tracking-tight">عروض تاتكس المميزة</h2>
-                <p className="text-base text-muted-foreground font-bold">أفضل الأسعار والخدمات المختارة لك</p>
+            <div className="flex items-center justify-between mb-8 flex-row-reverse text-right">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-black mb-1 tracking-tight">عروض Tatx المختارة</h2>
+                <p className="text-base text-muted-foreground font-bold">أفضل الخدمات بأسعار تنافسية</p>
               </div>
               <Button variant="ghost" className="text-primary font-black text-base gap-2 flex-row-reverse group hover:bg-primary/5 shadow-none rounded-xl h-10">
                  عرض الكل
@@ -221,7 +216,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Dynamic Content Rows (MD3 Style) */}
+          {/* Dynamic Content Rows */}
           {CATEGORIES.filter(cat => cat.id !== 'taxi').map((cat) => {
             const categoryItems = MENU_ITEMS.filter(item => item.category === cat.id).slice(0, 8);
             const provider = PROVIDERS.find(p => p.category === cat.id);
@@ -229,8 +224,8 @@ export default function Home() {
 
             return (
               <section key={cat.id} className="mb-12">
-                <div className="flex items-center justify-between mb-6 flex-row-reverse">
-                  <div className="text-right">
+                <div className="flex items-center justify-between mb-6 flex-row-reverse text-right">
+                  <div>
                     <h2 className="text-2xl font-black text-foreground tracking-tight">{cat.name}</h2>
                     <p className="text-xs text-muted-foreground font-bold mt-1">أفضل الخيارات في {cat.name}</p>
                   </div>

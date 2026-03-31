@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ShoppingBag, Bell, User, Search } from 'lucide-react';
+import { Home, ShoppingBag, Bell, User, Search, Car, Store } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/store/use-cart';
 
 const NAV_ITEMS = [
   { label: 'الرئيسية', icon: Home, href: '/' },
-  { label: 'البحث', icon: Search, href: '/search' },
-  { label: 'طلباتي', icon: ShoppingBag, href: '/orders' },
+  { label: 'تاكسي', icon: Car, href: '/taxi' },
+  { label: 'المتجر', icon: Store, href: '/provider/market-tatx' },
   { label: 'التنبيهات', icon: Bell, href: '/profile/notifications' },
   { label: 'حسابي', icon: User, href: '/profile' },
 ];
@@ -43,8 +43,8 @@ export function MobileBottomNav() {
               </div>
               <span className="text-[10px] font-black">{item.label}</span>
               
-              {/* Cart Badge */}
-              {item.href === '/orders' && itemCount > 0 && (
+              {/* Cart Badge - Show on Shop if items present */}
+              {item.href.includes('market') && itemCount > 0 && (
                 <span className="absolute top-2 right-4 h-4 w-4 bg-primary text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm">
                   {itemCount}
                 </span>

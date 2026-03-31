@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { 
@@ -77,9 +78,17 @@ export function PortalSidebar({ role, title }: PortalSidebarProps) {
   return (
     <aside className="w-72 bg-white border-l h-screen flex flex-col sticky top-0" dir="rtl">
       <div className="p-8">
-        <Link href="/" className="flex items-center gap-2 group mb-10">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg">T</div>
-          <span className="text-2xl font-black">تاتكس <span className="text-primary">{title}</span></span>
+        <Link href="/" className="flex items-center gap-3 group mb-10">
+          <div className="relative w-8 h-8 overflow-hidden rounded-lg bg-white border border-border flex items-center justify-center p-1 shadow-sm">
+            <Image 
+              src="https://picsum.photos/seed/tatx-logo/200/200" 
+              alt="Tatx Logo" 
+              width={32} 
+              height={32} 
+              className="object-contain"
+            />
+          </div>
+          <span className="text-2xl font-black">Tatx <span className="text-primary">{title}</span></span>
         </Link>
 
         <nav className="space-y-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 
 export function Footer() {
@@ -11,15 +12,21 @@ export function Footer() {
           {/* Brand & Social */}
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-black text-2xl">
-                T
+              <div className="relative w-8 h-8 overflow-hidden rounded-lg bg-white border border-border flex items-center justify-center">
+                <Image 
+                  src="https://picsum.photos/seed/tatx-logo/200/200" 
+                  alt="Tatx Logo" 
+                  width={32} 
+                  height={32} 
+                  className="object-contain"
+                />
               </div>
               <span className="text-2xl font-black">
-                تاتكس<span className="text-primary">Tatx</span>
+                Tatx
               </span>
             </Link>
             <p className="text-muted-foreground font-medium leading-relaxed">
-              كل احتياجاتك اليومية في مكان واحد. من خدمات التوصيل والمطاعم إلى حجز الشاليهات والقاعات. تاتكس رفيقك اليومي في المملكة.
+              كل احتياجاتك اليومية في تطبيق واحد. من خدمات التوصيل والمطاعم إلى حجز الشاليهات والقاعات. Tatx رفيقك اليومي في المملكة.
             </p>
             <div className="flex gap-4">
               {[Twitter, Instagram, Facebook, Youtube].map((Icon, idx) => (
@@ -32,19 +39,19 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-xl font-black mb-6 border-r-4 border-primary pr-3">خدماتنا</h4>
+            <h4 className="text-xl font-black mb-6 border-r-4 border-primary pr-3">خدمات Tatx</h4>
             <ul className="space-y-4 font-bold text-muted-foreground">
-              <li><Link href="/provider/rest-1" className="hover:text-primary transition-colors">مطاعم تاتكس</Link></li>
-              <li><Link href="/taxi" className="hover:text-primary transition-colors">تاكسي تاتكس</Link></li>
-              <li><Link href="/provider/market-tatx" className="hover:text-primary transition-colors">سوبر ماركت تاتكس</Link></li>
-              <li><Link href="/provider/chalet-1" className="hover:text-primary transition-colors">شاليهات تاتكس</Link></li>
-              <li><Link href="/provider/serv-1" className="hover:text-primary transition-colors">خدمات تاتكس</Link></li>
+              <li><Link href="/provider/rest-1" className="hover:text-primary transition-colors">المطاعم</Link></li>
+              <li><Link href="/taxi" className="hover:text-primary transition-colors">التاكسي</Link></li>
+              <li><Link href="/provider/market-tatx" className="hover:text-primary transition-colors">السوبر ماركت</Link></li>
+              <li><Link href="/provider/chalet-1" className="hover:text-primary transition-colors">الشاليهات</Link></li>
+              <li><Link href="/provider/serv-1" className="hover:text-primary transition-colors">الصيانة المنزلية</Link></li>
             </ul>
           </div>
 
           {/* Company */}
           <div>
-            <h4 className="text-xl font-black mb-6 border-r-4 border-primary pr-3">عن تاتكس</h4>
+            <h4 className="text-xl font-black mb-6 border-r-4 border-primary pr-3">عن Tatx</h4>
             <ul className="space-y-4 font-bold text-muted-foreground">
               <li><Link href="#" className="hover:text-primary transition-colors">من نحن</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">الشروط والأحكام</Link></li>
@@ -60,7 +67,7 @@ export function Footer() {
             <ul className="space-y-4 font-bold text-muted-foreground">
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary" />
-                <span>9200 XXXXX</span>
+                <span>9200 Tatx</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary" />
@@ -76,7 +83,7 @@ export function Footer() {
 
         <div className="mt-16 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-muted-foreground font-bold text-sm">
-            © {new Date().getFullYear()} تاتكس Tatx. جميع الحقوق محفوظة.
+            © {new Date().getFullYear()} Tatx. جميع الحقوق محفوظة.
           </p>
         </div>
       </div>

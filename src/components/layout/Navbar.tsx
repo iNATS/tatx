@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { ShoppingBag, User, Search, MapPin, ChevronDown, Menu, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useCart } from '@/store/use-cart';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -34,13 +34,20 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-border shadow-none">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-6">
-        {/* Brand Logo */}
+        {/* Brand Logo & Name */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-11 h-11 bg-primary rounded-[1rem] flex items-center justify-center text-white font-black text-2xl shadow-lg transition-all group-hover:scale-105 group-active:scale-95">
-            T
+          <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-border shadow-sm flex items-center justify-center p-1">
+            <Image 
+              src="https://picsum.photos/seed/tatx-logo/200/200" 
+              alt="Tatx Logo" 
+              width={40} 
+              height={40} 
+              className="object-contain"
+              data-ai-hint="app logo"
+            />
           </div>
-          <span className="text-2xl font-black hidden md:block tracking-tight">
-            تاتكس<span className="text-primary">Tatx</span>
+          <span className="text-2xl font-black hidden md:block tracking-tight text-foreground">
+            Tatx
           </span>
         </Link>
 
@@ -95,7 +102,7 @@ export function Navbar() {
           </DialogContent>
         </Dialog>
 
-        {/* Desktop Actions - Hidden on Mobile */}
+        {/* Desktop Actions */}
         <div className="flex items-center gap-3">
           <Link href="/profile" className="hidden md:block">
             <Button variant="ghost" className="flex gap-2 font-black shadow-none hover:bg-secondary rounded-full px-6 h-12">
@@ -118,9 +125,8 @@ export function Navbar() {
             </Button>
           </Link>
 
-          {/* Simple Search Toggle for Mobile Tablet */}
-          <Button variant="ghost" size="icon" className="md:hidden shadow-none rounded-full h-12 w-12">
-            <Search className="w-6 h-6" />
+          <Button variant="ghost" size="icon" className="md:hidden shadow-none rounded-full h-12 w-12" asChild>
+            <Link href="/search"><Search className="w-6 h-6" /></Link>
           </Button>
         </div>
       </div>
