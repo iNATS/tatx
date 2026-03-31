@@ -89,15 +89,27 @@ const LoginScreen = ({ navigation }) => {
       setLoading(false);
       setButtonPressed(false);
 
-      navigation.navigate('OTP', {
-        phone: form.phone.trim(),
-        authMode,
-        profile: {
-          name: form.name.trim(),
-          city: cityValue,
-        },
-        otpCode: data?.code || '1234',
-      });
+      // Show OTP code in alert for testing
+      const testCode = data?.code || '1234';
+      Alert.alert(
+        'تم إرسال رمز التحقق',
+        `رمز التحقق هو: ${testCode}\n(للاختبار استخدم هذا الرمز)`,
+        [
+          {
+            text: 'متابعة',
+            onPress: () =>
+              navigation.navigate('OTP', {
+                phone: form.phone.trim(),
+                authMode,
+                profile: {
+                  name: form.name.trim(),
+                  city: cityValue,
+                },
+                otpCode: testCode,
+              }),
+          },
+        ]
+      );
     } catch (err) {
       console.error('Unexpected error:', err);
       setLoading(false);

@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import { RTL_ROW } from '../utils/rtlHelpers';
 
 import SplashScreen from '../screens/SplashScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -113,15 +114,15 @@ const MainTabs = () => (
 );
 
 const AppNavigator = () => {
-  const { isAuthenticated, isRTL } = useApp();
+  const { isAuthenticated } = useApp();
   const { width } = useWindowDimensions();
   const isWideWeb = Platform.OS === 'web' && width >= 768;
 
   return (
     <View style={[styles.appShell, isWideWeb && styles.appShellWeb]}>
       <View style={[styles.appFrame, isWideWeb && styles.appFrameWeb]}>
-        <NavigationContainer theme={navTheme}>
-          <Stack.Navigator screenOptions={{ headerShown: false, animation: isRTL ? 'slide_from_left' : 'slide_from_right' }}>
+        <NavigationContainer theme={navTheme} independent={true}>
+          <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
             {!isAuthenticated ? (
               <>
                 <Stack.Screen name="Splash" component={SplashScreen} />

@@ -1,32 +1,32 @@
 import { I18nManager, Platform } from 'react-native';
 
-// RTL Configuration
-export const isRTL = I18nManager.isRTL;
+// RTL Configuration - Force RTL for Arabic
+export const isRTL = true; // Force RTL since app is Arabic
 
 // RTL-aware direction helpers
 export const RTL_DIRECTION = {
-  START: isRTL ? 'right' : 'left',
-  END: isRTL ? 'left' : 'right',
+  START: 'right',
+  END: 'left',
 };
 
 // RTL-aware alignment helpers
 export const RTL_ALIGN = {
-  START: isRTL ? 'flex-end' : 'flex-start',
-  END: isRTL ? 'flex-start' : 'flex-end',
+  START: 'flex-end',
+  END: 'flex-start',
   CENTER: 'center',
 };
 
 // RTL-aware text alignment
 export const RTL_TEXT = {
-  START: isRTL ? 'right' : 'left',
-  END: isRTL ? 'left' : 'right',
+  START: 'right',
+  END: 'left',
   CENTER: 'center',
 };
 
 // RTL-aware flex direction for rows
 export const RTL_ROW = {
-  NORMAL: isRTL ? 'row-reverse' : 'row',
-  REVERSE: isRTL ? 'row' : 'row-reverse',
+  NORMAL: 'row-reverse',
+  REVERSE: 'row',
 };
 
 // Phone validation for Saudi numbers
@@ -112,21 +112,34 @@ export const validateOTP = (code) => {
 
 // RTL-aware style helper
 export const createRTLStyle = (styleObj) => {
-  if (Platform.OS === 'web') {
-    return styleObj;
-  }
   return styleObj;
 };
 
-// Get back arrow based on RTL
+// Get back arrow based on RTL - Always right arrow for Arabic
 export const getBackArrow = () => {
-  return isRTL ? '→' : '←';
+  return '→';
 };
 
 // RTL-aware margin/padding helpers
 export const RTL_SPACING = {
-  marginStart: (value) => ({ [isRTL ? 'marginRight' : 'marginLeft']: value }),
-  marginEnd: (value) => ({ [isRTL ? 'marginLeft' : 'marginRight']: value }),
-  paddingStart: (value) => ({ [isRTL ? 'paddingRight' : 'paddingLeft']: value }),
-  paddingEnd: (value) => ({ [isRTL ? 'paddingLeft' : 'paddingRight']: value }),
+  marginStart: (value) => ({ marginRight: value }),
+  marginEnd: (value) => ({ marginLeft: value }),
+  paddingStart: (value) => ({ paddingRight: value }),
+  paddingEnd: (value) => ({ paddingLeft: value }),
+};
+
+// Common RTL styles
+export const commonRTLStyles = {
+  textRight: {
+    textAlign: 'right',
+  },
+  rowReverse: {
+    flexDirection: 'row-reverse',
+  },
+  alignItemsFlexStart: {
+    alignItems: 'flex-end',
+  },
+  justifyContentFlexStart: {
+    justifyContent: 'flex-start',
+  },
 };
