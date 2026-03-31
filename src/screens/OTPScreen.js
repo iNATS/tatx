@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, fonts, borderRadius } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { verifyAuthCode, requestAuthCode } from '../services/authService';
-import { validateOTP, getBackArrow } from '../utils/rtlHelpers';
+import { validateOTP, getBackArrow, RTL } from '../utils/rtlHelpers';
 
 const OTPScreen = ({ navigation, route }) => {
   const { isRTL, setIsAuthenticated, setUser } = useApp();
@@ -217,6 +217,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     flex: 1,
     textAlign: 'right',
+    writingDirection: 'rtl',
   },
   content: {
     flex: 1,
@@ -230,6 +231,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: spacing.xl,
     lineHeight: 24,
+    writingDirection: 'rtl',
   },
   phoneText: {
     fontSize: 14,
@@ -237,6 +239,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     fontFamily: fonts.semiBold,
     textAlign: 'center',
+    writingDirection: 'rtl',
   },
   codeContainer: {
     flexDirection: 'row-reverse',
@@ -253,6 +256,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
     color: colors.text,
     backgroundColor: colors.grayLight,
+    textAlign: 'center',
+    writingDirection: 'ltr', // Numbers stay LTR even in RTL context (Apple HIG)
   },
   codeInputError: {
     borderColor: colors.error,
@@ -264,12 +269,14 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     textAlign: 'center',
     marginBottom: spacing.md,
+    writingDirection: 'rtl',
   },
   timer: {
     fontSize: 48,
     fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: spacing.md,
+    writingDirection: 'ltr', // Numbers stay LTR (Apple HIG)
   },
   resendText: {
     fontSize: 14,
@@ -277,12 +284,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: spacing.sm,
     lineHeight: 20,
+    writingDirection: 'rtl',
   },
   resendButton: {
     fontSize: 16,
     color: colors.primary,
     textDecorationLine: 'underline',
     marginBottom: spacing.xl,
+    writingDirection: 'rtl',
   },
   resendButtonDisabled: {
     color: colors.gray,
@@ -309,6 +318,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
     color: colors.gray,
     letterSpacing: 0.5,
+    textAlign: 'center',
+    writingDirection: 'rtl',
   },
   verifyButtonTextActive: {
     color: colors.white,

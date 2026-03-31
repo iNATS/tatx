@@ -1,35 +1,31 @@
-import { I18nManager, Platform } from 'react-native';
+import { RTL, RTLStyles, formatNumber, getBackIcon } from './rtl';
 
-// RTL Configuration - Force RTL for Arabic
-export const isRTL = true; // Force RTL since app is Arabic
-
-// RTL-aware direction helpers
-export const RTL_DIRECTION = {
-  START: 'right',
-  END: 'left',
-};
-
-// RTL-aware alignment helpers
-export const RTL_ALIGN = {
-  START: 'flex-end',
-  END: 'flex-start',
-  CENTER: 'center',
-};
-
-// RTL-aware text alignment
+// Re-export RTL constants for easy access
+export const isRTL = RTL.IS_RTL;
+export const RTL_DIRECTION = RTL;
 export const RTL_TEXT = {
-  START: 'right',
-  END: 'left',
-  CENTER: 'center',
+  START: RTL.TEXT_ALIGN_START,
+  END: RTL.TEXT_ALIGN_END,
+  CENTER: RTL.TEXT_ALIGN_CENTER,
 };
-
-// RTL-aware flex direction for rows
 export const RTL_ROW = {
-  NORMAL: 'row-reverse',
-  REVERSE: 'row',
+  NORMAL: RTL.ROW,
+  REVERSE: RTL.ROW_REVERSE,
+};
+export const RTL_SPACING = {
+  marginStart: (value) => ({ [RTL.MARGIN_START]: value }),
+  marginEnd: (value) => ({ [RTL.MARGIN_END]: value }),
+  paddingStart: (value) => ({ [RTL.PADDING_START]: value }),
+  paddingEnd: (value) => ({ [RTL.PADDING_END]: value }),
 };
 
-// Phone validation for Saudi numbers
+// Common RTL styles (pre-defined)
+export const commonRTLStyles = RTLStyles;
+
+/**
+ * Phone validation for Saudi numbers
+ * Validates format: 05XXXXXXXX (10 digits, starts with 05)
+ */
 export const validateSaudiPhone = (phone) => {
   if (!phone) {
     return {
@@ -56,7 +52,10 @@ export const validateSaudiPhone = (phone) => {
   };
 };
 
-// Name validation
+/**
+ * Name validation for Arabic names
+ * Minimum 3 characters
+ */
 export const validateName = (name, isRequired = true) => {
   if (!name || !name.trim()) {
     if (isRequired) {
@@ -86,7 +85,10 @@ export const validateName = (name, isRequired = true) => {
   };
 };
 
-// OTP validation
+/**
+ * OTP validation
+ * Must be exactly 4 digits
+ */
 export const validateOTP = (code) => {
   if (!code || code.length !== 4) {
     return {
@@ -110,36 +112,33 @@ export const validateOTP = (code) => {
   };
 };
 
-// RTL-aware style helper
+/**
+ * Get back arrow icon (points right in RTL)
+ * Following Apple HIG: Back button points right in RTL
+ */
+export const getBackArrow = () => getBackIcon();
+
+/**
+ * Format number for display (maintains digit order)
+ * Apple HIG: Never reverse digit order in numbers
+ */
+export const formatNumberRTL = formatNumber;
+
+/**
+ * Check if text is RTL script (Arabic/Hebrew)
+ */
+export const isRTLText = (text) => {
+  if (!text) return false;
+  const rtlPattern = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
+  return rtlPattern.test(text);
+};
+
+/**
+ * Get RTL-aware style
+ */
 export const createRTLStyle = (styleObj) => {
-  return styleObj;
-};
-
-// Get back arrow based on RTL - Always right arrow for Arabic
-export const getBackArrow = () => {
-  return '→';
-};
-
-// RTL-aware margin/padding helpers
-export const RTL_SPACING = {
-  marginStart: (value) => ({ marginRight: value }),
-  marginEnd: (value) => ({ marginLeft: value }),
-  paddingStart: (value) => ({ paddingRight: value }),
-  paddingEnd: (value) => ({ paddingLeft: value }),
-};
-
-// Common RTL styles
-export const commonRTLStyles = {
-  textRight: {
-    textAlign: 'right',
-  },
-  rowReverse: {
-    flexDirection: 'row-reverse',
-  },
-  alignItemsFlexStart: {
-    alignItems: 'flex-end',
-  },
-  justifyContentFlexStart: {
-    justifyContent: 'flex-start',
-  },
+  return {
+    ...styleObj,
+    textAlign: styleObj.textAlign || RTL.TEXT_ALIGN,
+  };
 };

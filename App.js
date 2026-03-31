@@ -5,7 +5,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppProvider } from './src/context/AppContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { loadFonts } from './src/utils/loadFonts';
+import { RTL } from './src/utils/rtl';
 
+// Configure RTL for Arabic
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 if (typeof I18nManager.swapLeftAndRightInRTL === 'function') {
@@ -29,14 +31,47 @@ export default function App() {
     loadAppFonts();
   }, []);
 
+  // Configure web RTL
   useEffect(() => {
     if (Platform.OS !== 'web' || typeof document === 'undefined') {
       return;
     }
 
-    document.documentElement.setAttribute('dir', 'rtl');
+    // Set RTL direction on HTML element
+    document.documentElement.setAttribute('dir', RTL.DIRECTION);
     document.documentElement.setAttribute('lang', 'ar');
-    document.body.setAttribute('dir', 'rtl');
+    
+    // Set RTL direction on body
+    document.body.setAttribute('dir', RTL.DIRECTION);
+    document.body.style.direction = RTL.DIRECTION;
+    document.body.style.textAlign = RTL.TEXT_ALIGN;
+    
+    // Add RTL class for CSS targeting
+    document.documentElement.classList.add('rtl');
+    
+    // Inject RTL CSS if not exists
+    if (!document.getElementById('rtl-styles')) {
+      const style = document.createElement('style');
+      style.id = 'rtl-styles';
+      style.textContent = `
+        .rtl {
+          direction: rtl !important;
+          text-align: right !important;
+        }
+        .rtl * {
+          direction: rtl;
+          text-align: right;
+        }
+        .rtl input, .rtl textarea {
+          text-align: right;
+          direction: rtl;
+        }
+        .rtl .horizontal-scroll {
+          direction: rtl;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }, []);
 
   if (!fontsLoaded) {

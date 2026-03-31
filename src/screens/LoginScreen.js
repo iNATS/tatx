@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
 import { requestAuthCode } from '../services/authService';
-import { validateSaudiPhone, validateName, RTL_TEXT, RTL_ROW } from '../utils/rtlHelpers';
+import { validateSaudiPhone, validateName, RTL } from '../utils/rtlHelpers';
 
 const authModes = [
   { id: 'login', label: 'تسجيل الدخول', subtitle: 'ادخل برقم الجوال إذا كان لديك حساب' },
@@ -259,12 +259,12 @@ const styles = StyleSheet.create({
   fieldLabel: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right', marginBottom: spacing.sm },
   inputShell: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md, minHeight: 52 },
   inputError: { borderColor: colors.error, borderWidth: 1 },
-  input: { minHeight: 52, color: colors.text, textAlign: 'right', fontFamily: fonts.regular },
-  errorText: { color: colors.error, fontSize: 12, fontFamily: fonts.regular, textAlign: 'right', marginTop: 4 },
+  input: { minHeight: 52, color: colors.text, textAlign: 'right', fontFamily: fonts.regular, writingDirection: 'rtl' },
+  errorText: { color: colors.error, fontSize: 12, fontFamily: fonts.regular, textAlign: 'right', marginTop: 4, writingDirection: 'rtl' },
   primaryButton: { marginTop: spacing.sm, transform: [{ scale: 1 }] },
   primaryButtonPressed: { transform: [{ scale: 0.98 }] },
   primaryButtonGradient: { borderRadius: borderRadius.full, alignItems: 'center', justifyContent: 'center', minHeight: 54 },
-  primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 16, letterSpacing: 0.5 },
+  primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 16, letterSpacing: 0.5, textAlign: 'center' },
 });
 
 export default LoginScreen;

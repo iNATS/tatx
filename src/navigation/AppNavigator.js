@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
-import { RTL_ROW } from '../utils/rtlHelpers';
+import { RTL } from '../utils/rtl';
 
 import SplashScreen from '../screens/SplashScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -121,8 +121,18 @@ const AppNavigator = () => {
   return (
     <View style={[styles.appShell, isWideWeb && styles.appShellWeb]}>
       <View style={[styles.appFrame, isWideWeb && styles.appFrameWeb]}>
-        <NavigationContainer theme={navTheme} independent={true}>
-          <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+        <NavigationContainer 
+          theme={navTheme} 
+          independent={true}
+          direction={RTL.DIRECTION}
+        >
+          <Stack.Navigator 
+            screenOptions={{ 
+              headerShown: false, 
+              animation: RTL.SLIDE_FROM,
+              animationDuration: 300,
+            }}
+          >
             {!isAuthenticated ? (
               <>
                 <Stack.Screen name="Splash" component={SplashScreen} />
@@ -169,7 +179,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.borderLight,
   },
   tabBar: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     paddingHorizontal: spacing.sm,
     paddingTop: spacing.xs,
     backgroundColor: colors.card,
