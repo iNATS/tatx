@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -186,17 +185,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    borderWidth: 1,
+    borderColor: colors.borderLight,
     overflow: 'hidden',
   },
   header: {

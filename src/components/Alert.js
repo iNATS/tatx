@@ -6,10 +6,9 @@ import {
   Modal,
   TouchableOpacity,
   Animated,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius } from '../constants/theme';
 
 /**
  * Apple HIG Compliant Alert Component
@@ -193,17 +192,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
     padding: spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.2,
-        shadowRadius: 24,
-      },
-      android: {
-        elevation: 10,
-      },
-    }),
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   iconContainer: {
     alignItems: 'center',

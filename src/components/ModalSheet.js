@@ -8,7 +8,6 @@ import {
   Animated,
   PanResponder,
   Dimensions,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -214,17 +213,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderTopLeftRadius: borderRadius.xl * 1.5,
     borderTopRightRadius: borderRadius.xl * 1.5,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: colors.borderLight,
   },
   handleContainer: {
     alignItems: 'center',

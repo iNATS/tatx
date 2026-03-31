@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
 const PageHeader = ({
@@ -141,9 +141,10 @@ const styles = StyleSheet.create({
     height: 42,
     borderRadius: 21,
     backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.sm,
   },
   iconSpacer: {
     width: 42,
@@ -154,8 +155,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     minHeight: 56,
     paddingHorizontal: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
     alignItems: 'center',
-    ...shadows.sm,
   },
   searchInput: {
     flex: 1,
@@ -183,7 +185,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: borderRadius.full,
     backgroundColor: colors.card,
-    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   filterChipActive: {
     backgroundColor: colors.primary,
