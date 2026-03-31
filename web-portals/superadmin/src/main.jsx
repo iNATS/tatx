@@ -43,6 +43,7 @@ const expectedContentSections = [
   'homeServices',
   'homeOffers',
   'landingPage',
+  'medicalBookingContent',
   'onboardingSlides',
   'notifications',
   'restaurants',
@@ -51,6 +52,8 @@ const expectedContentSections = [
   'paymentMethods',
   'stayBookingOptions',
   'supportTopics',
+  'taxiContent',
+  'wholesaleContent',
   'walletTransactions',
   'user',
 ];

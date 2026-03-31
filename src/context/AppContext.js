@@ -178,6 +178,7 @@ export const AppProvider = ({ children }) => {
         homeServices: content.homeServices || defaultAppContent.homeServices,
         homeOffers: content.homeOffers || defaultAppContent.homeOffers,
         landingPage: content.landingPage || defaultAppContent.landingPage,
+        medicalBookingContent: content.medicalBookingContent || defaultAppContent.medicalBookingContent,
         onboardingSlides: content.onboardingSlides || defaultAppContent.onboardingSlides,
         notifications: content.notifications || defaultAppContent.notifications,
         restaurants: content.restaurants || defaultAppContent.restaurants,
@@ -186,6 +187,8 @@ export const AppProvider = ({ children }) => {
         paymentMethods: content.paymentMethods || defaultAppContent.paymentMethods,
         stayBookingOptions: content.stayBookingOptions || defaultAppContent.stayBookingOptions,
         supportTopics: content.supportTopics || defaultAppContent.supportTopics,
+        taxiContent: content.taxiContent || defaultAppContent.taxiContent,
+        wholesaleContent: content.wholesaleContent || defaultAppContent.wholesaleContent,
         walletTransactions: content.walletTransactions || defaultAppContent.walletTransactions,
         submitOrder,
       }}

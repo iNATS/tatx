@@ -15,7 +15,7 @@ const menuItems = [
 ];
 
 const AccountScreen = ({ navigation }) => {
-  const { user, setIsAuthenticated, rowDirection, textAlignStart, isRTL } = useApp();
+  const { user, setUser, setIsAuthenticated, rowDirection, textAlignStart, isRTL } = useApp();
   const chevronIcon = isRTL ? 'chevron-back' : 'chevron-forward';
 
   return (
@@ -87,7 +87,13 @@ const AccountScreen = ({ navigation }) => {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={() => setIsAuthenticated(false)}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => {
+            setUser(null);
+            setIsAuthenticated(false);
+          }}
+        >
           <Ionicons name="log-out-outline" size={18} color={colors.error} />
           <Text style={styles.logoutText}>تسجيل الخروج</Text>
         </TouchableOpacity>

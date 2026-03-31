@@ -7,24 +7,6 @@ import { colors, spacing, borderRadius, shadows, fonts } from '../constants/them
 import { useApp } from '../context/AppContext';
 import PriceDisplay from '../components/PriceDisplay';
 
-const rideTypes = [
-  { id: 'economy', name: 'Economy', label: 'اقتصادي', eta: '3 دقائق', price: 18, seats: 4, note: 'أفضل سعر للمشاوير اليومية', icon: 'car-outline' },
-  { id: 'comfort', name: 'Comfort', label: 'راحة', eta: '5 دقائق', price: 28, seats: 4, note: 'أسرع وصول وسيارات أحدث', icon: 'car-sport-outline' },
-  { id: 'family', name: 'Family', label: 'عائلي', eta: '7 دقائق', price: 36, seats: 6, note: 'مساحة أكبر للأفراد أو الأمتعة', icon: 'people-outline' },
-];
-
-const suggestedPlaces = [
-  { id: '1', title: 'المنزل', address: 'حي الياسمين، الرياض', lat: 24.8396, lng: 46.6437, icon: 'home-outline' },
-  { id: '2', title: 'العمل', address: 'مركز الملك عبدالله المالي', lat: 24.7667, lng: 46.6436, icon: 'briefcase-outline' },
-  { id: '3', title: 'المطار', address: 'مطار الملك خالد الدولي', lat: 24.9576, lng: 46.6988, icon: 'airplane-outline' },
-];
-
-const driverOffers = [
-  { id: 'd1', name: 'سامي', car: 'هيونداي سوناتا', plate: 'ح ر س 4821', price: 24, eta: '2 دقيقة' },
-  { id: 'd2', name: 'ناصر', car: 'تويوتا كامري', plate: 'ل س م 1932', price: 22, eta: '4 دقائق' },
-  { id: 'd3', name: 'وليد', car: 'كيا K5', plate: 'ص ب د 7714', price: 26, eta: '3 دقائق' },
-];
-
 const mapHTML = `
 <!DOCTYPE html>
 <html>
@@ -148,12 +130,15 @@ const mapHTML = `
 
 const TaxiScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { rowDirection, textAlignStart, isRTL } = useApp();
+  const { rowDirection, textAlignStart, isRTL, taxiContent } = useApp();
   const webViewRef = useRef(null);
   const timersRef = useRef([]);
+  const rideTypes = taxiContent?.rideTypes || [];
+  const suggestedPlaces = taxiContent?.suggestedPlaces || [];
+  const driverOffers = taxiContent?.driverOffers || [];
   const [pickup, setPickup] = useState('جاري تحديد موقعك');
   const [destination, setDestination] = useState('');
-  const [selectedRide, setSelectedRide] = useState(rideTypes[0].id);
+  const [selectedRide, setSelectedRide] = useState(rideTypes[0]?.id || 'economy');
   const [tripPhase, setTripPhase] = useState('idle');
   const [bookingStep, setBookingStep] = useState(1);
   const [showDriverOffers, setShowDriverOffers] = useState(false);

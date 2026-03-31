@@ -1,13 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { colors, typography, spacing, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import { verifyAuthCode, requestAuthCode } from '../services/authService';
 
 const OTPScreen = ({ navigation, route }) => {
-  const { isRTL } = useApp();
+  const { isRTL, setIsAuthenticated, setUser } = useApp();
   const [code, setCode] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(30);
+  const [loading, setLoading] = useState(false);
   const inputRefs = useRef([]);
+  const phone = route.params?.phone || '';
+  const authMode = route.params?.authMode || 'login';
+  const profile = route.params?.profile || {};
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -39,17 +44,44 @@ const OTPScreen = ({ navigation, route }) => {
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const fullCode = code.join('');
-    if (fullCode.length === 4) {
-      navigation.replace('MainTabs');
+    if (fullCode.length !== 4) {
+      return;
     }
+
+    setLoading(true);
+
+    const { data, error } = await verifyAuthCode({
+      phone,
+      code: fullCode,
+      mode: authMode,
+      profile,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      Alert.alert('تعذر التحقق', error.message || 'رمز التحقق غير صحيح.');
+      return;
+    }
+
+    setUser(data?.user || null);
+    setIsAuthenticated(true);
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setTimer(30);
     setCode(['', '', '', '']);
     inputRefs.current[0]?.focus();
+
+    const { data } = await requestAuthCode({
+      phone,
+      mode: authMode,
+      profile,
+    });
+
+    Alert.alert('تم إرسال رمز جديد', `للاختبار الحالي استخدم الرمز: ${data?.code || '1234'}`);
   };
 
   return (
@@ -65,6 +97,7 @@ const OTPScreen = ({ navigation, route }) => {
         <Text style={styles.subtitle}>
           قم بإدخال الكود الذي وصلك عبر خدمة الرسائل القصيرة
         </Text>
+        <Text style={styles.phoneText}>{phone}</Text>
 
         <View style={styles.codeContainer}>
           {code.map((digit, index) => (
@@ -97,9 +130,10 @@ const OTPScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={[styles.verifyButton, code.join('').length === 4 && styles.verifyButtonActive]}
           onPress={handleVerify}
+          disabled={loading}
         >
           <Text style={[styles.verifyButtonText, code.join('').length === 4 && styles.verifyButtonTextActive]}>
-            تأكيد
+            {loading ? 'جارٍ التحقق...' : 'تأكيد'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -141,6 +175,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: spacing.xl,
     lineHeight: 24,
+  },
+  phoneText: {
+    fontSize: 14,
+    color: colors.text,
+    marginBottom: spacing.lg,
+    fontFamily: fonts.semiBold,
   },
   codeContainer: {
     flexDirection: 'row-reverse',

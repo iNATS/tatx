@@ -6,73 +6,11 @@ import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 import PriceDisplay from '../components/PriceDisplay';
 
-const specialtyFilters = [
-  { id: 'all', label: 'الكل', icon: 'apps-outline' },
-  { id: 'طب أسرة', label: 'أسرة', icon: 'medkit-outline' },
-  { id: 'باطنية', label: 'باطنية', icon: 'pulse-outline' },
-  { id: 'جلدية', label: 'جلدية', icon: 'sparkles-outline' },
-  { id: 'أسنان', label: 'أسنان', icon: 'fitness-outline' },
-];
-
-const consultationFilters = [
-  { id: 'all', label: 'كل الزيارات' },
-  { id: 'clinic', label: 'داخل العيادة' },
-  { id: 'online', label: 'أونلاين' },
-];
-
-export const doctors = [
-  {
-    id: '1',
-    name: 'د. نورة السبيعي',
-    specialty: 'طب أسرة',
-    clinic: 'مجمع الندى الطبي',
-    location: 'الصحافة',
-    fee: 120,
-    experience: '12 سنة خبرة',
-    consultationType: 'clinic',
-    slots: ['05:30 م', '06:00 م', '07:00 م'],
-    days: ['اليوم', 'غدًا', 'الخميس', 'الجمعة'],
-  },
-  {
-    id: '2',
-    name: 'د. خالد الشهري',
-    specialty: 'باطنية',
-    clinic: 'عيادات الصفوة',
-    location: 'العليا',
-    fee: 150,
-    experience: '15 سنة خبرة',
-    consultationType: 'clinic',
-    slots: ['04:00 م', '05:15 م', '07:45 م'],
-    days: ['اليوم', 'غدًا', 'السبت'],
-  },
-  {
-    id: '3',
-    name: 'د. ريم العتيبي',
-    specialty: 'جلدية',
-    clinic: 'مركز العناية المتقدمة',
-    location: 'الياسمين',
-    fee: 180,
-    experience: '10 سنوات خبرة',
-    consultationType: 'online',
-    slots: ['06:30 م', '08:00 م', '09:00 م'],
-    days: ['غدًا', 'الخميس', 'الأحد'],
-  },
-  {
-    id: '4',
-    name: 'د. عبدالعزيز الدوسري',
-    specialty: 'أسنان',
-    clinic: 'ابتسامة الرياض',
-    location: 'الندى',
-    fee: 220,
-    experience: '14 سنة خبرة',
-    consultationType: 'clinic',
-    slots: ['03:30 م', '04:30 م', '06:30 م'],
-    days: ['اليوم', 'غدًا', 'السبت'],
-  },
-];
-
 const DoctorBookingScreen = ({ navigation }) => {
-  const { rowDirection, textAlignStart } = useApp();
+  const { rowDirection, textAlignStart, medicalBookingContent } = useApp();
+  const specialtyFilters = medicalBookingContent?.specialtyFilters || [];
+  const consultationFilters = medicalBookingContent?.consultationFilters || [];
+  const doctors = medicalBookingContent?.doctors || [];
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedConsultation, setSelectedConsultation] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');

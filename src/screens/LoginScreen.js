@@ -1,56 +1,78 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
-import { fetchAppUserByPhone, upsertAppUser } from '../services/appUserService';
+import { requestAuthCode } from '../services/authService';
 
-const roles = [
-  { id: 'user', label: 'عميل', subtitle: 'تصفح واطلب من المتاجر', icon: 'person-outline' },
-  { id: 'vendor', label: 'تاجر', subtitle: 'تابع الطلبات والعروض', icon: 'storefront-outline' },
-  { id: 'admin', label: 'إدارة', subtitle: 'نسخة مراجعة تشغيلية', icon: 'shield-checkmark-outline' },
+const authModes = [
+  { id: 'login', label: 'تسجيل الدخول', subtitle: 'ادخل برقم الجوال إذا كان لديك حساب' },
+  { id: 'register', label: 'إنشاء حساب', subtitle: 'أنشئ حسابًا جديدًا قبل استخدام التطبيق' },
 ];
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { setIsAuthenticated, setUser, rowDirection, textAlignStart, demoAccounts, demoMarket, user } = useApp();
-  const [selectedRole, setSelectedRole] = useState('user');
-  const [phone, setPhone] = useState(demoAccounts.user.phone);
+  const { demoMarket } = useApp();
+  const [authMode, setAuthMode] = useState('login');
+  const [form, setForm] = useState({
+    name: '',
+    phone: '',
+    city: demoMarket.city || 'الرياض',
+  });
   const [loading, setLoading] = useState(false);
 
-  const activeAccount = demoAccounts[selectedRole];
-
-  const handleRolePress = (role) => {
-    setSelectedRole(role);
-    setPhone(demoAccounts[role].phone);
+  const updateField = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleLogin = async () => {
+  const handleContinue = async () => {
+    if (!form.phone.trim()) {
+      Alert.alert('رقم الجوال مطلوب', 'أدخل رقم الجوال للمتابعة.');
+      return;
+    }
+
+    if (authMode === 'register' && !form.name.trim()) {
+      Alert.alert('الاسم مطلوب', 'أدخل الاسم الكامل لإنشاء الحساب.');
+      return;
+    }
+
     setLoading(true);
 
-    const fallbackUser = {
-      name: activeAccount.name,
-      phone: activeAccount.phone,
-      role: selectedRole,
-      city: activeAccount.city,
-      district: activeAccount.district || demoMarket.district,
-      walletBalance: 300,
-      addresses: user?.addresses || [],
-    };
+    const { data, error } = await requestAuthCode({
+      phone: form.phone.trim(),
+      mode: authMode,
+      profile: {
+        name: form.name.trim(),
+        city: form.city.trim() || demoMarket.city,
+      },
+    });
 
-    const { data: savedUser } = await upsertAppUser(fallbackUser);
-    const { data: dbUser } = await fetchAppUserByPhone(activeAccount.phone);
-
-    setUser(
-      dbUser || {
-        ...fallbackUser,
-        id: savedUser?.id || null,
-      }
-    );
-    setIsAuthenticated(true);
     setLoading(false);
+
+    if (error) {
+      Alert.alert('تعذر إرسال الرمز', 'حاول مرة أخرى بعد قليل.');
+      return;
+    }
+
+    Alert.alert(
+      'تم إرسال رمز التحقق',
+      `للاختبار الحالي استخدم الرمز: ${data?.code || '1234'}`,
+      [
+        {
+          text: 'متابعة',
+          onPress: () =>
+            navigation.navigate('OTP', {
+              phone: form.phone.trim(),
+              authMode,
+              profile: {
+                name: form.name.trim(),
+                city: form.city.trim() || demoMarket.city,
+              },
+            }),
+        },
+      ]
+    );
   };
 
   return (
@@ -62,67 +84,79 @@ const LoginScreen = () => {
               <Image source={require('../../assets/logo.png')} style={styles.heroLogo} resizeMode="contain" />
             </LinearGradient>
           </View>
-          <Text style={styles.heroBrand}>دائما معك</Text>
-          <Text style={styles.heroTitle}>تسجيل سريع للتجربة</Text>
-          <Text style={styles.heroSubtitle}>اختر نوع الحساب وأدخل رقم الجوال للمتابعة داخل خدمات {demoMarket.city}.</Text>
+          <Text style={styles.heroBrand}>Tatx SA</Text>
+          <Text style={styles.heroTitle}>ابدأ باستخدام التطبيق</Text>
+          <Text style={styles.heroSubtitle}>سجّل أو أنشئ حسابًا أولًا ثم فعّل رقم الجوال قبل الدخول إلى الخدمات.</Text>
         </View>
 
         <View style={styles.card}>
-          <View style={styles.roleList}>
-            {roles.map((role) => {
-              const isSelected = selectedRole === role.id;
+          <View style={styles.modeList}>
+            {authModes.map((mode) => {
+              const isSelected = authMode === mode.id;
+
               return (
                 <TouchableOpacity
-                  key={role.id}
-                  style={[styles.roleCard, isSelected && styles.roleCardSelected]}
+                  key={mode.id}
+                  style={[styles.modeCard, isSelected && styles.modeCardSelected]}
+                  onPress={() => setAuthMode(mode.id)}
                   activeOpacity={0.9}
-                  onPress={() => handleRolePress(role.id)}
                 >
-                  <View style={[styles.roleIcon, isSelected && styles.roleIconSelected]}>
-                    <Ionicons name={role.icon} size={20} color={isSelected ? colors.white : colors.primary} />
-                  </View>
-                  <View style={styles.roleTextBlock}>
-                    <Text style={[styles.roleTitle, { textAlign: textAlignStart }, isSelected && styles.roleTitleSelected]}>{role.label}</Text>
-                    <Text style={styles.roleSubtitle}>{role.subtitle}</Text>
-                  </View>
-                  {isSelected && <Ionicons name="checkmark-circle" size={22} color={colors.primary} />}
+                  <Text style={[styles.modeTitle, isSelected && styles.modeTitleSelected]}>{mode.label}</Text>
+                  <Text style={[styles.modeSubtitle, isSelected && styles.modeSubtitleSelected]}>{mode.subtitle}</Text>
                 </TouchableOpacity>
               );
             })}
           </View>
 
+          {authMode === 'register' ? (
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>الاسم الكامل</Text>
+              <View style={styles.inputShell}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="أدخل الاسم الكامل"
+                  placeholderTextColor={colors.textTertiary}
+                  value={form.name}
+                  onChangeText={(value) => updateField('name', value)}
+                />
+              </View>
+            </View>
+          ) : null}
+
           <View style={styles.fieldGroup}>
             <Text style={styles.fieldLabel}>رقم الجوال</Text>
-            <View style={[styles.inputShell, { flexDirection: rowDirection }]}>
+            <View style={styles.inputShell}>
               <TextInput
                 style={styles.input}
                 placeholder="05XXXXXXXX"
                 placeholderTextColor={colors.textTertiary}
                 keyboardType="phone-pad"
-                value={phone}
-                onChangeText={setPhone}
+                value={form.phone}
+                onChangeText={(value) => updateField('phone', value)}
               />
-              <Text style={styles.countryCode}>+966</Text>
             </View>
-            <Text style={styles.helperText}>الحساب المختار: {activeAccount.name}</Text>
           </View>
 
-          <TouchableOpacity style={styles.primaryButton} onPress={handleLogin} activeOpacity={0.9} disabled={loading}>
+          {authMode === 'register' ? (
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>المدينة</Text>
+              <View style={styles.inputShell}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="الرياض"
+                  placeholderTextColor={colors.textTertiary}
+                  value={form.city}
+                  onChangeText={(value) => updateField('city', value)}
+                />
+              </View>
+            </View>
+          ) : null}
+
+          <TouchableOpacity style={styles.primaryButton} onPress={handleContinue} activeOpacity={0.9} disabled={loading}>
             <LinearGradient colors={colors.primaryGradient} style={styles.primaryButtonGradient}>
-              {loading ? <ActivityIndicator color={colors.white} /> : <Text style={styles.primaryButtonText}>تسجيل الدخول</Text>}
+              {loading ? <ActivityIndicator color={colors.white} /> : <Text style={styles.primaryButtonText}>إرسال رمز التحقق</Text>}
             </LinearGradient>
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.infoCard}>
-          <View style={styles.infoRow}>
-            <Ionicons name="location-outline" size={18} color={colors.primary} />
-            <Text style={styles.infoText}>الخدمات المتاحة حالياً في {demoMarket.city}، {demoMarket.country}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Ionicons name="card-outline" size={18} color={colors.primary} />
-            <Text style={styles.infoText}>طرق الدفع المعروضة: آبل باي، مدى، وبطاقات الدفع</Text>
-          </View>
         </View>
       </ScrollView>
     </LinearGradient>
@@ -130,185 +164,30 @@ const LoginScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxxl,
-  },
-  hero: {
-    marginBottom: spacing.xl,
-    alignItems: 'flex-end',
-  },
-  logoWrap: {
-    alignSelf: 'center',
-    marginBottom: spacing.md,
-  },
-  logoShell: {
-    width: 78,
-    height: 78,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroLogo: {
-    width: 48,
-    height: 48,
-  },
-  heroBrand: {
-    color: colors.primary,
-    fontFamily: fonts.semiBold,
-    fontSize: 15,
-    textAlign: 'right',
-    marginBottom: spacing.xs,
-  },
-  heroPill: {
-    backgroundColor: colors.cardSecondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    marginBottom: spacing.md,
-  },
-  heroPillText: {
-    color: colors.primary,
-    fontFamily: fonts.semiBold,
-    fontSize: 13,
-  },
-  heroTitle: {
-    ...typography.display,
-    color: colors.text,
-    textAlign: 'right',
-  },
-  heroSubtitle: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'right',
-    marginTop: spacing.sm,
-  },
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 32,
-    padding: spacing.lg,
-    ...shadows.xl,
-  },
-  roleList: {
-    gap: spacing.sm,
-  },
-  roleCard: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    backgroundColor: colors.cardSecondary,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  roleCardSelected: {
-    backgroundColor: colors.cardSecondary,
-    borderColor: 'rgba(218,60,87,0.18)',
-  },
-  roleIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: colors.cardSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  roleIconSelected: {
-    backgroundColor: colors.primary,
-  },
-  roleTextBlock: {
-    flex: 1,
-    marginHorizontal: spacing.md,
-    alignItems: 'flex-end',
-  },
-  roleTitle: {
-    ...typography.label,
-    color: colors.text,
-  },
-  roleTitleSelected: {
-    color: colors.primary,
-  },
-  roleSubtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-    textAlign: 'right',
-  },
-  fieldGroup: {
-    marginTop: spacing.lg,
-  },
-  fieldLabel: {
-    ...typography.label,
-    color: colors.text,
-    textAlign: 'right',
-    marginBottom: spacing.sm,
-  },
-  inputShell: {
-    alignItems: 'center',
-    borderRadius: borderRadius.lg,
-    backgroundColor: colors.cardSecondary,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    paddingHorizontal: spacing.md,
-    height: 56,
-  },
-  input: {
-    flex: 1,
-    color: colors.text,
-    fontFamily: fonts.semiBold,
-    fontSize: 16,
-    textAlign: 'right',
-  },
-  countryCode: {
-    color: colors.textSecondary,
-    fontFamily: fonts.semiBold,
-    fontSize: 15,
-    marginHorizontal: spacing.sm,
-  },
-  helperText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    textAlign: 'right',
-    marginTop: spacing.sm,
-  },
-  primaryButton: {
-    borderRadius: borderRadius.lg,
-    overflow: 'hidden',
-    marginTop: spacing.lg,
-    ...shadows.md,
-  },
-  primaryButtonGradient: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-  },
-  primaryButtonText: {
-    color: colors.white,
-    fontFamily: fonts.semiBold,
-    fontSize: 17,
-  },
-  infoCard: {
-    marginTop: spacing.lg,
-    backgroundColor: 'rgba(255,255,255,0.78)',
-    borderRadius: 24,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-  },
-  infoRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  infoText: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    textAlign: 'right',
-    flex: 1,
-  },
+  container: { flex: 1 },
+  scrollContent: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl },
+  hero: { marginBottom: spacing.xl, alignItems: 'flex-end' },
+  logoWrap: { alignSelf: 'center', marginBottom: spacing.md },
+  logoShell: { width: 78, height: 78, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  heroLogo: { width: 48, height: 48 },
+  heroBrand: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right', marginBottom: spacing.xs },
+  heroTitle: { ...typography.display, color: colors.text, textAlign: 'right' },
+  heroSubtitle: { ...typography.body, color: colors.textSecondary, textAlign: 'right', marginTop: spacing.sm },
+  card: { backgroundColor: colors.card, borderRadius: 32, padding: spacing.lg, ...shadows.xl },
+  modeList: { gap: spacing.sm, marginBottom: spacing.lg },
+  modeCard: { backgroundColor: colors.cardSecondary, borderRadius: 20, padding: spacing.md, borderWidth: 1, borderColor: 'transparent' },
+  modeCardSelected: { borderColor: 'rgba(218,60,87,0.18)', backgroundColor: '#FFF4F6' },
+  modeTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 16, textAlign: 'right' },
+  modeTitleSelected: { color: colors.primary },
+  modeSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right' },
+  modeSubtitleSelected: { color: colors.text },
+  fieldGroup: { marginBottom: spacing.md },
+  fieldLabel: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right', marginBottom: spacing.sm },
+  inputShell: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md },
+  input: { minHeight: 52, color: colors.text, textAlign: 'right', fontFamily: fonts.regular },
+  primaryButton: { marginTop: spacing.sm },
+  primaryButtonGradient: { borderRadius: borderRadius.full, alignItems: 'center', justifyContent: 'center', minHeight: 54 },
+  primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 16 },
 });
 
 export default LoginScreen;
