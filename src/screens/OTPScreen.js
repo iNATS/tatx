@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, I18nManager } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, fonts, borderRadius } from '../constants/theme';
@@ -60,7 +60,11 @@ const OTPScreen = ({ navigation, route }) => {
     const validation = validateOTP(fullCode);
     if (!validation.valid) {
       setOtpError(validation.error);
-      Alert.alert('رمز التحقق غير صحيح', validation.error);
+      if (Platform.OS === 'web') {
+        window.alert(validation.error);
+      } else {
+        Alert.alert('رمز التحقق غير صحيح', validation.error);
+      }
       return;
     }
     setOtpError('');
@@ -77,7 +81,11 @@ const OTPScreen = ({ navigation, route }) => {
       });
 
       if (error) {
-        Alert.alert('تعذر التحقق', error.message || 'رمز التحقق غير صحيح.');
+        if (Platform.OS === 'web') {
+          window.alert('تعذر التحقق: ' + error.message);
+        } else {
+          Alert.alert('تعذر التحقق', error.message || 'رمز التحقق غير صحيح.');
+        }
         setLoading(false);
         setButtonPressed(false);
         return;
@@ -86,7 +94,11 @@ const OTPScreen = ({ navigation, route }) => {
       setUser(data?.user || null);
       setIsAuthenticated(true);
     } catch (err) {
-      Alert.alert('حدث خطأ', 'يرجى المحاولة مرة أخرى.');
+      if (Platform.OS === 'web') {
+        window.alert('حدث خطأ: يرجى المحاولة مرة أخرى.');
+      } else {
+        Alert.alert('حدث خطأ', 'يرجى المحاولة مرة أخرى.');
+      }
       setLoading(false);
       setButtonPressed(false);
     }
@@ -103,7 +115,13 @@ const OTPScreen = ({ navigation, route }) => {
       profile,
     });
 
-    Alert.alert('تم إرسال رمز جديد', `للاختبار الحالي استخدم الرمز: ${data?.code || '1234'}`);
+    const testCode = data?.code || '1234';
+    
+    if (Platform.OS === 'web') {
+      window.alert(`تم إرسال رمز جديد\n\nرمز التحقق هو: ${testCode}`);
+    } else {
+      Alert.alert('تم إرسال رمز جديد', `للاختبار الحالي استخدم الرمز: ${testCode}`);
+    }
   };
 
   return (

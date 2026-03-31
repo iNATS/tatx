@@ -5,16 +5,8 @@
  * Arabic is the primary language - all RTL rules apply
  */
 
-import { I18nManager } from 'react-native';
-
-// Force RTL for Arabic language
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
-
-// Swap left and right for RTL
-if (typeof I18nManager.swapLeftAndRightInRTL === 'function') {
-  I18nManager.swapLeftAndRightInRTL(true);
-}
+// DO NOT import I18nManager at module level - this causes Expo Go crashes
+// I18nManager must only be called in App.js at the top level
 
 /**
  * RTL Constants

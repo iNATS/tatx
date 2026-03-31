@@ -5,14 +5,16 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppProvider } from './src/context/AppContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { loadFonts } from './src/utils/loadFonts';
-import { RTL } from './src/utils/rtl';
 
-// Configure RTL for Arabic
+// Configure RTL for Arabic - MUST be at top level before any imports
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 if (typeof I18nManager.swapLeftAndRightInRTL === 'function') {
   I18nManager.swapLeftAndRightInRTL(true);
 }
+
+// Now import RTL utilities (after I18nManager is configured)
+import { RTL } from './src/utils/rtl';
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);

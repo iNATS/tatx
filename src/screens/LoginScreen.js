@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Alert, Platform, KeyboardAvoidingView, I18nManager } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Image, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
@@ -80,7 +80,11 @@ const LoginScreen = ({ navigation }) => {
 
       if (error) {
         console.error('Auth error:', error);
-        Alert.alert('تعذر إرسال الرمز', error.message || 'حاول مرة أخرى بعد قليل.');
+        if (Platform.OS === 'web') {
+          window.alert('تعذر إرسال الرمز: ' + (error.message || 'حاول مرة أخرى بعد قليل.'));
+        } else {
+          Alert.alert('تعذر إرسال الرمز', error.message || 'حاول مرة أخرى بعد قليل.');
+        }
         setLoading(false);
         setButtonPressed(false);
         return;
@@ -91,25 +95,43 @@ const LoginScreen = ({ navigation }) => {
 
       // Show OTP code in alert for testing
       const testCode = data?.code || '1234';
-      Alert.alert(
-        'تم إرسال رمز التحقق',
-        `رمز التحقق هو: ${testCode}\n(للاختبار استخدم هذا الرمز)`,
-        [
-          {
-            text: 'متابعة',
-            onPress: () =>
-              navigation.navigate('OTP', {
-                phone: form.phone.trim(),
-                authMode,
-                profile: {
-                  name: form.name.trim(),
-                  city: cityValue,
-                },
-                otpCode: testCode,
-              }),
+      
+      if (Platform.OS === 'web') {
+        // Web: Use browser alert and redirect
+        window.alert(
+          `تم إرسال رمز التحقق\n\nرمز التحقق هو: ${testCode}\n(للاختبار استخدم هذا الرمز)`
+        );
+        navigation.navigate('OTP', {
+          phone: form.phone.trim(),
+          authMode,
+          profile: {
+            name: form.name.trim(),
+            city: cityValue,
           },
-        ]
-      );
+          otpCode: testCode,
+        });
+      } else {
+        // Mobile: Use React Native Alert with button
+        Alert.alert(
+          'تم إرسال رمز التحقق',
+          `رمز التحقق هو: ${testCode}\n(للاختبار استخدم هذا الرمز)`,
+          [
+            {
+              text: 'متابعة',
+              onPress: () =>
+                navigation.navigate('OTP', {
+                  phone: form.phone.trim(),
+                  authMode,
+                  profile: {
+                    name: form.name.trim(),
+                    city: cityValue,
+                  },
+                  otpCode: testCode,
+                }),
+            },
+          ]
+        );
+      }
     } catch (err) {
       console.error('Unexpected error:', err);
       setLoading(false);
