@@ -177,6 +177,7 @@ export const AppProvider = ({ children }) => {
         demoMarket: content.demoMarket || defaultAppContent.demoMarket,
         homeServices: content.homeServices || defaultAppContent.homeServices,
         homeOffers: content.homeOffers || defaultAppContent.homeOffers,
+        landingPage: content.landingPage || defaultAppContent.landingPage,
         onboardingSlides: content.onboardingSlides || defaultAppContent.onboardingSlides,
         notifications: content.notifications || defaultAppContent.notifications,
         restaurants: content.restaurants || defaultAppContent.restaurants,

@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import { fetchSupportConversation, sendSupportMessage } from '../services/appUserService';
 
 const getMessageDirectionStyle = (value) => {
   const content = String(value || '').trim();
@@ -25,21 +26,61 @@ const getMessageDirectionStyle = (value) => {
 
 const ChatScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { isRTL, rowDirection, textAlignStart, supportTopics = [] } = useApp();
+  const { isRTL, rowDirection, textAlignStart, supportTopics = [], user } = useApp();
   const scrollViewRef = useRef(null);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
     { id: '1', sender: 'support', text: 'مرحباً بك في مركز الدعم. كيف نساعدك اليوم؟', time: '09:30' },
   ]);
 
-  const sendMessage = () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadConversation = async () => {
+      if (!user?.phone) {
+        return;
+      }
+
+      const { data } = await fetchSupportConversation({
+        phone: user.phone,
+        name: user.name,
+      });
+
+      if (!cancelled && data?.messages?.length) {
+        setMessages(data.messages);
+      }
+    };
+
+    loadConversation();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.phone, user?.name]);
+
+  const sendMessage = async () => {
     if (!message.trim()) return;
-    const nextMessage = { id: Date.now().toString(), sender: 'user', text: message.trim(), time: 'الآن' };
+    const pendingText = message.trim();
+    const nextMessage = { id: Date.now().toString(), sender: 'user', text: pendingText, time: 'الآن' };
     setMessages((prev) => [...prev, nextMessage]);
     setMessage('');
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { id: `${Date.now()}-reply`, sender: 'support', text: 'تم استلام رسالتك، وسيتم الرد عليك خلال دقائق.', time: 'الآن' }]);
-    }, 800);
+
+    const { data } = await sendSupportMessage({
+      phone: user?.phone,
+      name: user?.name,
+      text: pendingText,
+    });
+
+    if (data?.length) {
+      setMessages((prev) => {
+        const withoutPending = prev.filter((item) => item.id !== nextMessage.id);
+        return [...withoutPending, ...data];
+      });
+    } else {
+      setTimeout(() => {
+        setMessages((prev) => [...prev, { id: `${Date.now()}-reply`, sender: 'support', text: 'تم استلام رسالتك، وسيتم الرد عليك خلال دقائق.', time: 'الآن' }]);
+      }, 800);
+    }
   };
 
   return (

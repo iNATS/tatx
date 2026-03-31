@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
 import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
+import { fetchAppUserByPhone, upsertAppUser } from '../services/appUserService';
 
 const roles = [
   { id: 'user', label: 'عميل', subtitle: 'تصفح واطلب من المتاجر', icon: 'person-outline' },
@@ -26,22 +27,30 @@ const LoginScreen = () => {
     setPhone(demoAccounts[role].phone);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setLoading(true);
 
-    setTimeout(() => {
-      setUser({
-        name: activeAccount.name,
-        phone: activeAccount.phone,
-        role: selectedRole,
-        city: activeAccount.city,
-        district: activeAccount.district || demoMarket.district,
-        walletBalance: 300,
-        addresses: user?.addresses || [],
-      });
-      setIsAuthenticated(true);
-      setLoading(false);
-    }, 700);
+    const fallbackUser = {
+      name: activeAccount.name,
+      phone: activeAccount.phone,
+      role: selectedRole,
+      city: activeAccount.city,
+      district: activeAccount.district || demoMarket.district,
+      walletBalance: 300,
+      addresses: user?.addresses || [],
+    };
+
+    const { data: savedUser } = await upsertAppUser(fallbackUser);
+    const { data: dbUser } = await fetchAppUserByPhone(activeAccount.phone);
+
+    setUser(
+      dbUser || {
+        ...fallbackUser,
+        id: savedUser?.id || null,
+      }
+    );
+    setIsAuthenticated(true);
+    setLoading(false);
   };
 
   return (

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import { syncUserAddresses } from '../services/appUserService';
 
 const LocationScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -19,12 +20,24 @@ const LocationScreen = ({ navigation }) => {
     setAddresses(user?.addresses || []);
   }, [user?.addresses]);
 
-  const syncAddresses = (nextAddresses) => {
+  const syncAddresses = async (nextAddresses) => {
     setAddresses(nextAddresses);
     setUser((prev) => ({
       ...prev,
       addresses: nextAddresses,
     }));
+
+    if (user?.id) {
+      const { data } = await syncUserAddresses(user.id, nextAddresses);
+
+      if (data) {
+        setAddresses(data);
+        setUser((prev) => ({
+          ...prev,
+          addresses: data,
+        }));
+      }
+    }
   };
 
   const openNewModal = () => {

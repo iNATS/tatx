@@ -42,6 +42,7 @@ const expectedContentSections = [
   'demoMarket',
   'homeServices',
   'homeOffers',
+  'landingPage',
   'onboardingSlides',
   'notifications',
   'restaurants',
