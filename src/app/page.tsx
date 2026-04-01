@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -17,10 +18,6 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-/**
- * @fileOverview الصفحة الرئيسية المصممة وفق معايير Apple RTL HIG.
- * تركز على البياض الناصع، التيبوغرافيا القوية بخط Cairo، والوضوح التام.
- */
 export default function Home() {
   const router = useRouter();
 
@@ -38,7 +35,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1 bg-white overflow-hidden font-body">
         
-        {/* --- SECTION 1: POWERFUL BRIGHT HERO (APPLE RTL HIG) --- */}
+        {/* --- SECTION 1: BRIGHT HERO --- */}
         <section className="relative pt-20 pb-20 md:pt-32 md:pb-40 overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-full bg-[radial-gradient(circle_at_top,_rgba(226,126,54,0.05)_0%,_rgba(255,255,255,0)_50%)] -z-10" />
           
@@ -84,8 +81,8 @@ export default function Home() {
                     className="object-cover"
                   />
                   <div className="absolute top-10 right-10 bg-white/90 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-2xl border border-white/50 hidden md:flex items-center gap-5">
-                     <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-white">
-                        <Zap className="w-8 h-8 fill-white" />
+                     <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center p-2">
+                        <Image src="https://picsum.photos/seed/tatx-brand-logo/200/200" alt="Tatx Logo" width={48} height={48} className="object-contain" />
                      </div>
                      <div className="text-right">
                         <span className="block font-black text-xl text-[#1D1D1F]">سرعة البرق</span>
@@ -98,14 +95,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- SECTION 2: BENTO SERVICES (APPLE WIDGET STYLE) --- */}
+        {/* --- SECTION 2: BENTO SERVICES --- */}
         <section className="py-32 bg-[#FBFBFD]">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
               <div className="text-right space-y-4">
                 <h2 className="text-5xl md:text-7xl font-black text-[#1D1D1F] tracking-tight">خدمات بلا حدود.</h2>
                 <p className="text-xl md:text-2xl text-[#86868B] font-bold max-w-xl leading-relaxed">
-                  من الضروريات اليومية إلى الرفاهية المطلقة، كل شيء متاح بلمسة واحدة.
+                  من الضروريات اليومية إلى الرفاهية المطلقة، كل شيء متاح بلمسة واحدة في Tatx.
                 </p>
               </div>
               <Button variant="ghost" className="h-14 px-8 rounded-full font-black text-primary gap-3 text-xl hover:bg-primary/5">
@@ -169,13 +166,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- SECTION 4: APP SHOWCASE - POWERFUL SCREENS --- */}
+        {/* --- SECTION 4: APP SHOWCASE --- */}
         <section className="py-32 bg-white">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="text-center mb-24 space-y-6">
               <h2 className="text-5xl md:text-8xl font-black tracking-tight text-[#1D1D1F]">واجهات صُممت لتبهرك.</h2>
               <p className="text-xl md:text-3xl text-[#86868B] font-bold max-w-3xl mx-auto leading-relaxed">
-                بساطة تامة في الاستخدام، قوة هائلة في الأداء. اكتشف ذكاء التصميم في كل ركن.
+                بساطة تامة في الاستخدام، قوة هائلة في الأداء. اكتشف ذكاء تصميم Tatx في كل ركن.
               </p>
             </div>
 
@@ -199,12 +196,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- SECTION 5: THE FINAL CALL - BRIGHT & POWERFUL --- */}
+        {/* --- SECTION 5: THE FINAL CALL --- */}
         <section className="py-40 relative overflow-hidden">
           <div className="absolute inset-0 bg-primary/5 -z-10" />
           <div className="container mx-auto px-4 max-w-5xl text-center space-y-16">
-            <div className="w-24 h-24 bg-white rounded-[2rem] shadow-xl flex items-center justify-center mx-auto mb-10 border border-[#D2D2D7]/30">
-               <Image src="https://picsum.photos/seed/tatx-logo/200/200" alt="Tatx" width={64} height={64} className="object-contain" />
+            <div className="w-24 h-24 bg-white rounded-[2rem] shadow-xl flex items-center justify-center mx-auto mb-10 border border-[#D2D2D7]/30 p-4">
+               <Image src="https://picsum.photos/seed/tatx-brand-logo/200/200" alt="Tatx Logo" width={64} height={64} className="object-contain" data-ai-hint="tatx logo" />
             </div>
             <h2 className="text-6xl md:text-[120px] font-black text-[#1D1D1F] tracking-tight leading-[1.1]">
               ابدأ رحلتك <br /><span className="text-primary italic">مع Tatx اليوم.</span>

@@ -111,10 +111,11 @@ export function Navbar() {
           <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl bg-white shadow-sm border border-[#D2D2D7]/30 flex items-center justify-center p-1.5 transition-transform group-hover:scale-105">
             <Image 
               src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
-              alt="Tatx Logo" 
+              alt="Tatx Brand Logo" 
               width={48} 
               height={48} 
               className="object-contain"
+              data-ai-hint="tatx logo"
             />
           </div>
         </Link>

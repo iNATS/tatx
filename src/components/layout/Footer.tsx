@@ -17,11 +17,12 @@ export function Footer() {
               </span>
               <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-[#D2D2D7]/30 flex items-center justify-center p-1.5">
                 <Image 
-                  src="https://picsum.photos/seed/tatx-logo/200/200" 
+                  src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
                   alt="Tatx Logo" 
                   width={32} 
                   height={32} 
                   className="object-contain"
+                  data-ai-hint="tatx logo"
                 />
               </div>
             </Link>

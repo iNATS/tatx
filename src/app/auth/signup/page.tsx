@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -9,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { User, Store, Truck, ArrowRight, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -28,8 +30,17 @@ export default function SignupPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 h-full">
           <div className="md:col-span-2 bg-primary p-8 text-white flex flex-col justify-between items-end text-right">
             <div>
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-primary font-black text-2xl mb-6 shadow-xl">T</div>
-              <h2 className="text-3xl font-black mb-4">انضم إلى عائلة تاتكس</h2>
+              <div className="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl p-2">
+                <Image 
+                  src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
+                  alt="Tatx Brand Logo" 
+                  width={40} 
+                  height={40} 
+                  className="object-contain"
+                  data-ai-hint="tatx logo"
+                />
+              </div>
+              <h2 className="text-3xl font-black mb-4">انضم إلى عائلة Tatx</h2>
               <p className="text-white/80 font-bold text-sm leading-relaxed">كن جزءاً من أسرع منصة خدمات نمواً في المملكة.</p>
             </div>
             <div className="flex items-center gap-2 text-xs font-black bg-black/20 p-3 rounded-xl">

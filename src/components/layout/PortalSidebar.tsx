@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -79,13 +80,14 @@ export function PortalSidebar({ role, title }: PortalSidebarProps) {
     <aside className="w-72 bg-white border-l h-screen flex flex-col sticky top-0" dir="rtl">
       <div className="p-8">
         <Link href="/" className="flex items-center gap-3 group mb-10">
-          <div className="relative w-8 h-8 overflow-hidden rounded-lg bg-white border border-border flex items-center justify-center p-1 shadow-sm">
+          <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-border flex items-center justify-center p-1 shadow-sm">
             <Image 
-              src="https://picsum.photos/seed/tatx-logo/200/200" 
+              src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
               alt="Tatx Logo" 
-              width={32} 
-              height={32} 
+              width={40} 
+              height={40} 
               className="object-contain"
+              data-ai-hint="tatx logo"
             />
           </div>
           <span className="text-2xl font-black">Tatx <span className="text-primary">{title}</span></span>

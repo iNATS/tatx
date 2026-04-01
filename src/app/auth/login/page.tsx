@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -8,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowRight, Key, Mail } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,9 +27,18 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#F5F2F0] flex items-center justify-center p-4 font-body" dir="rtl">
       <Card className="w-full max-w-md border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white">
         <CardHeader className="bg-primary p-10 text-white text-right">
-          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-primary font-black text-2xl mb-6 shadow-xl mr-0 ml-auto">T</div>
+          <div className="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl mr-0 ml-auto p-2">
+            <Image 
+              src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
+              alt="Tatx Brand Logo" 
+              width={40} 
+              height={40} 
+              className="object-contain"
+              data-ai-hint="tatx logo"
+            />
+          </div>
           <CardTitle className="text-3xl font-black mb-2">مرحباً بعودتك</CardTitle>
-          <CardDescription className="text-white/80 font-bold">قم بتسجيل الدخول لمتابعة أعمالك</CardDescription>
+          <CardDescription className="text-white/80 font-bold">قم بتسجيل الدخول لمتابعة أعمالك في Tatx</CardDescription>
         </CardHeader>
         
         <CardContent className="p-10">
