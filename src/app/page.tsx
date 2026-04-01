@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -27,8 +26,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 /**
- * @fileOverview الصفحة الرئيسية المعاد تصميمها لتكون مشرقة وقوية.
- * تتبع معايير Apple HIG مع التركيز على البياض الناصع والتباين العالي للألوان الأساسية.
+ * @fileOverview الصفحة الرئيسية المصممة وفق معايير Apple RTL HIG.
+ * تركز على البياض الناصع، التيبوغرافيا القوية بخط Cairo، والوضوح التام.
  */
 export default function Home() {
   const router = useRouter();
@@ -47,10 +46,10 @@ export default function Home() {
       <Navbar />
       <main className="flex-1 bg-white overflow-hidden font-body">
         
-        {/* --- SECTION 1: POWERFUL BRIGHT HERO --- */}
+        {/* --- SECTION 1: POWERFUL BRIGHT HERO (APPLE RTL HIG) --- */}
         <section className="relative pt-20 pb-20 md:pt-32 md:pb-40 overflow-hidden">
-          {/* Decorative Mesh Gradient (Light) */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-full bg-[radial-gradient(circle_at_top,_rgba(226,126,54,0.08)_0%,_rgba(255,255,255,0)_50%)] -z-10" />
+          {/* Decorative Mesh Gradient (Ultra Light) */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-full bg-[radial-gradient(circle_at_top,_rgba(226,126,54,0.05)_0%,_rgba(255,255,255,0)_50%)] -z-10" />
           
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col items-center text-center space-y-10 mb-20">
@@ -59,7 +58,7 @@ export default function Home() {
                 <span>أذكى تطبيق للخدمات في المملكة</span>
               </div>
               
-              <h1 className="text-6xl md:text-[100px] font-black tracking-tighter text-[#1D1D1F] leading-[0.9] max-w-5xl">
+              <h1 className="text-6xl md:text-[100px] font-black text-[#1D1D1F] leading-[1.1] max-w-5xl">
                 حياتك اليومية <br />
                 <span className="text-primary italic">أسهل مع Tatx.</span>
               </h1>
@@ -93,7 +92,7 @@ export default function Home() {
                     fill 
                     className="object-cover"
                   />
-                  {/* Floating Action Badge */}
+                  {/* Floating Action Badge (Static - No Animation) */}
                   <div className="absolute top-10 right-10 bg-white/90 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-2xl border border-white/50 hidden md:flex items-center gap-5 transition-all hover:translate-y-[-5px]">
                      <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-white">
                         <Zap className="w-8 h-8 fill-white" />
@@ -155,7 +154,7 @@ export default function Home() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center p-12 md:p-24 relative z-10">
                 <div className="text-right space-y-10">
                   <Badge className="bg-primary/10 text-primary border-none font-black px-6 py-2.5 rounded-full text-sm">مشاوير Tatx الفاخرة</Badge>
-                  <h2 className="text-5xl md:text-8xl font-black text-[#1D1D1F] leading-[0.9] tracking-tight">
+                  <h2 className="text-5xl md:text-8xl font-black text-[#1D1D1F] leading-[1.1] tracking-tight">
                     انطلق بـ <br /><span className="text-primary italic">أسلوب Pro.</span>
                   </h2>
                   <p className="text-xl md:text-2xl text-[#86868B] font-bold leading-relaxed">
@@ -187,7 +186,7 @@ export default function Home() {
         <section className="py-32 bg-white">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="text-center mb-24 space-y-6">
-              <h2 className="text-5xl md:text-8xl font-black tracking-tighter text-[#1D1D1F]">واجهات صُممت لتبهرك.</h2>
+              <h2 className="text-5xl md:text-8xl font-black tracking-tight text-[#1D1D1F]">واجهات صُممت لتبهرك.</h2>
               <p className="text-xl md:text-3xl text-[#86868B] font-bold max-w-3xl mx-auto leading-relaxed">
                 بساطة تامة في الاستخدام، قوة هائلة في الأداء. اكتشف ذكاء التصميم في كل ركن.
               </p>
@@ -220,7 +219,7 @@ export default function Home() {
             <div className="w-24 h-24 bg-white rounded-[2rem] shadow-xl flex items-center justify-center mx-auto mb-10 border border-[#D2D2D7]/30">
                <Image src="https://picsum.photos/seed/tatx-logo/200/200" alt="Tatx" width={64} height={64} className="object-contain" />
             </div>
-            <h2 className="text-6xl md:text-[120px] font-black text-[#1D1D1F] tracking-tighter leading-[0.85]">
+            <h2 className="text-6xl md:text-[120px] font-black text-[#1D1D1F] tracking-tight leading-[1.1]">
               ابدأ رحلتك <br /><span className="text-primary italic">مع Tatx اليوم.</span>
             </h2>
             <p className="text-2xl md:text-4xl text-[#86868B] font-bold max-w-3xl mx-auto leading-relaxed">
