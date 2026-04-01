@@ -237,7 +237,7 @@ const StatCard = ({ title, value, note, icon: Icon, trend, trendValue, color = '
   };
 
   return (
-    <Card hover>
+    <Card>
       <div className="flex items-start justify-between gap-4 p-6">
         <div className="flex-1">
           <p className="text-sm font-semibold text-slate-500">{title}</p>
@@ -261,7 +261,7 @@ const StatCard = ({ title, value, note, icon: Icon, trend, trendValue, color = '
 };
 
 const ServiceCard = ({ service, onEdit, onDelete }) => (
-  <Card hover className="group">
+  <Card>
     <div className="p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
@@ -926,15 +926,15 @@ const VendorPortal = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-rose-50/30 to-slate-50" dir="rtl">
         {/* Sidebar */}
-        <aside className={`fixed inset-y-0 right-0 z-40 w-72 transform border-l border-white/60 bg-gradient-to-b from-white via-rose-50/50 to-white shadow-2xl transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <aside className={`fixed inset-y-0 right-0 z-40 w-72 transform border-l-2 border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="flex h-full flex-col">
-            <div className="flex items-center justify-between border-b border-primary-100 px-6 py-6">
+            <div className="flex items-center justify-between border-b-2 border-slate-100 px-6 py-6">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500 text-white">
                   <Store className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-lg font-black text-slate-950">{data.profile.store_name || 'بوابة البائع'}</p>
+                  <p className="text-lg font-black text-slate-950">{profile.store_name || 'بوابة البائع'}</p>
                   <p className="text-xs text-slate-400">Vendor Portal</p>
                 </div>
               </div>
@@ -961,11 +961,11 @@ const VendorPortal = () => {
                     }}
                     className={`flex w-full items-center gap-3 rounded-3xl px-4 py-4 text-right transition-all ${
                       active
-                        ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30'
-                        : 'text-slate-600 hover:bg-white hover:shadow-md'
+                        ? 'bg-primary-500 text-white'
+                        : 'text-slate-600 hover:bg-slate-100'
                     }`}
                   >
-                    <div className={`rounded-2xl p-2 ${active ? 'bg-white/20' : 'bg-primary-100 text-primary-600'}`}>
+                    <div className={`rounded-2xl p-2 ${active ? 'bg-white/20' : 'bg-slate-100 text-slate-600'}`}>
                       <Icon className="h-5 w-5" />
                     </div>
                     <span className="font-bold">{item.label}</span>
@@ -974,10 +974,10 @@ const VendorPortal = () => {
               })}
             </nav>
 
-            <div className="border-t border-slate-100 p-5">
-              <div className="rounded-3xl bg-gradient-to-br from-primary-50 to-primary-100/50 p-4">
-                <div className="font-bold text-slate-950">{data.profile.owner_name}</div>
-                <div className="mt-1 text-sm text-slate-500">{data.profile.phone}</div>
+            <div className="border-t-2 border-slate-100 p-5">
+              <div className="rounded-3xl bg-primary-50 p-4">
+                <div className="font-bold text-slate-950">{profile.owner_name || 'مستخدم تجريبي'}</div>
+                <div className="mt-1 text-sm text-slate-500">{profile.phone || phone}</div>
                 <button onClick={() => setIsAuthenticated(false)} className="mt-3 flex items-center gap-2 text-xs font-bold text-error-600 hover:text-error-700">
                   <LogOut className="h-3 w-3" />
                   تسجيل الخروج
@@ -990,15 +990,15 @@ const VendorPortal = () => {
         {/* Main Content */}
         <div className="lg:pr-72">
           {/* Header */}
-          <header className="sticky top-0 z-30 border-b border-white/60 bg-white/80 backdrop-blur-xl">
+          <header className="sticky top-0 z-30 border-b-2 border-slate-200 bg-white">
             <div className="flex items-center justify-between px-4 py-4 sm:px-6">
               <div className="flex items-center gap-3">
-                <button onClick={() => setSidebarOpen(true)} className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-600 shadow-sm lg:hidden">
+                <button onClick={() => setSidebarOpen(true)} className="rounded-2xl border-2 border-slate-200 bg-white p-3 text-slate-600 lg:hidden">
                   <Menu className="h-5 w-5" />
                 </button>
                 <div className="relative hidden md:block">
                   <Search className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input className="h-12 w-80 rounded-2xl border border-slate-200 bg-white pr-11 pl-4 text-sm outline-none focus:border-primary-300 focus:ring-4 focus:ring-primary-100" placeholder="ابحث..." />
+                  <input className="h-12 w-80 rounded-2xl border-2 border-slate-200 bg-white pr-11 pl-4 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100" placeholder="ابحث..." />
                 </div>
               </div>
 
@@ -1068,15 +1068,15 @@ const VendorPortal = () => {
                       </div>
                       <div className="rounded-2xl bg-slate-50 p-4">
                         <div className="text-xs text-slate-400">المتجر</div>
-                        <div className="mt-1 font-bold text-slate-950">{data.profile.store_name}</div>
+                        <div className="mt-1 font-bold text-slate-950">{profile.store_name}</div>
                       </div>
                       <div className="rounded-2xl bg-slate-50 p-4">
                         <div className="text-xs text-slate-400">المدينة</div>
-                        <div className="mt-1 font-bold text-slate-950">{data.profile.city}</div>
+                        <div className="mt-1 font-bold text-slate-950">{profile.city}</div>
                       </div>
                       <div className="rounded-2xl bg-slate-50 p-4">
                         <div className="text-xs text-slate-400">العمولة</div>
-                        <div className="mt-1 font-bold text-slate-950">{data.profile.commission_rate}%</div>
+                        <div className="mt-1 font-bold text-slate-950">{profile.commission_rate}%</div>
                       </div>
                     </div>
                   </Card>
@@ -1302,7 +1302,7 @@ const VendorPortal = () => {
           isOpen={serviceModalOpen}
           onClose={() => setServiceModalOpen(false)}
           onSave={handleSaveService}
-          vendorId={data.profile.id}
+          vendorId={profile.id}
         />
       </div>
     );

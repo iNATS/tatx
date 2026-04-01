@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, RefreshCon
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { vendorStores } from '../data/vendorCatalog';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
 import PriceDisplay from '../components/PriceDisplay';
+import { RTLText } from '../components/RTL';
 
 const wholesaleHighlights = [
   { id: 'w1', name: 'مواد غذائية', subtitle: 'للمطاعم والأعمال', icon: 'cube-outline' },
@@ -186,11 +187,11 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
-        {/* Section Header - Title on RIGHT, Link on LEFT */}
+        {/* Section Header - Standard RTL: Title on RIGHT, Link on LEFT */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>الخدمات</Text>
+          <RTLText size="title3" align="right">الخدمات</RTLText>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
+            <RTLText size="caption" align="left" color={colors.primary}>عرض الكل</RTLText>
           </TouchableOpacity>
         </View>
         
@@ -206,10 +207,10 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        {/* Offers Section */}
+        {/* Offers Section - Standard RTL */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>قسم العروض</Text>
-          <Text style={styles.sectionLink}>مختارة لك</Text>
+          <RTLText size="title3" align="right">قسم العروض</RTLText>
+          <RTLText size="caption" align="left" color={colors.primary}>مختارة لك</RTLText>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
           {homeOffers.map((offer) => (
@@ -224,11 +225,11 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        {/* Restaurants Section - Image on RIGHT - Apple HIG: Card layout */}
+        {/* Restaurants Section - Standard RTL: Image on RIGHT */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>مطاعم</Text>
+          <RTLText size="title3" align="right">مطاعم</RTLText>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
+            <RTLText size="caption" align="left" color={colors.primary}>عرض الكل</RTLText>
           </TouchableOpacity>
         </View>
         <View style={styles.hotList}>
@@ -269,10 +270,10 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </View>
 
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>الماركت</Text>
+        <View style={styles.sectionHeader}>
+          <RTLText size="title3" align="right">الماركت</RTLText>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Shop')}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
+            <RTLText size="caption" align="left" color={colors.primary}>عرض الكل</RTLText>
           </TouchableOpacity>
         </View>
         <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
@@ -288,10 +289,10 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>سوق الجملة</Text>
+        <View style={styles.sectionHeader}>
+          <RTLText size="title3" align="right">سوق الجملة</RTLText>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Wholesale')}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
+            <RTLText size="caption" align="left" color={colors.primary}>عرض الكل</RTLText>
           </TouchableOpacity>
         </View>
         {renderMiniScroller(wholesaleHighlights, () => navigation.navigate('Wholesale'))}
@@ -309,10 +310,10 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </TouchableOpacity>
 
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
-          <Text style={styles.sectionTitle}>تصنيفات الصيدلية</Text>
+        <View style={styles.sectionHeader}>
+          <RTLText size="title3" align="right">تصنيفات الصيدلية</RTLText>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'صيدلية' })}>
-            <Text style={styles.sectionLink}>عرض الكل</Text>
+            <RTLText size="caption" align="left" color={colors.primary}>عرض الكل</RTLText>
           </TouchableOpacity>
         </View>
         <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
@@ -402,10 +403,14 @@ const styles = StyleSheet.create({
     borderColor: colors.borderLight,
   },
   
-  // Section Header - Title on RIGHT, Link on LEFT
-  sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
-  sectionTitle: { ...typography.h3, color: colors.text, textAlign: 'right', writingDirection: 'rtl' },
-  sectionLink: { ...typography.caption, color: colors.primary, textAlign: 'left', writingDirection: 'rtl' },
+  // Section Header - Standard RTL: Title on RIGHT, Link on LEFT
+  sectionHeader: { 
+    marginTop: spacing.xl, 
+    marginBottom: spacing.md, 
+    flexDirection: 'row', // Natural LEFT to RIGHT
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+  },
   
   // Services - Apple HIG: Icon chips with proper spacing, no shadows
   servicesRow: { gap: spacing.sm, paddingBottom: spacing.xs },
