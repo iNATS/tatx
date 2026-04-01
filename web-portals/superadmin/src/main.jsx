@@ -688,9 +688,9 @@ const Sidebar = ({ isOpen, onClose, activeTab, setActiveTab }) => (
   </>
 );
 
-const Header = ({ onMenuClick, search, setSearch, title }) => (
+const Header = ({ onMenuClick, search, setSearch, title, adminUser, onLogout }) => (
   <header className="sticky top-0 z-30 border-b border-white/70 bg-white/80 backdrop-blur-xl">
-    <div className="flex flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
         <button onClick={onMenuClick} className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-600 lg:hidden">
           <Menu className="h-5 w-5" />
@@ -703,6 +703,19 @@ const Header = ({ onMenuClick, search, setSearch, title }) => (
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <SearchField value={search} onChange={setSearch} placeholder="ابحث عن مستخدم، متجر، طلب، أو تذكرة" />
+        
+        {adminUser && (
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:block text-left">
+              <p className="text-sm font-bold text-slate-950">{adminUser.name}</p>
+              <p className="text-xs text-slate-500">{adminUser.email}</p>
+            </div>
+            <Button variant="ghost" size="icon" onClick={onLogout} className="text-error-600 hover:text-error-700">
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
+        
         <Button variant="outline" size="icon" className="relative shrink-0">
           <Bell className="h-5 w-5" />
           <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500" />
@@ -1481,10 +1494,265 @@ const pageMeta = {
   settings: { title: 'إعدادات النظام', subtitle: 'سياسات المنصة والتحكم العام' },
 };
 
+// Login Screen Component
+const AdminLoginScreen = ({ phone, setPhone, onLogin, loading, error }) => {
+  const [localError, setLocalError] = useState('');
+
+  const handleSendOTP = async () => {
+    if (!phone.trim() || !/^05[0-9]{8}$/.test(phone)) {
+      setLocalError('أدخل رقم جوال سعودي صحيح (يبدأ بـ 05)');
+      return;
+    }
+    setLocalError('');
+    await onLogin();
+  };
+
+  return (
+    <div dir="rtl" className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white via-rose-50/30 to-slate-50 p-6">
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Info Side */}
+        <Card className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8 text-white">
+          <div className="relative z-10">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-rose-400">TATX SuperAdmin</p>
+            <h1 className="mt-4 text-5xl font-black leading-tight">بوابة المشرف الرئيسي</h1>
+            <p className="mt-5 text-sm leading-8 text-white/70">
+              لوحة التحكم الرئيسية لإدارة تطبيق تاتكس بالكامل.
+            </p>
+            
+            <div className="mt-8 grid gap-4">
+              {[
+                ['إدارة المستخدمين', 'التحكم في حسابات العملاء والبائعين'],
+                ['متابعة الطلبات', 'عرض جميع الطلبات وتحديث حالتها'],
+                ['إدارة المحتوى', 'تحديث المحتوى والإعدادات العامة'],
+              ].map(([title, desc]) => (
+                <div key={title} className="rounded-3xl bg-white/10 p-4 backdrop-blur-sm">
+                  <h3 className="font-bold">{title}</h3>
+                  <p className="mt-2 text-xs text-white/70">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white/10" />
+          <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-white/10" />
+        </Card>
+
+        {/* Login Form */}
+        <Card className="flex flex-col justify-center p-8">
+          <div>
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-950 text-white">
+              <ShieldCheck className="h-8 w-8" />
+            </div>
+            <h2 className="mt-6 text-3xl font-black text-slate-950">دخول المشرف</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-500">أدخل رقم الجوال المسجل كمشرف عام</p>
+            
+            <div className="mt-8 space-y-4">
+              <Input 
+                label="رقم الجوال" 
+                placeholder="05xxxxxxxx" 
+                value={phone} 
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  setLocalError('');
+                }}
+                icon={Phone}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendOTP()}
+              />
+              
+              {error && (
+                <div className="rounded-2xl bg-error-50 px-4 py-3 text-sm text-error-700">
+                  {error}
+                </div>
+              )}
+              
+              <Button className="w-full" onClick={handleSendOTP} disabled={loading || !phone.trim()} icon={Phone}>
+                {loading ? 'جارٍ الإرسال...' : 'إرسال رمز التحقق'}
+              </Button>
+              
+              <div className="text-center text-xs text-slate-400 mt-4">
+                جرب: 0555000003 (حساب مشرف)
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+// OTP Verification Screen
+const AdminOTPScreen = ({ phone, otpCode, setOtpCode, onVerify, verifying, onBack }) => {
+  const [localError, setLocalError] = useState('');
+  const inputRefs = useRef([]);
+
+  const handleVerifyOTP = () => {
+    if (!otpCode || otpCode.length !== 4) {
+      setLocalError('أدخل رمز التحقق المكون من 4 أرقام');
+      return;
+    }
+    setLocalError('');
+    onVerify();
+  };
+
+  const handleCodeChange = (value, index) => {
+    if (value && !/^\d$/.test(value)) return;
+    const newCode = otpCode.split('');
+    newCode[index] = value;
+    setOtpCode(newCode.join(''));
+    if (value && index < 3) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyPress = (e, index) => {
+    if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  return (
+    <div dir="rtl" className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white via-rose-50/30 to-slate-50 p-6">
+      <Card className="max-w-md w-full">
+        <div className="p-8">
+          <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-success-100 text-success-600 mx-auto">
+            <CheckCircle2 className="h-8 w-8" />
+          </div>
+          <h2 className="mt-6 text-2xl font-black text-center text-slate-950">رمز التحقق</h2>
+          <p className="mt-3 text-sm text-center leading-7 text-slate-500">
+            أدخل رمز التحقق المرسل إلى {phone}
+          </p>
+          <p className="mt-2 text-xs text-center text-primary-600 font-bold">
+            رمز الاختبار: 1234
+          </p>
+          
+          <div className="mt-8 space-y-4">
+            <div className="flex justify-center gap-3">
+              {[0, 1, 2, 3].map((index) => (
+                <input
+                  key={index}
+                  ref={(ref) => (inputRefs.current[index] = ref)}
+                  type="text"
+                  maxLength={1}
+                  value={otpCode[index] || ''}
+                  onChange={(e) => handleCodeChange(e.target.value, index)}
+                  onKeyDown={(e) => handleKeyPress(e, index)}
+                  className="input w-14 h-16 text-center text-2xl font-bold"
+                  autoFocus={index === 0}
+                />
+              ))}
+            </div>
+            
+            {localError && (
+              <div className="rounded-2xl bg-error-50 px-4 py-3 text-sm text-error-700 text-center">
+                {localError}
+              </div>
+            )}
+            
+            <Button className="w-full" onClick={handleVerifyOTP} disabled={verifying}>
+              {verifying ? 'جارٍ التحقق...' : 'تأكيد'}
+            </Button>
+            
+            <Button variant="ghost" className="w-full" onClick={onBack}>
+              تغيير رقم الجوال
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
 const App = () => {
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminUser, setAdminUser] = useState(null);
+  const [authStep, setAuthStep] = useState('login'); // 'login', 'otp'
+  const [phone, setPhone] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  
+  // App state
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState('');
+
+  // Handle OTP request
+  const handleRequestOTP = async () => {
+    setAuthLoading(true);
+    setAuthError('');
+    
+    const { data, error } = await requestAdminOTP(phone);
+    
+    setAuthLoading(false);
+    
+    if (error) {
+      setAuthError(error.message);
+      return;
+    }
+    
+    console.log('✅ OTP sent:', data.code);
+    setAuthStep('otp');
+  };
+
+  // Handle OTP verification
+  const handleVerifyOTP = async () => {
+    setAuthLoading(true);
+    setAuthError('');
+    
+    const { data, error } = await verifyAdminOTP(phone, otpCode);
+    
+    setAuthLoading(false);
+    
+    if (error) {
+      setAuthError(error.message);
+      return;
+    }
+    
+    console.log('✅ Admin authenticated:', data.user);
+    setAdminUser(data.user);
+    setIsAuthenticated(true);
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setAdminUser(null);
+    setAuthStep('login');
+    setPhone('');
+    setOtpCode('');
+    setAuthError('');
+  };
+
+  // Show login screen
+  if (!isAuthenticated) {
+    if (authStep === 'otp') {
+      return (
+        <AdminOTPScreen
+          phone={phone}
+          otpCode={otpCode}
+          setOtpCode={setOtpCode}
+          onVerify={handleVerifyOTP}
+          verifying={authLoading}
+          onBack={() => {
+            setAuthStep('login');
+            setOtpCode('');
+            setAuthError('');
+          }}
+        />
+      );
+    }
+    
+    return (
+      <AdminLoginScreen
+        phone={phone}
+        setPhone={setPhone}
+        onLogin={handleRequestOTP}
+        loading={authLoading}
+        error={authError}
+      />
+    );
+  }
 
   const currentMeta = pageMeta[activeTab] || pageMeta.dashboard;
 
@@ -1493,7 +1761,7 @@ const App = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="lg:pr-[310px]">
-        <Header onMenuClick={() => setSidebarOpen(true)} search={search} setSearch={setSearch} title={currentMeta.title} />
+        <Header onMenuClick={() => setSidebarOpen(true)} search={search} setSearch={setSearch} title={currentMeta.title} adminUser={adminUser} onLogout={handleLogout} />
 
         <main className="px-4 py-6 sm:px-6">
           <div className="mb-8 flex flex-col gap-4 rounded-[32px] border border-white/70 bg-white/75 p-6 shadow-[0_30px_80px_-50px_rgba(244,63,94,0.5)] backdrop-blur-xl lg:flex-row lg:items-end lg:justify-between">
