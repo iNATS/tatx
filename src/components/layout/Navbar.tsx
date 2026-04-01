@@ -103,7 +103,7 @@ export function Navbar() {
 
         {/* Right Side (Brand) */}
         <Link href="/" className="flex items-center gap-3 group">
-          <span className="text-2xl md:text-3xl font-black tracking-tight text-[#1D1D1F]">
+          <span className="text-2xl md:text-3xl font-black tracking-tight text-primary">
             Tatx
           </span>
           <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl bg-white shadow-sm border border-[#D2D2D7]/30 flex items-center justify-center p-1.5 transition-transform group-hover:scale-105">

@@ -11,7 +11,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-16">
           <div className="space-y-8">
             <Link href="/" className="flex items-center gap-3 group">
-              <span className="text-3xl font-black text-[#1D1D1F]">
+              <span className="text-3xl font-black text-primary">
                 Tatx
               </span>
               <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-[#D2D2D7]/30 flex items-center justify-center p-1.5">
