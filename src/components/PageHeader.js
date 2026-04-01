@@ -8,12 +8,19 @@ import { useApp } from '../context/AppContext';
 /**
  * Standard iOS Page Header - Apple HIG RTL Compliant
  * 
- * Usage:
- * - Back button on RIGHT (→) for RTL
- * - Title right of back button
- * - Actions on LEFT
+ * This is the standard header used throughout the Tatx SA app.
+ * 
+ * RTL Layout (Arabic):
+ * - Back button on RIGHT (→) - This is the START in RTL
+ * - Title CENTERED
+ * - Actions on LEFT - This is the END in RTL
+ * 
+ * Features:
  * - No shadows (iOS 26+ flat design)
  * - 44pt minimum touch targets
+ * - Optional search bar
+ * - Optional filter chips
+ * - Safe area aware
  */
 const PageHeader = ({
   navigation,
@@ -30,7 +37,7 @@ const PageHeader = ({
   filters = [],
   selectedFilter,
   onSelectFilter,
-  largeTitle = true, // Apple HIG: Large title on scroll
+  largeTitle = false, // Use large title (34pt) or standard (20pt)
 }) => {
   const insets = useSafeAreaInsets();
   const { isRTL, rowDirection, textAlignStart } = useApp();
@@ -38,9 +45,9 @@ const PageHeader = ({
 
   return (
     <View style={[styles.wrapper, { paddingTop: insets.top + spacing.sm }]}>
-      {/* Main Header Row - Apple HIG: 44pt height */}
-      <View style={[styles.headerRow, { flexDirection: rowDirection }]}>
-        {/* Left Side: Actions */}
+      {/* Main Header Row - Natural LEFT to RIGHT */}
+      <View style={styles.headerRow}>
+        {/* LEFT Side: Actions (END in RTL) */}
         {actionIcon ? (
           <TouchableOpacity 
             onPress={onActionPress} 
@@ -54,12 +61,12 @@ const PageHeader = ({
           <View style={styles.actionSpacer} />
         )}
 
-        {/* Center-Right: Title */}
+        {/* CENTER: Title */}
         <View style={styles.titleContainer}>
           <Text 
             style={[
               largeTitle ? styles.largeTitle : styles.title,
-              { textAlign: textAlignStart }
+              { textAlign: 'center' }
             ]} 
             numberOfLines={1}
           >
@@ -67,7 +74,7 @@ const PageHeader = ({
           </Text>
           {!!subtitle && (
             <Text 
-              style={[styles.subtitle, { textAlign: textAlignStart }]}
+              style={[styles.subtitle, { textAlign: 'center' }]}
               numberOfLines={1}
             >
               {subtitle}
@@ -75,7 +82,7 @@ const PageHeader = ({
           )}
         </View>
 
-        {/* Right Side: Back Button */}
+        {/* RIGHT Side: Back Button (START in RTL) */}
         {showBack ? (
           <TouchableOpacity
             onPress={onBackPress || (() => navigation?.goBack())}
@@ -169,6 +176,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderLight,
   },
   headerRow: {
+    flexDirection: 'row', // Natural LEFT to RIGHT layout
     alignItems: 'center',
     justifyContent: 'space-between',
     minHeight: 44, // Apple HIG: Minimum header height
@@ -204,7 +212,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
-    // No shadow - Apple HIG iOS 26+ flat design
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   actionButton: {
     width: 44,
@@ -213,14 +222,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
-    // No shadow - Apple HIG iOS 26+ flat design
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   actionSpacer: {
     width: 44,
     height: 44,
   },
   searchBar: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row', // Natural LEFT to RIGHT
     alignItems: 'center',
     backgroundColor: colors.card,
     borderRadius: 16,
@@ -229,7 +239,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderLight,
     gap: spacing.sm,
-    // No shadow - Apple HIG iOS 26+ flat design
   },
   searchInput: {
     flex: 1,
@@ -245,6 +254,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cardSecondary,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   filtersRow: {
     gap: spacing.sm,
@@ -259,7 +270,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.borderLight,
-    // No shadow - Apple HIG iOS 26+ flat design
   },
   filterChipActive: {
     backgroundColor: colors.primary,
