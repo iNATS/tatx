@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -14,7 +15,7 @@ export function Footer() {
               <span className="text-3xl font-black text-primary">
                 Tatx
               </span>
-              <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-[#D2D2D7]/30 flex items-center justify-center p-1.5">
+              <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-[#D2D2D7]/30 flex items-center justify-center p-1.5 shadow-sm">
                 <Image 
                   src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" 
                   alt="Tatx Logo" 

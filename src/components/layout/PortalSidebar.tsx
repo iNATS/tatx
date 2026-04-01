@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -68,7 +69,7 @@ export function PortalSidebar({ role, title }: PortalSidebarProps) {
           { icon: ShoppingBag, label: 'طلباتي', href: '/orders' },
           { icon: Bell, label: 'التنبيهات', href: '/profile/notifications' },
           { icon: CreditCard, label: 'بطاقاتي', href: '/profile/payments' },
-          { icon: Settings, label: 'الإعدادات', href: '/profile/settings' },
+          { icon: Settings, label: 'إعدادات المنصة', href: '/profile/settings' },
         ];
     }
   };
