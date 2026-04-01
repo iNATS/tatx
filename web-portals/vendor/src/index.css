@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-white via-rose-50/30 to-slate-50;
+    @apply font-sans;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+  
+  html {
+    direction: rtl;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary-500/30 transition-all hover:bg-primary-600 hover:shadow-xl hover:shadow-primary-500/40 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:shadow-md active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .card {
+    @apply rounded-3xl border border-white/70 bg-white/95 shadow-soft backdrop-blur-xl;
+  }
+  
+  .input {
+    @apply h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-primary-300 focus:ring-4 focus:ring-primary-100;
+  }
+  
+  .badge {
+    @apply inline-flex rounded-full px-3 py-1 text-xs font-semibold;
+  }
+  
+  .badge-success {
+    @apply badge bg-success-100 text-success-700;
+  }
+  
+  .badge-warning {
+    @apply badge bg-warning-100 text-warning-700;
+  }
+  
+  .badge-error {
+    @apply badge bg-error-100 text-error-700;
+  }
+  
+  .badge-slate {
+    @apply badge bg-slate-100 text-slate-700;
+  }
+}
