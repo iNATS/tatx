@@ -2,10 +2,11 @@
 "use client";
 
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Apple } from 'lucide-react';
 
 export function AppDownloadCTA() {
+  const appStoreUrl = "https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg";
+  const googlePlayUrl = "https://storage.googleapis.com/pe-portal-consumer-prod-wagtail-static/images/googleplay-badge-01-getit.width-1440.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=wagtail%40pe-portal-consumer-prod.iam.gserviceaccount.com%2F20260401%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260401T070647Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=8f41108c3f91c16681aa762bdf17525548b03092f6564192a9487ce5ca0e80afdddf144527da9801b0d82e6c06bf2e7005d610a9cbf7ee32a5ab5b2d7ad3105ca97345a71152b9bb67e2b36990350ae4d365b25ae67e666208c794e49e61156bcd828aa1f43cca2dcacece3e77d7735398a4ab15958fb5aaf2c6171400d8b1d883c5e783868d77696c5cdf0014959138cbb3680684d1636ceb0f5ec170575c3afa914bda43251aced0d4c0eb4976c9640a94613319cd0a3cdfbe245ad82194fab7c6be7e95b38f50a8e0dd755a73e70f11046b0d9dcc62f42eee85581b8b477b5951b399b952d6a92dc4963913dffc60bc61995d34b70ce905130845346c6139";
+
   return (
     <section className="bg-white py-32" dir="rtl">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -22,31 +23,23 @@ export function AppDownloadCTA() {
                 استمتع بتجربة Tatx الكاملة عبر التطبيق. اطلب وجباتك، احجز مشاويرك، أو نسق لمناسباتك القادمة بسرعة وسهولة فائقة.
               </p>
               
-              <div className="flex flex-wrap gap-6 justify-end">
-                {/* App Store Button Official Style */}
-                <Button className="h-[80px] px-10 rounded-3xl bg-black text-white hover:bg-black/90 font-black gap-5 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] transition-all hover:scale-105 active:scale-95 border-none">
-                  <Apple className="w-10 h-10" />
-                  <div className="text-left flex flex-col items-start leading-none">
-                    <span className="text-[10px] opacity-70 font-bold uppercase tracking-wider">Download on the</span>
-                    <span className="text-2xl font-black">App Store</span>
-                  </div>
-                </Button>
-                
-                {/* Google Play Button Official Style */}
-                <Button className="h-[80px] px-10 rounded-3xl bg-black text-white hover:bg-black/90 font-black gap-5 transition-all hover:scale-105 active:scale-95 border-none shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)]">
-                  <div className="w-10 h-10 flex items-center justify-center">
-                    <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
-                      <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1z" fill="#ffb900"/>
-                      <path d="M47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0z" fill="#21a366"/>
-                      <path d="M425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8z" fill="#ed3b3b"/>
-                      <path d="M104.6 499l280.8-161.2-60.1-60.1L104.6 499z" fill="#107c10"/>
-                    </svg>
-                  </div>
-                  <div className="text-left flex flex-col items-start leading-none">
-                    <span className="text-[10px] opacity-70 font-bold uppercase tracking-wider">GET IT ON</span>
-                    <span className="text-2xl font-black">Google Play</span>
-                  </div>
-                </Button>
+              <div className="flex flex-wrap gap-6 justify-end pt-4">
+                <div className="relative h-[65px] w-[190px] cursor-pointer hover:scale-105 transition-transform">
+                  <Image 
+                    src={appStoreUrl} 
+                    alt="Download on the App Store" 
+                    fill 
+                    className="object-contain" 
+                  />
+                </div>
+                <div className="relative h-[65px] w-[210px] cursor-pointer hover:scale-105 transition-transform">
+                  <Image 
+                    src={googlePlayUrl} 
+                    alt="Get it on Google Play" 
+                    fill 
+                    className="object-contain" 
+                  />
+                </div>
               </div>
             </div>
 
