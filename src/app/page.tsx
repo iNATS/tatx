@@ -30,6 +30,7 @@ export default function Home() {
 
   const appStoreBadge = "https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg";
   const googlePlayBadge = "https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg";
+  const brandLogo = "https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png";
 
   return (
     <>
@@ -134,7 +135,12 @@ export default function Home() {
                   </Button>
                 </div>
                 <div className="relative aspect-square md:aspect-video rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
-                  <Image src="/assets/img/iPhone-13-PRO-MAX-app.tatx.com.webp" alt="Tatx Premium Ride" fill className="object-cover" />
+                  <Image 
+                    src="/assets/img/iPhone-13-PRO-MAX-app.tatx.com.webp" 
+                    alt="Tatx Premium Ride" 
+                    fill 
+                    className="object-cover" 
+                  />
                 </div>
               </div>
             </div>
@@ -145,7 +151,7 @@ export default function Home() {
         <section className="py-40 relative overflow-hidden text-center bg-primary/5">
           <div className="container mx-auto px-4 max-w-5xl space-y-16">
             <div className="w-24 h-24 bg-white rounded-[2rem] shadow-xl flex items-center justify-center mx-auto mb-10 border border-[#D2D2D7]/30 p-4">
-               <Image src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" alt="Tatx Logo" width={64} height={64} className="object-contain" />
+               <Image src={brandLogo} alt="Tatx Logo" width={64} height={64} className="object-contain" />
             </div>
             <h2 className="text-6xl md:text-[120px] font-black text-[#1D1D1F] tracking-tight leading-[1.1]">
               ابدأ رحلتك <br /><span className="text-primary italic">مع Tatx اليوم.</span>

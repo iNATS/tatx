@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -6,6 +5,8 @@ import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone } from 'lucide-react';
 
 export function Footer() {
+  const brandLogo = "https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png";
+
   return (
     <footer className="bg-white border-t border-[#D2D2D7]/30 pt-20 pb-12" dir="rtl">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -17,7 +18,7 @@ export function Footer() {
               </span>
               <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-[#D2D2D7]/30 flex items-center justify-center p-1.5 shadow-sm">
                 <Image 
-                  src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" 
+                  src={brandLogo}
                   alt="Tatx Logo" 
                   width={32} 
                   height={32} 

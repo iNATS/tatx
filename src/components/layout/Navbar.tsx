@@ -1,10 +1,11 @@
 "use client";
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
 export function Navbar() {
+  const brandLogo = "https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png";
+  
   const navLinks = [
     { name: 'الرئيسية', href: '#hero' },
     { name: 'خدماتنا', href: '#services' },
@@ -37,7 +38,7 @@ export function Navbar() {
           </span>
           <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl bg-white shadow-sm border border-[#D2D2D7]/30 flex items-center justify-center p-1.5 transition-transform group-hover:scale-105">
             <Image 
-              src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" 
+              src={brandLogo}
               alt="Tatx Brand Logo" 
               width={48} 
               height={48} 
