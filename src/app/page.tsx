@@ -35,7 +35,7 @@ export default function Home() {
 
   const services = [
     { name: 'سوبر ماركت', icon: Store, desc: 'تسوق يومي سريع بنقرة واحدة', color: 'text-blue-600', tint: 'bg-blue-50/50' },
-    { name: 'مطاعم تاتكس', icon: Utensils, desc: 'وجباتك المفضلة تصلك ساخنة', color: 'text-orange-600', tint: 'bg-orange-50/50' },
+    { name: 'مطاعم Tatx', icon: Utensils, desc: 'وجباتك المفضلة تصلك ساخنة', color: 'text-orange-600', tint: 'bg-orange-50/50' },
     { name: 'تاكسي Tatx', icon: Car, desc: 'مشاوير آمنة مع كباتن محترفين', color: 'text-emerald-600', tint: 'bg-emerald-50/50' },
     { name: 'شاليهات', icon: HomeIcon, desc: 'استجمام وخصوصية تامة لعائلتك', color: 'text-purple-600', tint: 'bg-purple-50/50' },
     { name: 'قاعات', icon: PartyPopper, desc: 'قاعات فخمة لمناسباتك السعيدة', color: 'text-pink-600', tint: 'bg-pink-50/50' },
