@@ -1,10 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
+/**
+ * Standard iOS Page Header - Apple HIG RTL Compliant
+ * 
+ * Usage:
+ * - Back button on RIGHT (→) for RTL
+ * - Title right of back button
+ * - Actions on LEFT
+ * - No shadows (iOS 26+ flat design)
+ * - 44pt minimum touch targets
+ */
 const PageHeader = ({
   navigation,
   title,
@@ -20,50 +30,73 @@ const PageHeader = ({
   filters = [],
   selectedFilter,
   onSelectFilter,
+  largeTitle = true, // Apple HIG: Large title on scroll
 }) => {
   const insets = useSafeAreaInsets();
   const { isRTL, rowDirection, textAlignStart } = useApp();
-  const backIcon = isRTL ? 'arrow-forward' : 'arrow-back';
+  const backIcon = isRTL ? 'arrow-forward' : 'arrow-back'; // Points right in RTL
 
   return (
     <View style={[styles.wrapper, { paddingTop: insets.top + spacing.sm }]}>
-      <View style={[styles.topRow, { flexDirection: rowDirection }]}>
+      {/* Main Header Row - Apple HIG: 44pt height */}
+      <View style={[styles.headerRow, { flexDirection: rowDirection }]}>
+        {/* Left Side: Actions */}
         {actionIcon ? (
-          <TouchableOpacity onPress={onActionPress} style={styles.iconButton} activeOpacity={0.85}>
-            <Ionicons name={actionIcon} size={20} color={colors.primary} />
+          <TouchableOpacity 
+            onPress={onActionPress} 
+            style={styles.actionButton} 
+            activeOpacity={0.85}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name={actionIcon} size={22} color={colors.primary} />
           </TouchableOpacity>
         ) : (
-          <View style={styles.iconSpacer} />
+          <View style={styles.actionSpacer} />
         )}
 
-        <View style={styles.titleWrap}>
-          <Text style={[styles.title, { textAlign: textAlignStart }]} numberOfLines={1}>{title}</Text>
-          {!!subtitle && <Text style={[styles.subtitle, { textAlign: textAlignStart }]}>{subtitle}</Text>}
+        {/* Center-Right: Title */}
+        <View style={styles.titleContainer}>
+          <Text 
+            style={[
+              largeTitle ? styles.largeTitle : styles.title,
+              { textAlign: textAlignStart }
+            ]} 
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
+          {!!subtitle && (
+            <Text 
+              style={[styles.subtitle, { textAlign: textAlignStart }]}
+              numberOfLines={1}
+            >
+              {subtitle}
+            </Text>
+          )}
         </View>
 
+        {/* Right Side: Back Button */}
         {showBack ? (
           <TouchableOpacity
             onPress={onBackPress || (() => navigation?.goBack())}
-            style={styles.iconButton}
+            style={styles.backButton}
             activeOpacity={0.85}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Ionicons name={backIcon} size={22} color={colors.text} />
+            <Ionicons name={backIcon} size={24} color={colors.primary} />
           </TouchableOpacity>
-        ) : (
-          <View style={styles.iconSpacer} />
-        )}
+        ) : null}
       </View>
 
+      {/* Optional Search Bar - Apple HIG: Integrated design */}
       {(typeof onSearchChange === 'function' || typeof onSearchPress === 'function') && (
         <TouchableOpacity
           activeOpacity={typeof onSearchPress === 'function' ? 0.86 : 1}
           onPress={onSearchPress}
-          style={[styles.searchBar, { flexDirection: rowDirection }]}
+          style={styles.searchBar}
           disabled={typeof onSearchPress !== 'function'}
         >
-          <TouchableOpacity style={styles.filterButton} activeOpacity={0.85}>
-            <Ionicons name="options-outline" size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
+          <Ionicons name="search-outline" size={20} color={colors.textTertiary} />
           <TextInput
             value={searchValue}
             onChangeText={onSearchChange}
@@ -73,10 +106,15 @@ const PageHeader = ({
             editable={typeof onSearchChange === 'function'}
             pointerEvents={typeof onSearchPress === 'function' && typeof onSearchChange !== 'function' ? 'none' : 'auto'}
           />
-          <Ionicons name="search-outline" size={18} color={colors.textTertiary} />
+          {typeof onSearchChange === 'function' && (
+            <TouchableOpacity style={styles.filterButton} activeOpacity={0.85}>
+              <Ionicons name="options-outline" size={18} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </TouchableOpacity>
       )}
 
+      {/* Optional Filter Chips - Apple HIG: Horizontal scroll */}
       {!!filters.length && (
         <ScrollView
           horizontal
@@ -89,7 +127,11 @@ const PageHeader = ({
             return (
               <TouchableOpacity
                 key={filter.id}
-                style={[styles.filterChip, { flexDirection: rowDirection }, isActive && styles.filterChipActive]}
+                style={[
+                  styles.filterChip, 
+                  { flexDirection: rowDirection },
+                  isActive && styles.filterChipActive
+                ]}
                 onPress={() => onSelectFilter?.(filter.id)}
                 activeOpacity={0.85}
               >
@@ -100,7 +142,14 @@ const PageHeader = ({
                     color={isActive ? colors.white : colors.textSecondary}
                   />
                 )}
-                <Text style={[styles.filterText, isActive && styles.filterTextActive]}>{filter.label}</Text>
+                <Text 
+                  style={[
+                    styles.filterText, 
+                    isActive && styles.filterTextActive
+                  ]}
+                >
+                  {filter.label}
+                </Text>
               </TouchableOpacity>
             );
           })}
@@ -113,63 +162,86 @@ const PageHeader = ({
 const styles = StyleSheet.create({
   wrapper: {
     backgroundColor: colors.background,
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.sm,
     gap: spacing.sm,
+    borderBottomWidth: Platform.OS === 'ios' ? 0 : 1,
+    borderBottomColor: colors.borderLight,
   },
-  topRow: {
+  headerRow: {
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 44, // Apple HIG: Minimum header height
+    paddingTop: spacing.xs,
   },
-  titleWrap: {
+  titleContainer: {
     flex: 1,
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
   },
-  title: {
-    fontSize: 28,
+  largeTitle: {
+    fontSize: 34, // Apple HIG: Large Title
     fontFamily: fonts.bold,
     color: colors.text,
+    lineHeight: 41,
+  },
+  title: {
+    fontSize: 20, // Apple HIG: Title
+    fontFamily: fonts.bold,
+    color: colors.text,
+    lineHeight: 25,
   },
   subtitle: {
-    marginTop: 4,
+    marginTop: 2,
     color: colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 18,
   },
-  iconButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
     alignItems: 'center',
     justifyContent: 'center',
+    // No shadow - Apple HIG iOS 26+ flat design
   },
-  iconSpacer: {
-    width: 42,
-    height: 42,
+  actionButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // No shadow - Apple HIG iOS 26+ flat design
+  },
+  actionSpacer: {
+    width: 44,
+    height: 44,
   },
   searchBar: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
     backgroundColor: colors.card,
-    borderRadius: 18,
-    minHeight: 56,
+    borderRadius: 16,
+    minHeight: 48,
     paddingHorizontal: spacing.md,
     borderWidth: 1,
     borderColor: colors.borderLight,
-    alignItems: 'center',
+    gap: spacing.sm,
+    // No shadow - Apple HIG iOS 26+ flat design
   },
   searchInput: {
     flex: 1,
     color: colors.text,
     fontFamily: fonts.regular,
-    marginHorizontal: spacing.sm,
-    fontSize: 15,
+    fontSize: 16,
+    paddingVertical: Platform.OS === 'ios' ? 0 : spacing.xs,
   },
   filterButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.cardSecondary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -187,9 +259,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.borderLight,
+    // No shadow - Apple HIG iOS 26+ flat design
   },
   filterChipActive: {
     backgroundColor: colors.primary,
+    borderColor: 'transparent',
   },
   filterText: {
     color: colors.textSecondary,

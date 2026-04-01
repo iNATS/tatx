@@ -95,7 +95,7 @@ const LoginScreen = ({ navigation }) => {
 
       // Show OTP code in alert for testing
       const testCode = data?.code || '1234';
-      
+
       if (Platform.OS === 'web') {
         // Web: Use browser alert and redirect
         window.alert(
@@ -149,9 +149,10 @@ const LoginScreen = ({ navigation }) => {
       <LinearGradient colors={['#FBF6F8', '#FFF9FA']} style={styles.container}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.xxxl }]}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + spacing.xl, paddingBottom: insets.bottom + spacing.xxxl }]}
           keyboardShouldPersistTaps="handled"
         >
+        {/* Hero Section - Apple HIG: Centered content */}
         <View style={styles.hero}>
           <View style={styles.logoWrap}>
             <LinearGradient colors={['#FCE2E7', '#FFF7F8']} style={styles.logoShell}>
@@ -163,6 +164,7 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.heroSubtitle}>سجّل أو أنشئ حسابًا أولًا ثم فعّل رقم الجوال قبل الدخول إلى الخدمات.</Text>
         </View>
 
+        {/* Auth Mode Cards - Apple HIG: Stack layout */}
         <View style={styles.card}>
           <View style={styles.modeList}>
             {authModes.map((mode) => {
@@ -182,6 +184,7 @@ const LoginScreen = ({ navigation }) => {
             })}
           </View>
 
+          {/* Name Input (Register only) - Apple HIG: Input field layout */}
           {authMode === 'register' ? (
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>الاسم الكامل</Text>
@@ -200,6 +203,7 @@ const LoginScreen = ({ navigation }) => {
             </View>
           ) : null}
 
+          {/* Phone Input - Apple HIG: Input field layout */}
           <View style={styles.fieldGroup}>
             <Text style={styles.fieldLabel}>رقم الجوال</Text>
             <View style={[styles.inputShell, phoneError && styles.inputError]}>
@@ -217,6 +221,7 @@ const LoginScreen = ({ navigation }) => {
             {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
           </View>
 
+          {/* City Input (Register only) - Apple HIG: Input field layout */}
           {authMode === 'register' ? (
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>المدينة</Text>
@@ -233,6 +238,7 @@ const LoginScreen = ({ navigation }) => {
             </View>
           ) : null}
 
+          {/* Primary Action Button - Apple HIG: Full width, 54pt height */}
           <TouchableOpacity
             style={[styles.primaryButton, buttonPressed && styles.primaryButtonPressed]}
             onPress={handleContinue}
@@ -262,31 +268,149 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl },
-  hero: { marginBottom: spacing.xl, alignItems: 'center' },
-  logoWrap: { alignSelf: 'center', marginBottom: spacing.md },
-  logoShell: { width: 78, height: 78, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  
+  // Hero Section - Apple HIG: Centered layout
+  hero: { 
+    marginBottom: spacing.xl, 
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+  },
+  logoWrap: { 
+    alignSelf: 'center', 
+    marginBottom: spacing.md,
+  },
+  logoShell: { 
+    width: 78, 
+    height: 78, 
+    borderRadius: 24, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+  },
   heroLogo: { width: 48, height: 48 },
-  heroBrand: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'center', marginBottom: spacing.xs },
-  heroTitle: { ...typography.display, color: colors.text, textAlign: 'center' },
-  heroSubtitle: { ...typography.body, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.sm },
-  card: { backgroundColor: colors.card, borderRadius: 32, padding: spacing.lg, ...shadows.xl },
+  heroBrand: { 
+    color: colors.primary, 
+    fontFamily: fonts.semiBold, 
+    fontSize: 15, 
+    textAlign: 'center', 
+    marginBottom: spacing.xs,
+    writingDirection: 'ltr', // Brand name stays LTR
+  },
+  heroTitle: { 
+    ...typography.title1, 
+    color: colors.text, 
+    textAlign: 'center',
+    writingDirection: 'rtl',
+  },
+  heroSubtitle: { 
+    ...typography.body, 
+    color: colors.textSecondary, 
+    textAlign: 'center', 
+    marginTop: spacing.sm,
+    writingDirection: 'rtl',
+    paddingHorizontal: spacing.md,
+  },
+  
+  // Card - Apple HIG: Elevated surface with 32pt radius, no shadows
+  card: { 
+    backgroundColor: colors.card, 
+    borderRadius: 32, 
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  
+  // Mode List - Apple HIG: Stack layout with gap
   modeList: { gap: spacing.sm, marginBottom: spacing.lg },
-  modeCard: { backgroundColor: colors.cardSecondary, borderRadius: 20, padding: spacing.md, borderWidth: 1, borderColor: 'transparent' },
-  modeCardSelected: { borderColor: 'rgba(218,60,87,0.18)', backgroundColor: '#FFF4F6' },
-  modeTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 16, textAlign: 'right' },
+  modeCard: { 
+    backgroundColor: colors.cardSecondary, 
+    borderRadius: 20, 
+    padding: spacing.md, 
+    borderWidth: 1, 
+    borderColor: 'transparent',
+  },
+  modeCardSelected: { 
+    borderColor: 'rgba(218,60,87,0.18)', 
+    backgroundColor: '#FFF4F6',
+  },
+  modeTitle: { 
+    color: colors.text, 
+    fontFamily: fonts.bold, 
+    fontSize: 16, 
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
   modeTitleSelected: { color: colors.primary },
-  modeSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right' },
+  modeSubtitle: { 
+    color: colors.textSecondary, 
+    fontSize: 12, 
+    marginTop: 4, 
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    lineHeight: 18,
+  },
   modeSubtitleSelected: { color: colors.text },
+  
+  // Input Fields - Apple HIG: 54pt height, right-aligned
   fieldGroup: { marginBottom: spacing.md },
-  fieldLabel: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right', marginBottom: spacing.sm },
-  inputShell: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.lg, paddingHorizontal: spacing.md, minHeight: 52 },
-  inputError: { borderColor: colors.error, borderWidth: 1 },
-  input: { minHeight: 52, color: colors.text, textAlign: 'right', fontFamily: fonts.regular, writingDirection: 'rtl' },
-  errorText: { color: colors.error, fontSize: 12, fontFamily: fonts.regular, textAlign: 'right', marginTop: 4, writingDirection: 'rtl' },
-  primaryButton: { marginTop: spacing.sm, transform: [{ scale: 1 }] },
-  primaryButtonPressed: { transform: [{ scale: 0.98 }] },
-  primaryButtonGradient: { borderRadius: borderRadius.full, alignItems: 'center', justifyContent: 'center', minHeight: 54 },
-  primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 16, letterSpacing: 0.5, textAlign: 'center' },
+  fieldLabel: { 
+    color: colors.text, 
+    fontFamily: fonts.semiBold, 
+    fontSize: 14, 
+    textAlign: 'right', 
+    marginBottom: spacing.sm,
+    writingDirection: 'rtl',
+  },
+  inputShell: { 
+    backgroundColor: colors.cardSecondary, 
+    borderRadius: borderRadius.lg, 
+    paddingHorizontal: spacing.md, 
+    minHeight: 54, // Apple HIG: Minimum 44pt touch target
+    justifyContent: 'center',
+  },
+  inputError: { 
+    borderColor: colors.error, 
+    borderWidth: 1,
+  },
+  input: { 
+    minHeight: 54, 
+    color: colors.text, 
+    textAlign: 'right', 
+    fontFamily: fonts.regular, 
+    writingDirection: 'rtl',
+    fontSize: 17, // Apple HIG: Body text size
+  },
+  errorText: { 
+    color: colors.error, 
+    fontSize: 12, 
+    fontFamily: fonts.regular, 
+    textAlign: 'right', 
+    marginTop: 4, 
+    writingDirection: 'rtl',
+  },
+  
+  // Primary Button - Apple HIG: 54pt height, full width
+  primaryButton: { 
+    marginTop: spacing.lg, 
+    transform: [{ scale: 1 }],
+  },
+  primaryButtonPressed: { 
+    transform: [{ scale: 0.98 }],
+  },
+  primaryButtonGradient: { 
+    borderRadius: borderRadius.full, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    minHeight: 54, // Apple HIG: Minimum 44pt, using 54pt
+    paddingHorizontal: spacing.xl,
+  },
+  primaryButtonText: { 
+    color: colors.white, 
+    fontFamily: fonts.semiBold, 
+    fontSize: 17, // Apple HIG: Button text size
+    letterSpacing: 0, // Arabic doesn't use letter-spacing
+    textAlign: 'center',
+    writingDirection: 'rtl',
+  },
 });
 
 export default LoginScreen;

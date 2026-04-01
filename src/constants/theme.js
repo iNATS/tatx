@@ -222,62 +222,13 @@ export const borderRadius = {
   full: 9999, // Circular (pills, avatars)
 };
 
-/**
- * Apple HIG Shadows for iOS
- * Using subtle, natural shadows
- */
 export const shadows = {
-  // No shadow (flat elements)
+  // No shadows - Apple HIG iOS 26+ flat design
   none: {
     shadowColor: 'transparent',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
     elevation: 0,
-  },
-  
-  // Small shadow (subtle depth)
-  sm: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  
-  // Medium shadow (cards, buttons)
-  md: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  
-  // Large shadow (modals, sheets)
-  lg: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  
-  // Extra large (floating elements)
-  xl: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  
-  // Floating (iOS floating action button)
-  float: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
   },
 };

@@ -194,7 +194,7 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
         
-        {/* Services - Scroll from RIGHT */}
+        {/* Services - Scroll from RIGHT - Apple HIG: Icon chips with proper spacing */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.servicesRow}>
           {homeServices.map((service) => (
             <TouchableOpacity key={service.id} style={styles.serviceChip} activeOpacity={0.88} onPress={() => handleServicePress(service)}>
@@ -224,7 +224,7 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        {/* Restaurants Section - Image on RIGHT */}
+        {/* Restaurants Section - Image on RIGHT - Apple HIG: Card layout */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>مطاعم</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
@@ -253,6 +253,7 @@ const HomeScreen = ({ navigation }) => {
                 </View>
                 <View style={styles.hotRestaurantBottom}>
                   <View style={styles.hotDeliveryPill}>
+                    <Ionicons name="time-outline" size={12} color={colors.primary} />
                     <Text style={styles.hotDeliveryText}>{restaurant.deliveryTime} دقيقة</Text>
                   </View>
                   <View style={styles.hotTagsRow}>
@@ -361,67 +362,155 @@ const styles = StyleSheet.create({
   avatarShell: { width: 44, height: 44, borderRadius: 16, backgroundColor: '#FFF0F3', alignItems: 'center', justifyContent: 'center', marginLeft: spacing.sm },
   avatarLogo: { width: 28, height: 28 },
   topBarText: { flex: 1, marginRight: spacing.sm },
-  welcomeText: { ...typography.h3, color: colors.text, textAlign: 'right' },
-  locationText: { ...typography.caption, color: colors.textSecondary, textAlign: 'right', marginTop: 2 },
-  notificationButton: { width: 44, height: 44, borderRadius: 16, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', ...shadows.sm },
+  welcomeText: { ...typography.h3, color: colors.text, textAlign: 'right', writingDirection: 'rtl' },
+  locationText: { ...typography.caption, color: colors.textSecondary, textAlign: 'right', marginTop: 2, writingDirection: 'rtl' },
+  notificationButton: { 
+    width: 44, 
+    height: 44, 
+    borderRadius: 22, 
+    backgroundColor: colors.card, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
   
-  // Search Card - Icon on RIGHT
-  searchCard: { marginBottom: spacing.md, borderRadius: 28, overflow: 'hidden', ...shadows.md },
+  // Search Card - Apple HIG: No shadows, border only
+  searchCard: { 
+    marginBottom: spacing.md, 
+    borderRadius: 28, 
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
   searchGradient: { padding: spacing.md },
   searchMain: { flexDirection: 'row-reverse', alignItems: 'center' },
   searchTextWrap: { flex: 1, marginHorizontal: spacing.md },
-  searchTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right' },
-  searchPlaceholder: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', lineHeight: 18 },
+  searchTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right', writingDirection: 'rtl' },
+  searchPlaceholder: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', lineHeight: 18, writingDirection: 'rtl' },
   searchIconWrap: { width: 54, height: 54, borderRadius: 20, backgroundColor: '#FFE8EE', alignItems: 'center', justifyContent: 'center' },
   
-  // Hero Offer
-  heroOfferCard: { marginBottom: spacing.md, width: '100%', height: 238, borderRadius: 30, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
+  // Hero Offer - Apple HIG: No shadows
+  heroOfferCard: { 
+    marginBottom: spacing.md, 
+    width: '100%', 
+    height: 238, 
+    borderRadius: 30, 
+    overflow: 'hidden', 
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
   
   // Section Header - Title on RIGHT, Link on LEFT
   sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
-  sectionTitle: { ...typography.h3, color: colors.text, textAlign: 'right' },
-  sectionLink: { ...typography.caption, color: colors.primary, textAlign: 'left' },
+  sectionTitle: { ...typography.h3, color: colors.text, textAlign: 'right', writingDirection: 'rtl' },
+  sectionLink: { ...typography.caption, color: colors.primary, textAlign: 'left', writingDirection: 'rtl' },
   
-  // Services
+  // Services - Apple HIG: Icon chips with proper spacing, no shadows
   servicesRow: { gap: spacing.sm, paddingBottom: spacing.xs },
-  serviceChip: { backgroundColor: colors.card, borderRadius: 22, paddingHorizontal: spacing.md, paddingVertical: spacing.md, alignItems: 'center', minWidth: 88, ...shadows.sm },
-  serviceIcon: { width: 44, height: 44, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
-  serviceName: { ...typography.bodySmall, color: colors.text, fontFamily: fonts.semiBold },
+  serviceChip: { 
+    backgroundColor: colors.card, 
+    borderRadius: 20, 
+    paddingHorizontal: spacing.md, 
+    paddingVertical: spacing.md, 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    minWidth: 96,
+    minHeight: 96,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  serviceIcon: { 
+    width: 48, 
+    height: 48, 
+    borderRadius: 16, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: spacing.sm,
+  },
+  serviceName: { 
+    ...typography.bodySmall, 
+    color: colors.text, 
+    fontFamily: fonts.semiBold, 
+    writingDirection: 'rtl',
+    textAlign: 'center',
+  },
   
   // Horizontal Lists
   horizontalList: { gap: spacing.md, paddingBottom: spacing.xs },
   
-  // Offer Cards
-  offerCard: { width: 270, height: 220, borderRadius: 28, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
-  offerImage: { width: '100%', height: '100%' },
-  offerGradient: { ...StyleSheet.absoluteFillObject, justifyContent: 'flex-end', padding: spacing.lg },
-  offerVendor: { color: 'rgba(255,255,255,0.86)', fontFamily: fonts.semiBold, fontSize: 12, textAlign: 'right' },
-  offerTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.xs, textAlign: 'right' },
-  offerSubtitle: { color: 'rgba(255,255,255,0.88)', fontSize: 12, lineHeight: 18, marginTop: spacing.xs, textAlign: 'right' },
+  // Offer Cards - Apple HIG: Full bleed image with gradient overlay, no shadows
+  offerCard: { 
+    width: 280, 
+    height: 200, 
+    borderRadius: 28, 
+    overflow: 'hidden', 
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  offerImage: { 
+    width: '100%', 
+    height: '100%',
+  },
+  offerGradient: { 
+    ...StyleSheet.absoluteFillObject, 
+    justifyContent: 'flex-end', 
+    padding: spacing.lg,
+  },
+  offerVendor: { 
+    color: 'rgba(255,255,255,0.9)', 
+    fontFamily: fonts.semiBold, 
+    fontSize: 12, 
+    textAlign: 'right', 
+    writingDirection: 'rtl',
+  },
+  offerTitle: { 
+    color: colors.white, 
+    fontFamily: fonts.bold, 
+    fontSize: 22, 
+    marginTop: spacing.xs, 
+    textAlign: 'right', 
+    writingDirection: 'rtl',
+    lineHeight: 28,
+  },
+  offerSubtitle: { 
+    color: 'rgba(255,255,255,0.9)', 
+    fontSize: 13, 
+    lineHeight: 18, 
+    marginTop: spacing.xs, 
+    textAlign: 'right', 
+    writingDirection: 'rtl',
+  },
   
-  // Restaurant Cards - Image on RIGHT
+  // Restaurant Cards - Apple HIG: Image on RIGHT, content flows left, no shadows
   hotList: { gap: spacing.md, marginBottom: spacing.sm },
   hotRestaurantCard: {
     backgroundColor: colors.card,
-    borderRadius: 28,
+    borderRadius: 24,
     padding: spacing.md,
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    ...shadows.sm,
+    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   hotRestaurantCardFeatured: {
     backgroundColor: '#FFF4F6',
+    borderWidth: 1,
+    borderColor: 'rgba(218,60,87,0.15)',
   },
   hotRestaurantImage: {
-    width: 96,
-    height: 96,
-    borderRadius: 22,
+    width: 88,
+    height: 88,
+    borderRadius: 20,
     backgroundColor: colors.cardSecondary,
   },
   hotRestaurantBody: {
     flex: 1,
-    marginHorizontal: spacing.md,
     justifyContent: 'space-between',
+    gap: spacing.sm,
   },
   hotRestaurantTop: {
     flexDirection: 'row-reverse',
@@ -436,11 +525,14 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
     paddingHorizontal: 10,
     paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   hotMetaPillText: {
     color: colors.primary,
     fontFamily: fonts.bold,
     fontSize: 11,
+    writingDirection: 'ltr',
   },
   hotRestaurantInfo: {
     flex: 1,
@@ -449,31 +541,37 @@ const styles = StyleSheet.create({
   hotRestaurantName: {
     color: colors.text,
     fontFamily: fonts.bold,
-    fontSize: 17,
+    fontSize: 16,
     textAlign: 'right',
+    writingDirection: 'rtl',
   },
   hotRestaurantCategory: {
     color: colors.textSecondary,
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 2,
     textAlign: 'right',
+    writingDirection: 'rtl',
   },
   hotRestaurantBottom: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: spacing.md,
+    gap: spacing.sm,
   },
   hotDeliveryPill: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: '#FFE8EE',
     borderRadius: borderRadius.full,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
   hotDeliveryText: {
     color: colors.primary,
     fontFamily: fonts.semiBold,
-    fontSize: 12,
+    fontSize: 11,
+    writingDirection: 'rtl',
   },
   hotTagsRow: {
     flexDirection: 'row-reverse',
@@ -483,59 +581,221 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cardSecondary,
     borderRadius: borderRadius.full,
     paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingVertical: 6,
   },
   hotTagText: {
     color: colors.textSecondary,
     fontSize: 11,
     fontFamily: fonts.semiBold,
+    writingDirection: 'rtl',
   },
   miniRailCard: {
-    width: 158,
+    width: 160,
     backgroundColor: colors.card,
-    borderRadius: 26,
+    borderRadius: 24,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: '#F7E2E7',
-    ...shadows.sm,
+    alignItems: 'center',
   },
   miniRailIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 18,
+    width: 56,
+    height: 56,
+    borderRadius: 20,
     backgroundColor: '#FFF1F4',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
     borderWidth: 1,
     borderColor: '#F7D6DE',
   },
-  miniRailTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 15, textAlign: 'right' },
-  miniRailSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 6, textAlign: 'right', lineHeight: 18 },
-  productRailCard: { width: 176, backgroundColor: colors.card, borderRadius: 26, padding: spacing.sm, borderWidth: 1, borderColor: '#F7E2E7', ...shadows.sm },
-  productRailImage: { width: '100%', height: 116, borderRadius: 18, backgroundColor: colors.cardSecondary, marginBottom: spacing.sm },
-  productRailTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, lineHeight: 20, textAlign: 'right', marginBottom: spacing.xs },
-  marketLuxuryCard: { width: 220, backgroundColor: colors.card, borderRadius: 28, overflow: 'hidden', ...shadows.md },
-  marketLuxuryImage: { width: '100%', height: 154, backgroundColor: colors.cardSecondary },
-  marketLuxuryInfo: { padding: spacing.md, alignItems: 'flex-end' },
-  marketLuxuryEyebrow: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 12, textAlign: 'right' },
-  marketLuxuryTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right', marginTop: 6, marginBottom: spacing.xs, lineHeight: 24 },
-  taxiPromoCard: { marginTop: spacing.xl, borderRadius: 28, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
-  taxiPromoImage: { width: '100%', height: 168 },
-  taxiPromoContentCard: { margin: spacing.md, marginTop: -26, backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: 24, padding: spacing.md, flexDirection: 'row-reverse', alignItems: 'center', ...shadows.sm },
-  taxiPromoBadge: { width: 56, height: 56, borderRadius: 20, backgroundColor: '#FFF1F4', alignItems: 'center', justifyContent: 'center' },
-  taxiPromoText: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
-  taxiPromoTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 20, textAlign: 'right' },
-  taxiPromoSubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', lineHeight: 18, marginTop: 4 },
-  specialtyLuxuryCard: { width: 210, backgroundColor: colors.card, borderRadius: 28, overflow: 'hidden', ...shadows.md },
-  specialtyLuxuryImage: { width: '100%', height: 142, backgroundColor: colors.cardSecondary },
-  specialtyLuxuryInfo: { padding: spacing.md, alignItems: 'flex-end' },
-  specialtyLuxuryBadge: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#FFF1F4', alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
-  specialtyLuxuryTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17, textAlign: 'right' },
-  specialtyLuxurySubtitle: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', marginTop: 4, lineHeight: 18 },
-  cartBar: { position: 'absolute', left: spacing.md, right: spacing.md, backgroundColor: colors.text, borderRadius: 24, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', ...shadows.float },
-  cartBarTitle: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
-  cartBarSubtitle: { color: 'rgba(255,255,255,0.72)', fontSize: 12, marginTop: 2, textAlign: 'right' },
+  miniRailTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 14, textAlign: 'center', writingDirection: 'rtl' },
+  miniRailSubtitle: { color: colors.textSecondary, fontSize: 11, textAlign: 'center', lineHeight: 16, writingDirection: 'rtl' },
+  productRailCard: { 
+    width: 176, 
+    backgroundColor: colors.card, 
+    borderRadius: 24, 
+    padding: spacing.sm, 
+    borderWidth: 1, 
+    borderColor: '#F7E2E7', 
+    alignItems: 'center',
+  },
+  productRailImage: { 
+    width: '100%', 
+    height: 120, 
+    borderRadius: 18, 
+    backgroundColor: colors.cardSecondary, 
+    marginBottom: spacing.sm,
+  },
+  productRailTitle: { 
+    color: colors.text, 
+    fontFamily: fonts.semiBold, 
+    fontSize: 14, 
+    lineHeight: 20, 
+    textAlign: 'center', 
+    marginBottom: spacing.xs, 
+    writingDirection: 'rtl',
+  },
+  
+  // Market Cards - Apple HIG: Image top, info aligned right, no shadows
+  marketLuxuryCard: { 
+    width: 220, 
+    backgroundColor: colors.card, 
+    borderRadius: 28, 
+    overflow: 'hidden', 
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  marketLuxuryImage: { 
+    width: '100%', 
+    height: 154, 
+    backgroundColor: colors.cardSecondary,
+  },
+  marketLuxuryInfo: { 
+    padding: spacing.md, 
+    alignItems: 'flex-end',
+  },
+  marketLuxuryEyebrow: { 
+    color: colors.primary, 
+    fontFamily: fonts.semiBold, 
+    fontSize: 12, 
+    textAlign: 'right', 
+    writingDirection: 'rtl',
+  },
+  marketLuxuryTitle: { 
+    color: colors.text, 
+    fontFamily: fonts.bold, 
+    fontSize: 17, 
+    textAlign: 'right', 
+    marginTop: 6, 
+    marginBottom: spacing.xs, 
+    lineHeight: 24, 
+    writingDirection: 'rtl',
+  },
+  // Taxi Promo Card - Apple HIG: Image top, overlay content, no shadows
+  taxiPromoCard: { 
+    marginTop: spacing.xl, 
+    borderRadius: 28, 
+    overflow: 'hidden', 
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  taxiPromoImage: { 
+    width: '100%', 
+    height: 180,
+  },
+  taxiPromoContentCard: { 
+    margin: spacing.md, 
+    marginTop: -32, 
+    backgroundColor: 'rgba(255,255,255,0.98)', 
+    borderRadius: 24, 
+    padding: spacing.md, 
+    flexDirection: 'row-reverse', 
+    alignItems: 'center', 
+    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  taxiPromoBadge: { 
+    width: 56, 
+    height: 56, 
+    borderRadius: 20, 
+    backgroundColor: '#FFF1F4', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  taxiPromoText: { 
+    flex: 1,
+  },
+  taxiPromoTitle: { 
+    color: colors.text, 
+    fontFamily: fonts.bold, 
+    fontSize: 18, 
+    textAlign: 'right', 
+    writingDirection: 'rtl',
+    lineHeight: 24,
+  },
+  taxiPromoSubtitle: { 
+    color: colors.textSecondary, 
+    fontSize: 12, 
+    textAlign: 'right', 
+    lineHeight: 18, 
+    marginTop: 4, 
+    writingDirection: 'rtl',
+  },
+  
+  // Pharmacy/Specialty Cards - Apple HIG: Image with badge overlay, no shadows
+  specialtyLuxuryCard: { 
+    width: 200, 
+    backgroundColor: colors.card, 
+    borderRadius: 28, 
+    overflow: 'hidden', 
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  specialtyLuxuryImage: { 
+    width: '100%', 
+    height: 140, 
+    backgroundColor: colors.cardSecondary,
+  },
+  specialtyLuxuryInfo: { 
+    padding: spacing.md, 
+    alignItems: 'flex-end',
+  },
+  specialtyLuxuryBadge: { 
+    width: 40, 
+    height: 40, 
+    borderRadius: 17, 
+    backgroundColor: '#FFF1F4', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: spacing.sm,
+  },
+  specialtyLuxuryTitle: { 
+    color: colors.text, 
+    fontFamily: fonts.bold, 
+    fontSize: 16, 
+    textAlign: 'right', 
+    writingDirection: 'rtl',
+  },
+  specialtyLuxurySubtitle: { 
+    color: colors.textSecondary, 
+    fontSize: 11, 
+    textAlign: 'right', 
+    marginTop: 4, 
+    lineHeight: 16, 
+    writingDirection: 'rtl',
+  },
+  cartBar: { 
+    position: 'absolute', 
+    left: spacing.md, 
+    right: spacing.md, 
+    backgroundColor: colors.text, 
+    borderRadius: 24, 
+    paddingHorizontal: spacing.lg, 
+    paddingVertical: spacing.md, 
+    flexDirection: 'row-reverse', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  cartBarTitle: { 
+    color: colors.white, 
+    fontFamily: fonts.semiBold, 
+    fontSize: 15, 
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  cartBarSubtitle: { 
+    color: 'rgba(255,255,255,0.72)', 
+    fontSize: 12, 
+    marginTop: 2, 
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
 });
 
 export default HomeScreen;

@@ -183,6 +183,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingTop: spacing.xs,
     backgroundColor: colors.card,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
   },
   tabItem: {
     flex: 1,
@@ -201,10 +203,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: colors.textSecondary,
     fontFamily: fonts.regular,
+    writingDirection: 'rtl',
   },
   tabLabelFocused: {
     color: colors.primary,
     fontFamily: fonts.semiBold,
+    writingDirection: 'rtl',
   },
   appShell: {
     flex: 1,

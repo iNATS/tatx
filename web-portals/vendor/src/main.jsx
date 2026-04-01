@@ -309,36 +309,207 @@ const ServiceCard = ({ service, onEdit, onDelete }) => (
   </Card>
 );
 
-const OrderRow = ({ order }) => (
-  <tr className="border-b border-slate-50 transition-colors hover:bg-slate-50/50">
-    <td className="px-4 py-4 font-bold text-slate-900">{order.order_number}</td>
-    <td className="px-4 py-4">
-      <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-600">
-          <Users className="h-4 w-4" />
+const OrderRow = ({ order, onViewDetails, onUpdateStatus }) => {
+  const statusColors = {
+    pending: 'warning',
+    preparing: 'primary',
+    ready: 'slate',
+    on_way: 'primary',
+    completed: 'success',
+    cancelled: 'error',
+  };
+
+  const statusLabels = {
+    pending: 'قيد الانتظار',
+    preparing: 'قيد التحضير',
+    ready: 'جاهز للاستلام',
+    on_way: 'في الطريق',
+    completed: 'مكتمل',
+    cancelled: 'ملغى',
+  };
+
+  return (
+    <tr className="border-b border-slate-50 transition-colors hover:bg-slate-50/50">
+      <td className="px-4 py-4 font-bold text-slate-900">{order.order_number}</td>
+      <td className="px-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-600">
+            <Users className="h-4 w-4" />
+          </div>
+          <span className="font-semibold">{order.customer_name || 'عميل التطبيق'}</span>
         </div>
-        <span className="font-semibold">{order.customer_name || 'عميل التطبيق'}</span>
+      </td>
+      <td className="px-4 py-4">
+        <div className="font-bold text-slate-950">{order.total} ر.س</div>
+        {order.discount > 0 && <div className="text-xs text-error-600">خصم: {order.discount} ر.س</div>}
+      </td>
+      <td className="px-4 py-4">
+        <Badge variant={statusColors[order.status] || 'slate'}>
+          {statusLabels[order.status] || order.status}
+        </Badge>
+      </td>
+      <td className="px-4 py-4 text-slate-500">
+        {order.created_at ? new Date(order.created_at).toLocaleString('ar-SA') : '-'}
+      </td>
+      <td className="px-4 py-4">
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={() => onViewDetails(order)}>
+            <Eye className="h-4 w-4" />
+          </Button>
+          {order.status === 'pending' && (
+            <Button variant="success" size="sm" onClick={() => onUpdateStatus(order.id, 'preparing')}>
+              <CheckCircle2 className="h-4 w-4" />
+            </Button>
+          )}
+          {order.status === 'preparing' && (
+            <Button variant="primary" size="sm" onClick={() => onUpdateStatus(order.id, 'ready')}>
+              <Package className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+// Order Details Modal
+const OrderDetailsModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
+  if (!order) return null;
+
+  const statusColors = {
+    pending: 'warning',
+    preparing: 'primary',
+    ready: 'slate',
+    on_way: 'primary',
+    completed: 'success',
+    cancelled: 'error',
+  };
+
+  const statusLabels = {
+    pending: 'قيد الانتظار',
+    preparing: 'قيد التحضير',
+    ready: 'جاهز للاستلام',
+    on_way: 'في الطريق',
+    completed: 'مكتمل',
+    cancelled: 'ملغى',
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={`تفاصيل الطلب - ${order.order_number}`}>
+      <div className="space-y-6">
+        {/* Order Status */}
+        <div className="rounded-3xl bg-slate-50 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-slate-500">حالة الطلب</div>
+              <div className="mt-2">
+                <Badge variant={statusColors[order.status] || 'slate'}>
+                  {statusLabels[order.status] || order.status}
+                </Badge>
+              </div>
+            </div>
+            <div className="text-left">
+              <div className="text-sm text-slate-500">رقم الطلب</div>
+              <div className="mt-1 font-bold text-slate-950">{order.order_number}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Customer Info */}
+        <div>
+          <h4 className="font-bold text-slate-950 mb-3">معلومات العميل</h4>
+          <div className="rounded-2xl border border-slate-200 p-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <div className="text-xs text-slate-400">اسم العميل</div>
+                <div className="font-semibold text-slate-950">{order.customer_name || 'عميل التطبيق'}</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-400">رقم الجوال</div>
+                <div className="font-semibold text-slate-950">{order.customer_phone || 'غير متوفر'}</div>
+              </div>
+              <div className="md:col-span-2">
+                <div className="text-xs text-slate-400">العنوان</div>
+                <div className="font-semibold text-slate-950">{order.address || 'غير متوفر'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Items */}
+        <div>
+          <h4 className="font-bold text-slate-950 mb-3">المنتجات</h4>
+          <div className="space-y-2">
+            {(order.items || []).map((item, index) => (
+              <div key={index} className="flex items-center justify-between rounded-2xl border border-slate-200 p-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600 font-bold text-sm">
+                    {item.quantity}x
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-950">{item.name}</div>
+                    {item.description && <div className="text-xs text-slate-500">{item.description}</div>}
+                  </div>
+                </div>
+                <div className="font-bold text-slate-950">{item.price} ر.س</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Payment Summary */}
+        <div className="rounded-2xl bg-slate-50 p-4 space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-slate-500">المجموع الجزئي</span>
+            <span className="font-semibold text-slate-950">{order.subtotal} ر.س</span>
+          </div>
+          {order.discount > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-500">الخصم</span>
+              <span className="font-semibold text-error-600">-{order.discount} ر.س</span>
+            </div>
+          )}
+          <div className="flex justify-between text-sm">
+            <span className="text-slate-500">رسوم التوصيل</span>
+            <span className="font-semibold text-slate-950">{order.delivery_fee} ر.س</span>
+          </div>
+          <div className="border-t border-slate-200 pt-2 flex justify-between">
+            <span className="font-bold text-slate-950">الإجمالي</span>
+            <span className="font-bold text-primary-600">{order.total} ر.س</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-slate-100">
+          {order.status === 'pending' && (
+            <Button 
+              className="flex-1" 
+              onClick={() => {
+                onUpdateStatus(order.id, 'preparing');
+                onClose();
+              }}
+            >
+              ابدأ التحضير
+            </Button>
+          )}
+          {order.status === 'preparing' && (
+            <Button 
+              className="flex-1" 
+              variant="success"
+              onClick={() => {
+                onUpdateStatus(order.id, 'ready');
+                onClose();
+              }}
+            >
+              جاهز للاستلام
+            </Button>
+          )}
+          <Button variant="secondary" className="flex-1" onClick={onClose}>إغلاق</Button>
+        </div>
       </div>
-    </td>
-    <td className="px-4 py-4">
-      <div className="font-bold text-slate-950">{order.total} ر.س</div>
-      {order.discount > 0 && <div className="text-xs text-error-600">خصم: {order.discount} ر.س</div>}
-    </td>
-    <td className="px-4 py-4">
-      <Badge variant={order.status === 'completed' ? 'success' : order.status === 'pending' ? 'warning' : 'slate'}>
-        {order.status === 'completed' ? 'مكتمل' : order.status === 'pending' ? 'قيد الانتظار' : order.status}
-      </Badge>
-    </td>
-    <td className="px-4 py-4 text-slate-500">
-      {order.created_at ? new Date(order.created_at).toLocaleString('ar-SA') : '-'}
-    </td>
-    <td className="px-4 py-4">
-      <Button variant="ghost" size="sm" icon={Eye}>
-        عرض
-      </Button>
-    </td>
-  </tr>
-);
+    </Modal>
+  );
+};
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -614,21 +785,73 @@ const VendorPortal = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
+  
+  // OTP State
+  const [otpMode, setOtpMode] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState('1234');
+  
+  // Order State
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
 
-  const handleLogin = async () => {
+  const handleSendOTP = async () => {
     try {
       setLoading(true);
       setError('');
+      console.log('📤 Sending OTP to:', phone);
+      
+      // Fetch vendor data to check if account exists
       const result = await fetchVendorPortalData(phone);
       setData(result);
       
-      if (result.application?.status === 'approved') {
-        setIsAuthenticated(true);
-      }
+      // Generate OTP (in production, send via SMS)
+      const otp = '1234'; // Test OTP
+      setGeneratedOtp(otp);
+      
+      console.log('✅ OTP sent:', otp);
+      
+      // Show OTP screen
+      setOtpMode(true);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    try {
+      setVerifyingOtp(true);
+      console.log('🔐 Verifying OTP:', otpCode);
+
+      // Check OTP
+      if (otpCode !== generatedOtp) {
+        setError('رمز التحقق غير صحيح');
+        setVerifyingOtp(false);
+        return;
+      }
+
+      console.log('✅ OTP verified');
+
+      // For demo/testing - allow login even without approved status
+      // In production, check: if (data.application?.status !== 'approved')
+      if (data.application?.status === 'rejected') {
+        setError('الطلب مرفوض. يرجى التواصل مع الدعم');
+        setVerifyingOtp(false);
+        return;
+      }
+
+      // Login successful - allow access even if pending (for testing)
+      console.log('✅ Login successful');
+      setIsAuthenticated(true);
+      setOtpMode(false);
+    } catch (err) {
+      console.error('❌ Login error:', err);
+      setError(err.message);
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
@@ -652,10 +875,53 @@ const VendorPortal = () => {
     }
   };
 
-  // Render pending or approved state
-  if (isAuthenticated && data.profile) {
-    const activeServices = data.services.filter((s) => s.is_active).length;
-    const totalSales = data.orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    console.log('📦 Updating order status:', orderId, '→', newStatus);
+    
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/customer_orders?id=eq.${orderId}`, {
+        method: 'PATCH',
+        headers: getHeaders({ Prefer: 'return=representation' }),
+        body: JSON.stringify({ status: newStatus }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update order status');
+      }
+      
+      // Update local state
+      setData((prev) => ({
+        ...prev,
+        orders: prev.orders.map((order) =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        ),
+      }));
+      
+      console.log('✅ Order status updated');
+    } catch (error) {
+      console.error('❌ Error updating order:', error);
+      alert('فشل تحديث حالة الطلب');
+    }
+  };
+
+  const handleViewOrderDetails = (order) => {
+    setSelectedOrder(order);
+    setOrderModalOpen(true);
+  };
+
+  // Render authenticated vendor portal
+  if (isAuthenticated) {
+    const activeServices = data.services ? data.services.filter((s) => s.is_active).length : 0;
+    const totalSales = data.orders ? data.orders.reduce((sum, o) => sum + Number(o.total || 0), 0) : 0;
+    const servicesCount = data.services ? data.services.length : 0;
+    const ordersCount = data.orders ? data.orders.length : 0;
+    const profile = data.profile || { 
+      store_name: 'متجر تجريبي', 
+      owner_name: 'مستخدم تجريبي', 
+      city: 'الرياض', 
+      commission_rate: 10,
+      phone: phone
+    };
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-white via-rose-50/30 to-slate-50" dir="rtl">
@@ -750,8 +1016,8 @@ const VendorPortal = () => {
               <div className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   <StatCard title="الخدمات النشطة" value={activeServices} note="المعروضة الآن" icon={Package} trend="up" trendValue="+2 هذا الأسبوع" color="success" />
-                  <StatCard title="إجمالي الخدمات" value={data.services.length} note="قابلة للإدارة" icon={Store} color="primary" />
-                  <StatCard title="الطلبات" value={data.orders.length} note="كل الطلبات" icon={ShoppingBag} trend="up" trendValue="+12% هذا الشهر" color="warning" />
+                  <StatCard title="إجمالي الخدمات" value={servicesCount} note="قابلة للإدارة" icon={Store} color="primary" />
+                  <StatCard title="الطلبات" value={ordersCount} note="كل الطلبات" icon={ShoppingBag} trend="up" trendValue="+12% هذا الشهر" color="warning" />
                   <StatCard title="المبيعات" value={`${totalSales.toFixed(0)} ر.س`} note="إجمالي المبيعات" icon={Wallet} trend="up" trendValue="+25% هذا الأسبوع" color="success" />
                 </div>
 
@@ -761,27 +1027,31 @@ const VendorPortal = () => {
                       <h3 className="text-lg font-bold text-slate-950">آخر الخدمات</h3>
                     </div>
                     <div className="divide-y divide-slate-50">
-                      {data.services.slice(0, 5).map((service) => (
-                        <div key={service.id} className="flex items-center justify-between p-4 transition-colors hover:bg-slate-50/50">
-                          <div className="flex items-center gap-4">
-                            {service.image_url ? (
-                              <img src={service.image_url} alt={service.title} className="h-12 w-12 rounded-xl object-cover" />
-                            ) : (
-                              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
-                                <Package className="h-5 w-5" />
+                      {data.services && data.services.length > 0 ? (
+                        data.services.slice(0, 5).map((service) => (
+                          <div key={service.id} className="flex items-center justify-between p-4 transition-colors hover:bg-slate-50/50">
+                            <div className="flex items-center gap-4">
+                              {service.image_url ? (
+                                <img src={service.image_url} alt={service.title} className="h-12 w-12 rounded-xl object-cover" />
+                              ) : (
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
+                                  <Package className="h-5 w-5" />
+                                </div>
+                              )}
+                              <div>
+                                <div className="font-bold text-slate-950">{service.title}</div>
+                                <div className="text-xs text-slate-400">{service.category} • {service.inventory_count} بالمخزون</div>
                               </div>
-                            )}
-                            <div>
-                              <div className="font-bold text-slate-950">{service.title}</div>
-                              <div className="text-xs text-slate-400">{service.category} • {service.inventory_count} بالمخزون</div>
+                            </div>
+                            <div className="text-left">
+                              <div className="font-bold text-slate-950">{service.price} ر.س</div>
+                              <Badge variant={service.is_active ? 'success' : 'warning'}>{service.is_active ? 'نشط' : 'موقوف'}</Badge>
                             </div>
                           </div>
-                          <div className="text-left">
-                            <div className="font-bold text-slate-950">{service.price} ر.س</div>
-                            <Badge variant={service.is_active ? 'success' : 'warning'}>{service.is_active ? 'نشط' : 'موقوف'}</Badge>
-                          </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <div className="p-4 text-center text-sm text-slate-500">لا توجد خدمات بعد</div>
+                      )}
                     </div>
                   </Card>
 
@@ -827,73 +1097,101 @@ const VendorPortal = () => {
                 </div>
 
                 <div className="grid gap-4 xl:grid-cols-2">
-                  {data.services.map((service) => (
-                    <ServiceCard
-                      key={service.id}
-                      service={service}
-                      onEdit={(s) => { setEditingService(s); setServiceModalOpen(true); }}
-                      onDelete={handleDeleteService}
-                    />
-                  ))}
-                </div>
-
-                {data.services.length === 0 && (
-                  <Card>
-                    <div className="flex flex-col items-center justify-center p-12 text-center">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary-100 text-primary-600">
-                        <Package className="h-10 w-10" />
-                      </div>
-                      <h3 className="mt-6 text-xl font-bold text-slate-950">لا توجد خدمات بعد</h3>
-                      <p className="mt-2 text-sm text-slate-500">ابدأ بإضافة أول خدمة لمتجرك</p>
-                      <Button className="mt-6" icon={Plus} onClick={() => { setEditingService(null); setServiceModalOpen(true); }}>
-                        إضافة خدمة
-                      </Button>
+                  {data.services && data.services.length > 0 ? (
+                    data.services.map((service) => (
+                      <ServiceCard
+                        key={service.id}
+                        service={service}
+                        onEdit={(s) => { setEditingService(s); setServiceModalOpen(true); }}
+                        onDelete={handleDeleteService}
+                      />
+                    ))
+                  ) : (
+                    <div className="xl:col-span-2">
+                      <Card>
+                        <div className="flex flex-col items-center justify-center p-12 text-center">
+                          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary-100 text-primary-600">
+                            <Package className="h-10 w-10" />
+                          </div>
+                          <h3 className="mt-6 text-xl font-bold text-slate-950">لا توجد خدمات بعد</h3>
+                          <p className="mt-2 text-sm text-slate-500">ابدأ بإضافة أول خدمة لمتجرك</p>
+                          <Button className="mt-6" icon={Plus} onClick={() => { setEditingService(null); setServiceModalOpen(true); }}>
+                            إضافة خدمة
+                          </Button>
+                        </div>
+                      </Card>
                     </div>
-                  </Card>
-                )}
+                  )}
+                </div>
               </div>
             )}
 
             {activeTab === 'orders' && (
-              <Card>
-                <div className="border-b border-slate-100 px-6 py-5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-2xl font-black text-slate-950">الطلبات</h2>
-                      <p className="mt-1 text-sm text-slate-500">جميع الطلبات المرتبطة بمتجرك</p>
-                    </div>
-                    <Button variant="secondary" icon={Filter}>تصفية</Button>
-                  </div>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full">
-                    <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/50 text-right text-xs font-bold uppercase text-slate-400">
-                        <th className="px-4 py-3 first:pr-0">رقم الطلب</th>
-                        <th className="px-4 py-3">العميل</th>
-                        <th className="px-4 py-3">الإجمالي</th>
-                        <th className="px-4 py-3">الحالة</th>
-                        <th className="px-4 py-3">الوقت</th>
-                        <th className="px-4 py-3 last:pl-0">إجراءات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.orders.map((order) => (
-                        <OrderRow key={order.id} order={order} />
-                      ))}
-                    </tbody>
-                  </table>
-                  {data.orders.length === 0 && (
-                    <div className="flex flex-col items-center justify-center p-12 text-center">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100 text-slate-400">
-                        <ShoppingBag className="h-10 w-10" />
+              <>
+                <Card>
+                  <div className="border-b border-slate-100 px-6 py-5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-2xl font-black text-slate-950">الطلبات</h2>
+                        <p className="mt-1 text-sm text-slate-500">جميع الطلبات المرتبطة بمتجرك</p>
                       </div>
-                      <h3 className="mt-6 text-xl font-bold text-slate-950">لا توجد طلبات بعد</h3>
-                      <p className="mt-2 text-sm text-slate-500">ستظهر الطلبات هنا عند بدء استقبالها</p>
+                      <div className="flex gap-2">
+                        <Button variant="secondary" icon={Filter}>تصفية</Button>
+                        <Badge variant="primary">{ordersCount} طلب</Badge>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </Card>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="border-b border-slate-100 bg-slate-50/50 text-right text-xs font-bold uppercase text-slate-400">
+                          <th className="px-4 py-3 first:pr-0">رقم الطلب</th>
+                          <th className="px-4 py-3">العميل</th>
+                          <th className="px-4 py-3">الإجمالي</th>
+                          <th className="px-4 py-3">الحالة</th>
+                          <th className="px-4 py-3">الوقت</th>
+                          <th className="px-4 py-3 last:pl-0">إجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.orders && data.orders.length > 0 ? (
+                          data.orders.map((order) => (
+                            <OrderRow 
+                              key={order.id} 
+                              order={order}
+                              onViewDetails={handleViewOrderDetails}
+                              onUpdateStatus={handleUpdateOrderStatus}
+                            />
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="6" className="p-12 text-center">
+                              <div className="flex flex-col items-center justify-center">
+                                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100 text-slate-400">
+                                  <ShoppingBag className="h-10 w-10" />
+                                </div>
+                                <h3 className="mt-6 text-xl font-bold text-slate-950">لا توجد طلبات بعد</h3>
+                                <p className="mt-2 text-sm text-slate-500">ستظهر الطلبات هنا عند بدء استقبالها</p>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+                
+                {/* Order Details Modal */}
+                <OrderDetailsModal 
+                  order={selectedOrder}
+                  isOpen={orderModalOpen}
+                  onClose={() => {
+                    setOrderModalOpen(false);
+                    setSelectedOrder(null);
+                  }}
+                  onUpdateStatus={handleUpdateOrderStatus}
+                />
+              </>
             )}
 
             {activeTab === 'settings' && (
@@ -901,11 +1199,96 @@ const VendorPortal = () => {
                 <div className="border-b border-slate-100 px-6 py-5">
                   <h2 className="text-2xl font-black text-slate-950">إعدادات المتجر</h2>
                 </div>
-                <div className="p-6">
-                  <div className="rounded-3xl bg-primary-50 p-6 text-center">
-                    <Settings className="mx-auto h-16 w-16 text-primary-500" />
-                    <h3 className="mt-4 text-xl font-bold text-slate-950">قريباً</h3>
-                    <p className="mt-2 text-sm text-slate-500">سيتم إضافة إعدادات المتجر قريباً</p>
+                <div className="p-6 space-y-6">
+                  {/* Store Information */}
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-950 mb-4">معلومات المتجر</h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Input 
+                        label="اسم المتجر" 
+                        defaultValue={profile?.store_name || ''}
+                        icon={Store}
+                      />
+                      <Input 
+                        label="اسم المالك" 
+                        defaultValue={profile?.owner_name || ''}
+                        icon={Users}
+                      />
+                      <Input 
+                        label="المدينة" 
+                        defaultValue={profile?.city || ''}
+                        icon={ChevronLeft}
+                      />
+                      <Input 
+                        label="نسبة العمولة" 
+                        defaultValue={`${profile?.commission_rate || 0}%`}
+                        icon={Wallet}
+                        disabled
+                      />
+                    </div>
+                  </div>
+
+                  {/* Store Hours */}
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-950 mb-4">ساعات العمل</h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Input 
+                        label="وقت الفتح" 
+                        type="time"
+                        defaultValue="09:00"
+                      />
+                      <Input 
+                        label="وقت الإغلاق" 
+                        type="time"
+                        defaultValue="23:00"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-950 mb-4">معلومات الاتصال</h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Input 
+                        label="رقم الجوال" 
+                        defaultValue={profile?.phone || ''}
+                        icon={Phone}
+                        disabled
+                      />
+                      <Input 
+                        label="البريد الإلكتروني" 
+                        type="email"
+                        placeholder="example@mail.com"
+                        icon={Bell}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Notifications */}
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-950 mb-4">الإشعارات</h3>
+                    <div className="space-y-3">
+                      <label className="flex items-center justify-between rounded-2xl border border-slate-200 p-4">
+                        <div>
+                          <div className="font-bold text-slate-950">إشعارات الطلبات الجديدة</div>
+                          <div className="text-xs text-slate-500">استلم إشعار عند وصول طلب جديد</div>
+                        </div>
+                        <input type="checkbox" defaultChecked className="h-5 w-5" />
+                      </label>
+                      <label className="flex items-center justify-between rounded-2xl border border-slate-200 p-4">
+                        <div>
+                          <div className="font-bold text-slate-950">إشعارات التحديثات</div>
+                          <div className="text-xs text-slate-500">استلم إشعار بتحديثات النظام</div>
+                        </div>
+                        <input type="checkbox" className="h-5 w-5" />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-3 pt-4 border-t border-slate-100">
+                    <Button className="flex-1">حفظ التغييرات</Button>
+                    <Button variant="secondary">إلغاء</Button>
                   </div>
                 </div>
               </Card>
@@ -925,41 +1308,22 @@ const VendorPortal = () => {
     );
   }
 
-  // Show pending state
-  if (data.application && data.application.status !== 'approved') {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white via-amber-50/30 to-slate-50 p-6" dir="rtl">
-        <Card className="max-w-2xl text-center">
-          <div className="p-8">
-            <div className={`mx-auto flex h-20 w-20 items-center justify-center rounded-[28px] ${data.application.status === 'rejected' ? 'bg-error-100 text-error-600' : 'bg-warning-100 text-warning-600'}`}>
-              {data.application.status === 'rejected' ? <X className="h-9 w-9" /> : <Clock3 className="h-9 w-9" />}
-            </div>
-            <h1 className="mt-6 text-3xl font-black text-slate-950">
-              {data.application.status === 'rejected' ? 'الطلب يحتاج تحديث' : 'تحت المراجعة'}
-            </h1>
-            <p className="mt-4 text-sm leading-8 text-slate-500">
-              {data.application.status === 'rejected'
-                ? 'راجع ملاحظات المشرف ثم عد إلى التطبيق لتحديث الطلب.'
-                : 'سيتم فتح البوابة فور اعتماد المشرف لطلبك.'}
-            </p>
-            {data.application.review_notes && (
-              <div className="mt-6 rounded-3xl bg-slate-50 p-5 text-right">
-                <div className="text-sm font-bold text-slate-950">ملاحظة المشرف</div>
-                <div className="mt-2 text-sm leading-7 text-slate-500">{data.application.review_notes}</div>
-              </div>
-            )}
-            <div className="mt-8 flex justify-center gap-3">
-              <Button variant="secondary" onClick={() => setIsAuthenticated(false)} icon={LogOut}>خروج</Button>
-              <Button onClick={handleLogin} icon={Clock3}>تحديث الحالة</Button>
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  // Show login screen
-  return <LoginScreen phone={phone} setPhone={setPhone} onLogin={handleLogin} loading={loading} error={error} />;
+  // Show login screen (removed pending check - allows demo mode)
+  return (
+    <LoginScreen 
+      phone={phone} 
+      setPhone={setPhone} 
+      onLogin={handleSendOTP} 
+      loading={loading} 
+      error={error}
+      otpMode={otpMode}
+      setOtpMode={setOtpMode}
+      otpCode={otpCode}
+      setOtpCode={setOtpCode}
+      onVerifyOtp={handleVerifyOTP}
+      verifyingOtp={verifyingOtp}
+    />
+  );
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -55,7 +55,7 @@ const OTPScreen = ({ navigation, route }) => {
 
   const handleVerify = async () => {
     const fullCode = code.join('');
-    
+
     // Validate OTP
     const validation = validateOTP(fullCode);
     if (!validation.valid) {
@@ -116,7 +116,7 @@ const OTPScreen = ({ navigation, route }) => {
     });
 
     const testCode = data?.code || '1234';
-    
+
     if (Platform.OS === 'web') {
       window.alert(`تم إرسال رمز جديد\n\nرمز التحقق هو: ${testCode}`);
     } else {
@@ -135,6 +135,7 @@ const OTPScreen = ({ navigation, route }) => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        {/* Header - Apple HIG: Back button on right, title right of back button */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButtonWrap}>
             <Text style={styles.backButton}>{getBackArrow()}</Text>
@@ -142,12 +143,14 @@ const OTPScreen = ({ navigation, route }) => {
           <Text style={styles.title}>تأكيد كود التفعيل</Text>
         </View>
 
+        {/* Content - Apple HIG: Centered layout */}
         <View style={styles.content}>
           <Text style={styles.subtitle}>
             قم بإدخال الكود الذي وصلك عبر خدمة الرسائل القصيرة
           </Text>
           <Text style={styles.phoneText}>{phone}</Text>
 
+          {/* OTP Inputs - Apple HIG: Numbers maintain LTR digit order */}
           <View style={styles.codeContainer}>
             {code.map((digit, index) => (
               <TextInput
@@ -159,7 +162,6 @@ const OTPScreen = ({ navigation, route }) => {
                 onKeyPress={(e) => handleKeyPress(e, index)}
                 keyboardType="number-pad"
                 maxLength={1}
-                textAlign="center"
                 returnKeyType={index < 3 ? 'next' : 'done'}
                 selectTextOnFocus
               />
@@ -167,6 +169,7 @@ const OTPScreen = ({ navigation, route }) => {
           </View>
           {otpError ? <Text style={styles.otpErrorText}>{otpError}</Text> : null}
 
+          {/* Timer - Apple HIG: Numbers maintain LTR */}
           <Text style={styles.timer}>{String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}</Text>
 
           <Text style={styles.resendText}>
@@ -179,6 +182,7 @@ const OTPScreen = ({ navigation, route }) => {
             </Text>
           </TouchableOpacity>
 
+          {/* Verify Button - Apple HIG: 54pt height, centered */}
           <TouchableOpacity
             style={[styles.verifyButton, isCodeComplete && styles.verifyButtonActive, buttonPressed && styles.verifyButtonPressed]}
             onPress={handleVerify}
@@ -214,16 +218,23 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
+  
+  // Header - Apple HIG: 44pt height, back on right
   header: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xl,
     paddingBottom: spacing.lg,
+    minHeight: 44,
   },
   backButtonWrap: {
     padding: spacing.sm,
     marginLeft: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backButton: {
     fontSize: 24,
@@ -237,6 +248,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     writingDirection: 'rtl',
   },
+  
+  // Content - Apple HIG: Centered layout
   content: {
     flex: 1,
     paddingHorizontal: spacing.lg,
@@ -259,8 +272,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     writingDirection: 'rtl',
   },
+  
+  // OTP Inputs - Apple HIG: 60×60pt, centered, numbers LTR
   codeContainer: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     gap: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -275,7 +290,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     backgroundColor: colors.grayLight,
     textAlign: 'center',
-    writingDirection: 'ltr', // Numbers stay LTR even in RTL context (Apple HIG)
+    writingDirection: 'ltr', // Apple HIG: Numbers stay LTR
   },
   codeInputError: {
     borderColor: colors.error,
@@ -289,12 +304,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     writingDirection: 'rtl',
   },
+  
+  // Timer - Apple HIG: Numbers LTR
   timer: {
     fontSize: 48,
     fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: spacing.md,
-    writingDirection: 'ltr', // Numbers stay LTR (Apple HIG)
+    writingDirection: 'ltr', // Apple HIG: Numbers stay LTR
   },
   resendText: {
     fontSize: 14,
@@ -314,6 +331,8 @@ const styles = StyleSheet.create({
   resendButtonDisabled: {
     color: colors.gray,
   },
+  
+  // Verify Button - Apple HIG: 54pt height, min 44pt touch
   verifyButton: {
     borderRadius: borderRadius.full,
     minWidth: 200,
@@ -329,13 +348,13 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 50,
+    minHeight: 54, // Apple HIG: Minimum 44pt, using 54pt
   },
   verifyButtonText: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: fonts.semiBold,
     color: colors.gray,
-    letterSpacing: 0.5,
+    letterSpacing: 0, // Arabic doesn't use letter-spacing
     textAlign: 'center',
     writingDirection: 'rtl',
   },
