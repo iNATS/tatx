@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   :root {
     /* Material Design 3 (MD3) Light Theme Color Palette */
     --background: 0 0% 98%;

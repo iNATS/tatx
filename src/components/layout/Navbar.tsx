@@ -30,26 +30,35 @@ export function Navbar() {
   const [selectedLocation, setSelectedLocation] = useState(LOCATIONS[0]);
   const [isOpen, setIsOpen] = useState(false);
 
+  const navLinks = [
+    { name: 'الرئيسية', href: '#hero' },
+    { name: 'خدماتنا', href: '#services' },
+    { name: 'مشاوير تاتكس', href: '#taxi' },
+    { name: 'تحميل التطبيق', href: '#download' },
+    { name: 'كن شريكاً', href: '#partners' },
+  ];
+
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-2xl border-b border-[#D2D2D7]/30 h-20 md:h-24">
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         
-        <div className="flex items-center gap-3">
-          <Link href="/profile">
-            <Button variant="ghost" size="icon" className="rounded-full h-12 w-12 hover:bg-[#F5F5F7] shadow-none">
-              <User className="w-6 h-6 text-[#1D1D1F]" />
-            </Button>
-          </Link>
-          <Link href="/cart">
-            <Button variant="ghost" className="relative h-12 px-5 rounded-full hover:bg-[#F5F5F7] font-black text-[#1D1D1F] gap-2 shadow-none border-none">
-              <ShoppingBag className="w-6 h-6" />
-              {itemCount > 0 && (
-                <span className="h-5 w-5 flex items-center justify-center text-[10px] bg-primary text-white rounded-full">
-                  {itemCount}
-                </span>
-              )}
-            </Button>
-          </Link>
+        <div className="flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name} 
+              href={link.href}
+              className="text-sm font-black text-[#1D1D1F] hover:text-primary transition-colors hidden lg:block"
+            >
+              {link.name}
+            </Link>
+          ))}
+          <div className="flex items-center gap-3 lg:hidden">
+            <Link href="/profile">
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-[#F5F5F7] shadow-none">
+                <User className="w-5 h-5 text-[#1D1D1F]" />
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div className="hidden md:flex flex-1 justify-center">

@@ -37,7 +37,7 @@ export default function Home() {
       <main className="flex-1 bg-white overflow-hidden font-body">
         
         {/* HERO SECTION */}
-        <section className="relative pt-20 pb-20 md:pt-32 md:pb-40 overflow-hidden">
+        <section id="hero" className="relative pt-20 pb-20 md:pt-32 md:pb-40 overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-full bg-[radial-gradient(circle_at_top,_rgba(226,126,54,0.05)_0%,_rgba(255,255,255,0)_50%)] -z-10" />
           
           <div className="container mx-auto px-4 max-w-7xl">
@@ -81,7 +81,7 @@ export default function Home() {
         </section>
 
         {/* BENTO SERVICES */}
-        <section className="py-32 bg-[#FBFBFD]">
+        <section id="services" className="py-32 bg-[#FBFBFD]">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
               <div className="text-right space-y-4">
@@ -117,7 +117,7 @@ export default function Home() {
         </section>
 
         {/* TAXI SECTION */}
-        <section className="py-32 px-4">
+        <section id="taxi" className="py-32 px-4">
           <div className="container mx-auto max-w-7xl">
             <div className="bg-white rounded-[4rem] overflow-hidden relative border-2 border-primary/10 shadow-[0_50px_100px_-20px_rgba(226,126,54,0.1)]">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center p-12 md:p-24 relative z-10">

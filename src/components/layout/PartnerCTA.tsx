@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Car, Store, ArrowLeft } from 'lucide-react';
@@ -7,7 +6,7 @@ import Link from 'next/link';
 
 export function PartnerCTA() {
   return (
-    <section className="bg-white pb-40" dir="rtl">
+    <section id="partners" className="bg-white pb-40" dir="rtl">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           

@@ -7,7 +7,7 @@ export function AppDownloadCTA() {
   const googlePlayBadge = "https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg";
 
   return (
-    <section className="bg-white py-32" dir="rtl">
+    <section id="download" className="bg-white py-32" dir="rtl">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="relative overflow-hidden bg-primary/5 rounded-[4rem] p-12 md:p-24 border border-primary/10">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-20 relative z-10">
