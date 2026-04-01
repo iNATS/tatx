@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Sha
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
 const OrderDetailScreen = ({ route, navigation }) => {
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     marginBottom: spacing.md,
-    ...shadows.lg,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   statusGradient: {
     padding: spacing.md,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   cardTitle: {
     fontSize: 16,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   driverInfo: {
     alignItems: 'center',
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.lg,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   plateText: {
     fontSize: 13,
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   addressInfo: {
     alignItems: 'center',
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   orderItem: {
     alignItems: 'center',
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   summaryRow: {
     justifyContent: 'space-between',
@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
     gap: spacing.xs,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   actionButtonText: {
     fontSize: 14,

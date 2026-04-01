@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { syncUserAddresses } from '../services/appUserService';
 
@@ -177,13 +177,13 @@ const styles = StyleSheet.create({
   headerButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md, paddingBottom: spacing.xxl },
-  currentBanner: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, alignItems: 'center', marginBottom: spacing.md, ...shadows.sm },
+  currentBanner: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, alignItems: 'center', marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   currentBannerText: { flex: 1, width: '100%', marginHorizontal: spacing.md, alignItems: 'flex-end' },
   bannerTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right', alignSelf: 'stretch' },
   bannerSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
   bannerButton: { backgroundColor: colors.cardSecondary, paddingHorizontal: spacing.md, paddingVertical: 10, borderRadius: borderRadius.full },
   bannerButtonText: { color: colors.primary, fontFamily: fonts.semiBold, textAlign: 'right' },
-  addressCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', ...shadows.sm },
+  addressCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', borderWidth: 1, borderColor: colors.borderLight },
   cardTop: { justifyContent: 'space-between', alignItems: 'center' },
   titleRow: { alignItems: 'center', gap: spacing.sm },
   addressTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, textAlign: 'right' },
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   outlineButtonText: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'right' },
   primaryMiniButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: spacing.lg, paddingVertical: 10 },
   primaryMiniText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'right' },
-  addButton: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, alignItems: 'center', justifyContent: 'center', gap: spacing.sm, ...shadows.sm },
+  addButton: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, alignItems: 'center', justifyContent: 'center', gap: spacing.sm, borderWidth: 1, borderColor: colors.borderLight },
   addButtonText: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right' },
   modalOverlay: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' },
   modalCard: { backgroundColor: colors.card, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: spacing.lg },

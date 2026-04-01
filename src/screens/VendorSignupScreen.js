@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { submitVendorApplication } from '../services/vendorService';
 
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   sectionTitle: {
     fontSize: 18,
@@ -683,7 +683,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderRadius: borderRadius.xl,
     gap: spacing.sm,
-    ...shadows.md,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   nextButtonText: {
     fontSize: 16,

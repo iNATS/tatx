@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
 const OrderSuccessScreen = ({ navigation, route }) => {
@@ -71,11 +71,11 @@ const OrderSuccessScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: { alignItems: 'center', paddingHorizontal: spacing.lg, paddingBottom: spacing.lg },
-  iconWrap: { width: 82, height: 82, borderRadius: 28, backgroundColor: colors.success, alignItems: 'center', justifyContent: 'center', ...shadows.md },
+  iconWrap: { width: 82, height: 82, borderRadius: 28, backgroundColor: colors.success, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.borderLight },
   title: { marginTop: spacing.lg, fontSize: 28, fontFamily: fonts.bold, color: colors.text },
   subtitle: { marginTop: spacing.sm, color: colors.textSecondary, textAlign: 'center', lineHeight: 22 },
   content: { padding: spacing.md, paddingBottom: 140 },
-  card: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
+  card: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   orderHeader: { alignItems: 'center', marginBottom: spacing.md },
   logo: { width: 64, height: 64, borderRadius: 18, backgroundColor: colors.cardSecondary },
   orderInfo: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
@@ -91,9 +91,9 @@ const styles = StyleSheet.create({
   totalText: { color: colors.primary, fontSize: 16, fontFamily: fonts.bold },
   discountText: { color: colors.success },
   divider: { height: 1, backgroundColor: colors.borderLight, marginVertical: spacing.sm },
-  secondaryButton: { backgroundColor: colors.card, borderRadius: borderRadius.full, paddingVertical: 14, alignItems: 'center', ...shadows.sm },
+  secondaryButton: { backgroundColor: colors.card, borderRadius: borderRadius.full, paddingVertical: 14, alignItems: 'center', borderWidth: 1, borderColor: colors.borderLight },
   secondaryButtonText: { color: colors.text, fontFamily: fonts.semiBold },
-  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, paddingHorizontal: spacing.lg, paddingTop: spacing.md, flexDirection: 'row-reverse', gap: spacing.sm, ...shadows.float },
+  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, paddingHorizontal: spacing.lg, paddingTop: spacing.md, flexDirection: 'row-reverse', gap: spacing.sm, borderWidth: 1, borderColor: colors.borderLight },
   primaryButton: { flex: 1, backgroundColor: colors.primary, borderRadius: borderRadius.full, alignItems: 'center', paddingVertical: 16 },
   primaryButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
   ghostButton: { flex: 1, backgroundColor: colors.cardSecondary, borderRadius: borderRadius.full, alignItems: 'center', paddingVertical: 16 },

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
 import OfferPromoCard from '../components/OfferPromoCard';
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     minHeight: 54,
     alignItems: 'center',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   searchAction: {
     width: 34,
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: spacing.md,
     alignItems: 'flex-end',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   statValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right' },
   statLabel: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right' },
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
     paddingHorizontal: 12,
     paddingVertical: 9,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   filterChipActive: { backgroundColor: colors.primary },
   filterIconWrap: {
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   infoBadge: {
     width: 48,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 26,
     overflow: 'hidden',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   productImage: { width: '100%', height: 142, backgroundColor: colors.cardSecondary },
   productBody: { padding: spacing.md, alignItems: 'flex-end' },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-    ...shadows.float,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   cartBarText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right' },
   cartBarPrice: { color: colors.white, fontFamily: fonts.bold, fontSize: 16, textAlign: 'right' },

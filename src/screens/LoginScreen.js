@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Activi
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../context/AppContext';
-import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, typography, fonts } from '../constants/theme';
 import { requestAuthCode } from '../services/authService';
 import { validateSaudiPhone, validateName, RTL } from '../utils/rtlHelpers';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   sharePaymentCard: {
     flexDirection: 'row-reverse',
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     flexDirection: 'row-reverse',
     writingDirection: 'rtl',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   itemImage: { width: 82, height: 82, borderRadius: 18, backgroundColor: colors.cardSecondary },
   itemInfo: { flex: 1, width: '100%', marginRight: spacing.md, alignItems: 'flex-end' },
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-    ...shadows.float,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   footerLabel: { color: colors.textSecondary, fontSize: 12, textAlign: 'right' },
   footerTotal: { color: colors.text, fontSize: 20, fontFamily: fonts.bold, textAlign: 'right' },

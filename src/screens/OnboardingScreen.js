@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, shadows, typography, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, typography, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
 const { width } = Dimensions.get('window');
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 36,
     overflow: 'hidden',
-    ...shadows.xl,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   image: {
     width: '100%',
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: 14,
     borderRadius: borderRadius.full,
-    ...shadows.md,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   primaryButtonText: {
     color: colors.white,

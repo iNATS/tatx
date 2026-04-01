@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 
@@ -157,7 +157,7 @@ const OrdersScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: spacing.md, paddingBottom: 140 },
-  snapshotCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.md, ...shadows.sm },
+  snapshotCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   snapshotMetric: { flex: 1, alignItems: 'center' },
   snapshotValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 22 },
   snapshotLabel: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'center' },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     writingDirection: 'rtl',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   orderHeader: { alignItems: 'center' },
   orderLogo: {

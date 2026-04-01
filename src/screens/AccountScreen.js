@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 
@@ -105,7 +105,7 @@ const AccountScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: spacing.md, paddingBottom: 120 },
-  profileCard: { backgroundColor: colors.card, borderRadius: 30, padding: spacing.lg, alignItems: 'stretch', ...shadows.md },
+  profileCard: { backgroundColor: colors.card, borderRadius: 30, padding: spacing.lg, alignItems: 'stretch', borderWidth: 1, borderColor: colors.borderLight },
   settingsButton: { alignSelf: 'flex-end', width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   logo: { width: 88, height: 88, marginTop: spacing.sm, alignSelf: 'center' },
   name: { color: colors.text, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.md, alignSelf: 'stretch' },
@@ -130,19 +130,19 @@ const styles = StyleSheet.create({
   identityBody: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   identityTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15 },
   identitySubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 20 },
-  quickStatsCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.md, ...shadows.sm },
+  quickStatsCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   quickStat: { flex: 1, alignItems: 'center' },
   quickStatValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 20 },
   quickStatLabel: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'center' },
   quickDivider: { width: 1, alignSelf: 'stretch', backgroundColor: colors.borderLight, marginHorizontal: spacing.sm },
   sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md },
   sectionTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 18, textAlign: 'right' },
-  menuCard: { backgroundColor: colors.card, borderRadius: 24, paddingHorizontal: spacing.md, ...shadows.sm },
+  menuCard: { backgroundColor: colors.card, borderRadius: 24, paddingHorizontal: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   menuItem: { alignItems: 'center', paddingVertical: spacing.md },
   menuItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.borderLight },
   menuLabel: { flex: 1, color: colors.text, fontFamily: fonts.semiBold, textAlign: 'right' },
   menuIconWrap: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center', marginHorizontal: spacing.md },
-  logoutButton: { marginTop: spacing.xl, backgroundColor: colors.card, borderRadius: borderRadius.full, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row-reverse', gap: spacing.sm, ...shadows.sm },
+  logoutButton: { marginTop: spacing.xl, backgroundColor: colors.card, borderRadius: borderRadius.full, paddingVertical: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row-reverse', gap: spacing.sm, borderWidth: 1, borderColor: colors.borderLight },
   logoutText: { color: colors.error, fontFamily: fonts.semiBold, fontSize: 15 },
 });
 

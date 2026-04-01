@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { getStoreItemCount } from '../data/vendorCatalog';
 import PageHeader from '../components/PageHeader';
@@ -162,7 +162,7 @@ const CategoryVendorDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: spacing.md, paddingBottom: spacing.xxl },
-  coverCard: { height: 220, borderRadius: 28, overflow: 'hidden', marginBottom: spacing.md, ...shadows.md },
+  coverCard: { height: 220, borderRadius: 28, overflow: 'hidden', marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   cover: { width: '100%', height: '100%', backgroundColor: colors.cardSecondary, position: 'absolute' },
   coverOverlay: { ...StyleSheet.absoluteFillObject },
   coverContent: { flex: 1, justifyContent: 'space-between', padding: spacing.md, paddingTop: spacing.lg },
@@ -175,10 +175,10 @@ const styles = StyleSheet.create({
   promoLabel: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 12, textAlign: 'right' },
   promoValue: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, textAlign: 'right', marginTop: 6, lineHeight: 22 },
   metricsRow: { gap: spacing.sm, marginBottom: spacing.md },
-  metricCard: { flex: 1, backgroundColor: colors.card, borderRadius: 22, paddingVertical: spacing.md, paddingHorizontal: spacing.sm, alignItems: 'center', borderWidth: 1, borderColor: colors.borderLight, ...shadows.sm },
+  metricCard: { flex: 1, backgroundColor: colors.card, borderRadius: 22, paddingVertical: spacing.md, paddingHorizontal: spacing.sm, alignItems: 'center', borderWidth: 1, borderColor: colors.borderLight, borderWidth: 1, borderColor: colors.borderLight },
   metricValue: { color: colors.text, fontFamily: fonts.bold, fontSize: 13, textAlign: 'center', marginTop: 8 },
   metricLabel: { color: colors.textSecondary, fontSize: 11, textAlign: 'center', marginTop: 4 },
-  summaryCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, alignItems: 'center', marginBottom: spacing.lg, ...shadows.sm },
+  summaryCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, alignItems: 'center', marginBottom: spacing.lg, borderWidth: 1, borderColor: colors.borderLight },
   summaryBadge: { width: 52, height: 52, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   summaryText: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   summaryTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 16, alignSelf: 'stretch' },
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   groupHeader: { justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   groupTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 20 },
   groupCount: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 12 },
-  emptyCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.xl, alignItems: 'center', ...shadows.sm },
+  emptyCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.xl, alignItems: 'center', borderWidth: 1, borderColor: colors.borderLight },
   emptyTitle: { marginTop: spacing.md, color: colors.text, fontFamily: fonts.bold, fontSize: 16 },
   emptySubtitle: { marginTop: 6, color: colors.textSecondary, textAlign: 'center', lineHeight: 20 },
 });

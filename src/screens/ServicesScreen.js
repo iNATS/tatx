@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 import AppListCard from '../components/AppListCard';
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     alignItems: 'center',
     marginBottom: spacing.lg,
-    ...shadows.md,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   logo: { width: 76, height: 76 },
   heroText: { flex: 1, marginHorizontal: spacing.md },

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 
@@ -222,12 +222,12 @@ const CheckoutScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.md, paddingBottom: spacing.xxl },
-  checkoutHero: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, alignItems: 'center', marginBottom: spacing.md, ...shadows.sm },
+  checkoutHero: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, alignItems: 'center', marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   checkoutHeroBadge: { width: 54, height: 54, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   checkoutHeroText: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
   checkoutHeroTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17, alignSelf: 'stretch' },
   checkoutHeroSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, lineHeight: 20, alignSelf: 'stretch' },
-  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
+  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   sectionHeader: { justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
   sectionTitle: { fontSize: 17, fontFamily: fonts.semiBold, color: colors.text, textAlign: 'right', marginBottom: spacing.md },
   linkText: { color: colors.primary, fontSize: 13, fontFamily: fonts.semiBold },
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   totalRow: { marginTop: spacing.sm, paddingTop: spacing.sm, borderTopWidth: 1, borderTopColor: colors.borderLight },
   totalLabel: { color: colors.text, fontSize: 16, fontFamily: fonts.semiBold },
   totalValue: { color: colors.primary, fontSize: 18, fontFamily: fonts.bold },
-  submitButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, alignItems: 'center', paddingVertical: 16, ...shadows.md },
+  submitButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, alignItems: 'center', paddingVertical: 16, borderWidth: 1, borderColor: colors.borderLight },
   submitButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 16 },
 });
 

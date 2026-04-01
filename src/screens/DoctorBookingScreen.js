@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 import PriceDisplay from '../components/PriceDisplay';
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   topBannerTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17 },
   topBannerSubtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 4, lineHeight: 21 },
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   consultationChipActive: { backgroundColor: colors.primary },
   consultationText: { color: colors.textSecondary, fontFamily: fonts.semiBold, fontSize: 13 },
   consultationTextActive: { color: colors.white },
-  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
+  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   topRow: { alignItems: 'center' },
   avatarShell: { width: 58, height: 58, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   infoWrap: { flex: 1, marginHorizontal: spacing.md },

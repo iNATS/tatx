@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
 import PriceDisplay from '../components/PriceDisplay';
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   headerCenter: { flex: 1, paddingHorizontal: spacing.md },
   headerTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 22 },
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   cartBadge: {
     position: 'absolute',
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     minHeight: 56,
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   searchFilterButton: {
     width: 36,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   },
   searchInput: { flex: 1, color: colors.text, fontFamily: fonts.regular, marginHorizontal: spacing.sm },
   filtersRow: { gap: spacing.sm, paddingVertical: spacing.md },
-  filterChip: { backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: spacing.md, paddingVertical: 10, ...shadows.sm },
+  filterChip: { backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: spacing.md, paddingVertical: 10, borderWidth: 1, borderColor: colors.borderLight },
   filterChipActive: { backgroundColor: colors.primary },
   filterText: { color: colors.textSecondary, fontFamily: fonts.semiBold, fontSize: 13 },
   filterTextActive: { color: colors.white },
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     alignItems: 'center',
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   heroBadge: {
     width: 52,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   sectionTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right' },
   sectionLink: { color: colors.primary, fontFamily: fonts.semiBold, fontSize: 13, textAlign: 'right' },
   horizontalRow: { gap: spacing.md, paddingBottom: spacing.sm },
-  dealCard: { width: 220, backgroundColor: colors.card, borderRadius: 24, overflow: 'hidden', writingDirection: 'rtl', ...shadows.sm },
+  dealCard: { width: 220, backgroundColor: colors.card, borderRadius: 24, overflow: 'hidden', writingDirection: 'rtl', borderWidth: 1, borderColor: colors.borderLight },
   dealImage: { width: '100%', height: 130, backgroundColor: colors.cardSecondary },
   dealContent: { width: '100%', padding: spacing.md, alignItems: 'flex-end' },
   dealName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 15, lineHeight: 22, textAlign: 'right', alignSelf: 'stretch' },
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   dealFooter: { justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
   dealButton: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   dealPriceWrap: { alignItems: 'flex-end' },
-  productRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', ...shadows.sm },
+  productRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', borderWidth: 1, borderColor: colors.borderLight },
   productImage: { width: 96, height: 96, borderRadius: 20, backgroundColor: colors.cardSecondary },
   productBody: { flex: 1, width: '100%', marginHorizontal: spacing.md, justifyContent: 'space-between', alignItems: 'flex-end' },
   productTop: { justifyContent: 'space-between', alignItems: 'flex-end', width: '100%' },
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     justifyContent: 'space-between',
     alignItems: 'center',
-    ...shadows.float,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   cartBarText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 14, textAlign: 'right' },
   cartBarPrice: { color: colors.white, fontFamily: fonts.bold, fontSize: 16, textAlign: 'right' },

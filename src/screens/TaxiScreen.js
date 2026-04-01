@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Platform } 
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PriceDisplay from '../components/PriceDisplay';
 
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   routeCard: {
     position: 'absolute',
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    ...shadows.float,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   routeRow: { alignItems: 'center', minHeight: 48 },
   routeInput: { flex: 1, color: colors.text, fontFamily: fonts.regular, fontSize: 15 },
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 34,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    ...shadows.float,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   sheetContent: { flex: 1, justifyContent: 'space-between', paddingBottom: 2 },
   sheetHandle: {
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     padding: spacing.lg,
-    ...shadows.float,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   driverSheetTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right', marginBottom: spacing.md },
   driverOfferCard: {

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 import AppListCard from '../components/AppListCard';
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     padding: spacing.lg,
     marginBottom: spacing.lg,
-    ...shadows.md,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   heroEyebrow: {
     color: colors.primary,
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: spacing.md,
     marginBottom: spacing.lg,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   loadingWrap: {
     alignItems: 'center',
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 24,
     padding: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   portalHintTitle: {
     color: colors.text,

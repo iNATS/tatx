@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 
@@ -63,7 +63,7 @@ const DoctorBookingScheduleScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: spacing.md, paddingBottom: 140 },
-  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, marginBottom: spacing.md, ...shadows.sm },
+  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   sectionTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 16, marginBottom: spacing.md },
   wrap: { flexWrap: 'wrap', gap: spacing.sm },
   chip: { backgroundColor: colors.cardSecondary, borderRadius: borderRadius.full, paddingHorizontal: spacing.md, paddingVertical: 12 },
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: colors.primary },
   chipText: { color: colors.textSecondary, fontFamily: fonts.semiBold, fontSize: 13 },
   chipTextActive: { color: colors.white },
-  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, padding: spacing.lg, ...shadows.float },
+  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, padding: spacing.lg, borderWidth: 1, borderColor: colors.borderLight },
   button: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingVertical: 16, alignItems: 'center' },
   buttonDisabled: { opacity: 0.45 },
   buttonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { getCategoryImage } from '../utils/placeholderImages';
 import { useApp } from '../context/AppContext';
 import { vendorStores, getStoreItemCount } from '../data/vendorCatalog';
@@ -150,7 +150,7 @@ const CategoryScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  heroCard: { height: 196, borderRadius: 28, overflow: 'hidden', marginBottom: spacing.md, ...shadows.sm },
+  heroCard: { height: 196, borderRadius: 28, overflow: 'hidden', marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   heroImage: { width: '100%', height: '100%', position: 'absolute' },
   heroOverlay: { ...StyleSheet.absoluteFillObject },
   heroContent: { flex: 1, paddingHorizontal: spacing.md, justifyContent: 'flex-end', paddingBottom: spacing.lg },
@@ -158,11 +158,11 @@ const styles = StyleSheet.create({
   heroSubtitle: { color: 'rgba(255,255,255,0.88)', textAlign: 'right', fontSize: 13 },
   content: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
   offersRow: { gap: spacing.md, paddingVertical: spacing.md },
-  restaurantCard: { backgroundColor: colors.card, borderRadius: 30, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight, overflow: 'hidden', ...shadows.md },
+  restaurantCard: { backgroundColor: colors.card, borderRadius: 30, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight, overflow: 'hidden', borderWidth: 1, borderColor: colors.borderLight },
   restaurantImageWrap: { position: 'relative' },
   restaurantImage: { width: '100%', height: 178, backgroundColor: colors.cardSecondary },
-  offerPillOverlay: { position: 'absolute', top: spacing.md, right: spacing.md, alignSelf: 'flex-end', backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: 12, paddingVertical: 7, ...shadows.sm },
-  storeCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', ...shadows.sm },
+  offerPillOverlay: { position: 'absolute', top: spacing.md, right: spacing.md, alignSelf: 'flex-end', backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: 12, paddingVertical: 7, borderWidth: 1, borderColor: colors.borderLight },
+  storeCard: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', borderWidth: 1, borderColor: colors.borderLight },
   storeImage: { width: 104, height: 104, borderRadius: 22, backgroundColor: colors.cardSecondary },
   restaurantBody: { padding: spacing.md },
   restaurantTitleRow: { justifyContent: 'space-between', alignItems: 'flex-start', gap: spacing.sm },
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   storeButton: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingHorizontal: 18, paddingVertical: 10 },
   storeButtonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 13 },
   storeCount: { color: colors.textSecondary, fontSize: 12, textAlign: 'right', alignSelf: 'stretch' },
-  itemRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', ...shadows.sm },
+  itemRow: { backgroundColor: colors.card, borderRadius: 24, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', borderWidth: 1, borderColor: colors.borderLight },
   itemImage: { width: 100, height: 100, borderRadius: 20, backgroundColor: colors.cardSecondary },
   itemBody: { flex: 1, width: '100%', marginHorizontal: spacing.md, justifyContent: 'space-between', alignItems: 'flex-end' },
   itemName: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, textAlign: 'right', alignSelf: 'stretch' },

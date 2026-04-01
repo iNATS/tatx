@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
 const initialMethods = [
@@ -166,13 +166,13 @@ const styles = StyleSheet.create({
   headerButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md, paddingBottom: spacing.xxl },
-  currentCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', ...shadows.sm },
+  currentCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', borderWidth: 1, borderColor: colors.borderLight },
   currentLabel: { color: colors.textSecondary, fontSize: 12 },
   currentRow: { alignItems: 'center', marginTop: spacing.sm },
   currentText: { flex: 1, width: '100%', marginHorizontal: spacing.md, alignItems: 'flex-end' },
   currentTitle: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 16, textAlign: 'right', alignSelf: 'stretch' },
   currentSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', alignSelf: 'stretch' },
-  methodCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', ...shadows.sm },
+  methodCard: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, writingDirection: 'rtl', borderWidth: 1, borderColor: colors.borderLight },
   methodMain: { alignItems: 'center' },
   radioWrap: { width: 28, alignItems: 'center' },
   methodInfo: { flex: 1, width: '100%', alignItems: 'flex-end', marginHorizontal: spacing.md },

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 import PriceDisplay from '../components/PriceDisplay';
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     padding: spacing.md,
     marginBottom: spacing.md,
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   titleRow: { alignItems: 'center' },
   iconBadge: {
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...shadows.float,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   footerPriceWrap: { flex: 1, alignItems: 'flex-end' },
   footerLabel: { color: colors.textSecondary, fontSize: 12 },

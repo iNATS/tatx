@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, borderRadius } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 
 const WalletScreen = ({ navigation }) => {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: spacing.md,
     writingDirection: 'rtl',
-    ...shadows.lg,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   balanceGradient: {
     padding: spacing.md,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     writingDirection: 'rtl',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   pointsContent: {
     alignItems: 'center',
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     alignItems: 'center',
     writingDirection: 'rtl',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   statIcon: {
     width: 40,
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.md,
     writingDirection: 'rtl',
-    ...shadows.sm,
+    borderWidth: 1, borderColor: colors.borderLight,
   },
   transactionsHeader: {
     justifyContent: 'space-between',

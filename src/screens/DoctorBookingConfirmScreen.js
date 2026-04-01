@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import PageHeader from '../components/PageHeader';
 import PriceDisplay from '../components/PriceDisplay';
@@ -46,14 +46,14 @@ const DoctorBookingConfirmScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: spacing.md, paddingBottom: 140 },
-  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, ...shadows.sm },
+  card: { backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   successIcon: { width: 56, height: 56, borderRadius: 18, backgroundColor: '#FFF1F4', alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: spacing.md },
   cardTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 17, textAlign: 'center', marginBottom: spacing.md },
   row: { justifyContent: 'space-between', alignItems: 'center', paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
   noBorder: { borderBottomWidth: 0 },
   label: { color: colors.textSecondary, fontSize: 13 },
   value: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 14, maxWidth: '58%' },
-  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, padding: spacing.lg, ...shadows.float },
+  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, padding: spacing.lg, borderWidth: 1, borderColor: colors.borderLight },
   button: { backgroundColor: colors.primary, borderRadius: borderRadius.full, paddingVertical: 16, alignItems: 'center' },
   buttonText: { color: colors.white, fontFamily: fonts.semiBold, fontSize: 15 },
 });

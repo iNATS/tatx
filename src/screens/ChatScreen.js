@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, shadows, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
 import { fetchSupportConversation, sendSupportMessage } from '../services/appUserService';
 
@@ -151,13 +151,13 @@ const styles = StyleSheet.create({
   headerButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md, paddingBottom: 120 },
-  heroCard: { backgroundColor: colors.primary, borderRadius: 28, padding: spacing.lg, ...shadows.md },
+  heroCard: { backgroundColor: colors.primary, borderRadius: 28, padding: spacing.lg, borderWidth: 1, borderColor: colors.borderLight },
   heroTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 24, textAlign: 'right' },
   heroSubtitle: { color: 'rgba(255,255,255,0.86)', marginTop: spacing.sm, textAlign: 'right', lineHeight: 22 },
   topicsWrap: { flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.lg },
-  topicChip: { backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: spacing.md, paddingVertical: 10, ...shadows.sm },
+  topicChip: { backgroundColor: colors.card, borderRadius: borderRadius.full, paddingHorizontal: spacing.md, paddingVertical: 10, borderWidth: 1, borderColor: colors.borderLight },
   topicText: { color: colors.text, fontFamily: fonts.semiBold, fontSize: 13 },
-  messagesCard: { marginTop: spacing.lg, backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, ...shadows.sm },
+  messagesCard: { marginTop: spacing.lg, backgroundColor: colors.card, borderRadius: 26, padding: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   messageRow: { marginBottom: spacing.sm },
   userRow: { alignItems: 'flex-end' },
   supportRow: { alignItems: 'flex-start' },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   userMessageText: { color: colors.white },
   messageTime: { color: colors.textTertiary, fontSize: 11, marginTop: spacing.xs, textAlign: 'right' },
   userTime: { color: 'rgba(255,255,255,0.7)' },
-  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, paddingHorizontal: spacing.md, paddingTop: spacing.md, alignItems: 'center', gap: spacing.sm, ...shadows.float },
+  footer: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: colors.card, paddingHorizontal: spacing.md, paddingTop: spacing.md, alignItems: 'center', gap: spacing.sm, borderWidth: 1, borderColor: colors.borderLight },
   attachButton: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
   input: { flex: 1, backgroundColor: colors.cardSecondary, borderRadius: borderRadius.full, minHeight: 48, paddingHorizontal: spacing.md, textAlign: 'right', color: colors.text },
   sendButton: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
