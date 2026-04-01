@@ -52,17 +52,18 @@ const ProductScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm, flexDirection: rowDirection }]}>
+      {/* Header - Back on RIGHT, Cart on LEFT */}
+      <View style={styles.header}>
         <TouchableOpacity
           onPress={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home'))}
           style={styles.headerButton}
         >
-          <Ionicons name={backIcon} size={22} color={colors.text} />
+          <Ionicons name="arrow-forward" size={22} color={colors.text} />
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <Text style={[styles.headerTitle, { textAlign: textAlignStart }]}>المتجر</Text>
-          <Text style={[styles.headerSubtitle, { textAlign: textAlignStart }]}>منتجات المنصة اليومية في مكان واحد</Text>
+          <Text style={styles.headerTitle}>المتجر</Text>
+          <Text style={styles.headerSubtitle}>منتجات المنصة اليومية في مكان واحد</Text>
         </View>
 
         <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.cartButton}>
@@ -76,21 +77,23 @@ const ProductScreen = ({ navigation }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, { paddingBottom: 150 }]}>
-        <View style={[styles.searchBar, { flexDirection: rowDirection }]}>
-          <TouchableOpacity style={styles.searchFilterButton} onPress={() => setSelectedFilter('all')}>
-            <Ionicons name="options-outline" size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
+        {/* Search Bar - Icon on RIGHT */}
+        <View style={styles.searchBar}>
+          <Ionicons name="search-outline" size={20} color={colors.textTertiary} />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
-            style={[styles.searchInput, { textAlign: textAlignStart }]}
+            style={styles.searchInput}
             placeholder="ابحث عن منتج أو نوع المنتج"
             placeholderTextColor={colors.textTertiary}
           />
-          <Ionicons name="search-outline" size={20} color={colors.textTertiary} />
+          <TouchableOpacity style={styles.searchFilterButton} onPress={() => setSelectedFilter('all')}>
+            <Ionicons name="options-outline" size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
         </View>
 
-        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtersRow}>
+        {/* Filters - Scroll from RIGHT */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtersRow}>
           {productFilters.map((filter) => (
             <TouchableOpacity
               key={filter.id}

@@ -144,28 +144,32 @@ const HomeScreen = ({ navigation }) => {
         contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md, paddingBottom: 140 }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
-        <View style={[styles.topBar, { flexDirection: rowDirection }]}>
-          <View style={styles.avatarShell}>
-            <Image source={require('../../assets/logo.png')} style={styles.avatarLogo} resizeMode="contain" />
-          </View>
-          <View style={styles.topBarText}>
-            <Text style={[styles.welcomeText, { textAlign: textAlignStart }]}>أهلاً، {user?.name || 'ضيفنا'}</Text>
-            <Text style={[styles.locationText, { textAlign: textAlignStart }]}>دائما معك • {demoMarket.city}، {user?.district || demoMarket.district}</Text>
+        {/* Top Bar - Avatar on RIGHT, Notification on LEFT */}
+        <View style={styles.topBar}>
+          <View style={styles.topBarRight}>
+            <View style={styles.avatarShell}>
+              <Image source={require('../../assets/logo.png')} style={styles.avatarLogo} resizeMode="contain" />
+            </View>
+            <View style={styles.topBarText}>
+              <Text style={styles.welcomeText}>أهلاً، {user?.name || 'ضيفنا'}</Text>
+              <Text style={styles.locationText}>دائما معك • {demoMarket.city}، {user?.district || demoMarket.district}</Text>
+            </View>
           </View>
           <TouchableOpacity style={styles.notificationButton} activeOpacity={0.85} onPress={() => navigation.navigate('Notifications')}>
             <Ionicons name="notifications-outline" size={22} color={colors.text} />
           </TouchableOpacity>
         </View>
 
+        {/* Search Card - Icon on RIGHT */}
         <TouchableOpacity style={styles.searchCard} activeOpacity={0.9} onPress={() => navigation.navigate('Shop')}>
           <LinearGradient colors={['#FFF6F8', '#FFFFFF']} style={styles.searchGradient}>
             <View style={styles.searchMain}>
+              <View style={styles.searchIconWrap}>
+                <Ionicons name="search-outline" size={21} color={colors.primary} />
+              </View>
               <View style={styles.searchTextWrap}>
                 <Text style={styles.searchTitle}>ابحث</Text>
                 <Text style={styles.searchPlaceholder}>منتجات، مطاعم، صيدلية، سوق الجملة، أو هدايا</Text>
-              </View>
-              <View style={styles.searchIconWrap}>
-                <Ionicons name="search-outline" size={21} color={colors.primary} />
               </View>
             </View>
           </LinearGradient>
@@ -182,13 +186,16 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+        {/* Section Header - Title on RIGHT, Link on LEFT */}
+        <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>الخدمات</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.servicesRow}>
+        
+        {/* Services - Scroll from RIGHT */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.servicesRow}>
           {homeServices.map((service) => (
             <TouchableOpacity key={service.id} style={styles.serviceChip} activeOpacity={0.88} onPress={() => handleServicePress(service)}>
               <View style={[styles.serviceIcon, { backgroundColor: `${service.color}15` }]}>
@@ -199,11 +206,12 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+        {/* Offers Section */}
+        <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>قسم العروض</Text>
           <Text style={styles.sectionLink}>مختارة لك</Text>
         </View>
-        <ScrollView horizontal inverted={isRTL} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
           {homeOffers.map((offer) => (
             <TouchableOpacity key={offer.id} style={styles.offerCard} activeOpacity={0.88} onPress={() => handleOfferPress(offer)}>
               <Image source={{ uri: offer.image }} style={styles.offerImage} />
@@ -216,7 +224,8 @@ const HomeScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+        {/* Restaurants Section - Image on RIGHT */}
+        <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>مطاعم</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Category', { name: 'مطاعم' })}>
             <Text style={styles.sectionLink}>عرض الكل</Text>
@@ -226,27 +235,27 @@ const HomeScreen = ({ navigation }) => {
           {restaurants.slice(0, 6).map((restaurant, index) => (
             <TouchableOpacity
               key={restaurant.id}
-              style={[styles.hotRestaurantCard, index === 0 && styles.hotRestaurantCardFeatured, { flexDirection: rowDirection }]}
+              style={[styles.hotRestaurantCard, index === 0 && styles.hotRestaurantCardFeatured]}
               activeOpacity={0.9}
               onPress={() => openRestaurantMenu(restaurant.name)}
             >
               <Image source={{ uri: restaurant.logo }} style={styles.hotRestaurantImage} />
               <View style={styles.hotRestaurantBody}>
-                <View style={[styles.hotRestaurantTop, { flexDirection: rowDirection }]}>
+                <View style={styles.hotRestaurantTop}>
                   <View style={styles.hotMetaPill}>
                     <Ionicons name="flame-outline" size={13} color={colors.primary} />
                     <Text style={styles.hotMetaPillText}>Hot</Text>
                   </View>
                   <View style={styles.hotRestaurantInfo}>
-                    <Text style={[styles.hotRestaurantName, { textAlign: textAlignStart }]}>{restaurant.name}</Text>
-                    <Text style={[styles.hotRestaurantCategory, { textAlign: textAlignStart }]}>{restaurant.category}</Text>
+                    <Text style={styles.hotRestaurantName}>{restaurant.name}</Text>
+                    <Text style={styles.hotRestaurantCategory}>{restaurant.category}</Text>
                   </View>
                 </View>
-                <View style={[styles.hotRestaurantBottom, { flexDirection: rowDirection }]}>
+                <View style={styles.hotRestaurantBottom}>
                   <View style={styles.hotDeliveryPill}>
                     <Text style={styles.hotDeliveryText}>{restaurant.deliveryTime} دقيقة</Text>
                   </View>
-                  <View style={[styles.hotTagsRow, { flexDirection: rowDirection }]}>
+                  <View style={styles.hotTagsRow}>
                     {restaurant.tags.slice(0, 2).map((tag) => (
                       <View key={tag} style={styles.hotTagChip}>
                         <Text style={styles.hotTagText}>{tag}</Text>
@@ -345,40 +354,58 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { paddingHorizontal: spacing.lg },
-  topBar: { alignItems: 'center', marginBottom: spacing.lg },
+  
+  // Top Bar - Avatar on RIGHT, Notification on LEFT
+  topBar: { flexDirection: 'row-reverse', alignItems: 'center', marginBottom: spacing.lg },
+  topBarRight: { flex: 1, flexDirection: 'row-reverse', alignItems: 'center' },
   avatarShell: { width: 44, height: 44, borderRadius: 16, backgroundColor: '#FFF0F3', alignItems: 'center', justifyContent: 'center', marginLeft: spacing.sm },
   avatarLogo: { width: 28, height: 28 },
-  topBarText: { flex: 1, alignItems: 'flex-end' },
-  welcomeText: { ...typography.h3, color: colors.text },
-  locationText: { ...typography.caption, color: colors.textSecondary },
+  topBarText: { flex: 1, marginRight: spacing.sm },
+  welcomeText: { ...typography.h3, color: colors.text, textAlign: 'right' },
+  locationText: { ...typography.caption, color: colors.textSecondary, textAlign: 'right', marginTop: 2 },
   notificationButton: { width: 44, height: 44, borderRadius: 16, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center', ...shadows.sm },
+  
+  // Search Card - Icon on RIGHT
   searchCard: { marginBottom: spacing.md, borderRadius: 28, overflow: 'hidden', ...shadows.md },
   searchGradient: { padding: spacing.md },
   searchMain: { flexDirection: 'row-reverse', alignItems: 'center' },
-  searchTextWrap: { flex: 1, marginHorizontal: spacing.md, alignItems: 'flex-end' },
+  searchTextWrap: { flex: 1, marginHorizontal: spacing.md },
   searchTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: 18, textAlign: 'right' },
   searchPlaceholder: { color: colors.textSecondary, fontSize: 12, marginTop: 4, textAlign: 'right', lineHeight: 18 },
   searchIconWrap: { width: 54, height: 54, borderRadius: 20, backgroundColor: '#FFE8EE', alignItems: 'center', justifyContent: 'center' },
+  
+  // Hero Offer
   heroOfferCard: { marginBottom: spacing.md, width: '100%', height: 238, borderRadius: 30, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
-  sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md, justifyContent: 'space-between', alignItems: 'center' },
+  
+  // Section Header - Title on RIGHT, Link on LEFT
+  sectionHeader: { marginTop: spacing.xl, marginBottom: spacing.md, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
   sectionTitle: { ...typography.h3, color: colors.text, textAlign: 'right' },
   sectionLink: { ...typography.caption, color: colors.primary, textAlign: 'left' },
+  
+  // Services
   servicesRow: { gap: spacing.sm, paddingBottom: spacing.xs },
   serviceChip: { backgroundColor: colors.card, borderRadius: 22, paddingHorizontal: spacing.md, paddingVertical: spacing.md, alignItems: 'center', minWidth: 88, ...shadows.sm },
   serviceIcon: { width: 44, height: 44, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
   serviceName: { ...typography.bodySmall, color: colors.text, fontFamily: fonts.semiBold },
+  
+  // Horizontal Lists
   horizontalList: { gap: spacing.md, paddingBottom: spacing.xs },
+  
+  // Offer Cards
   offerCard: { width: 270, height: 220, borderRadius: 28, overflow: 'hidden', backgroundColor: colors.card, ...shadows.md },
   offerImage: { width: '100%', height: '100%' },
   offerGradient: { ...StyleSheet.absoluteFillObject, justifyContent: 'flex-end', padding: spacing.lg },
   offerVendor: { color: 'rgba(255,255,255,0.86)', fontFamily: fonts.semiBold, fontSize: 12, textAlign: 'right' },
   offerTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 24, marginTop: spacing.xs, textAlign: 'right' },
   offerSubtitle: { color: 'rgba(255,255,255,0.88)', fontSize: 12, lineHeight: 18, marginTop: spacing.xs, textAlign: 'right' },
+  
+  // Restaurant Cards - Image on RIGHT
   hotList: { gap: spacing.md, marginBottom: spacing.sm },
   hotRestaurantCard: {
     backgroundColor: colors.card,
     borderRadius: 28,
     padding: spacing.md,
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     ...shadows.sm,
   },
@@ -397,11 +424,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   hotRestaurantTop: {
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   hotMetaPill: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 4,
     backgroundColor: colors.white,
@@ -422,13 +450,16 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontFamily: fonts.bold,
     fontSize: 17,
+    textAlign: 'right',
   },
   hotRestaurantCategory: {
     color: colors.textSecondary,
     fontSize: 12,
     marginTop: 4,
+    textAlign: 'right',
   },
   hotRestaurantBottom: {
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: spacing.md,
@@ -445,6 +476,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   hotTagsRow: {
+    flexDirection: 'row-reverse',
     gap: spacing.xs,
   },
   hotTagChip: {
