@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -31,6 +32,7 @@ export default function Home() {
   const appStoreBadge = "https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg";
   const googlePlayBadge = "https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg";
   const brandLogo = "https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png";
+  const appScreenshot = "https://images.sftcdn.net/images/t_app-cover-l,f_auto/p/75df1bdf-499a-4260-9ba0-8aca15b79912/2498934352/tatx-ttks-screenshot";
 
   return (
     <>
@@ -70,7 +72,7 @@ export default function Home() {
             <div className="relative mx-auto max-w-[1000px] w-full mt-10 px-4">
                <div className="relative z-10 aspect-[16/9] rounded-[4rem] overflow-hidden shadow-[0_80px_120px_-30px_rgba(0,0,0,0.1)] border-[12px] border-[#1D1D1F] bg-white">
                   <Image 
-                    src="https://picsum.photos/seed/tatx-main-hero/2000/1200" 
+                    src={appScreenshot} 
                     alt="Tatx App Power" 
                     fill 
                     className="object-cover"
