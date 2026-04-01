@@ -25,6 +25,7 @@ import {
   Wallet,
   X,
 } from 'lucide-react';
+import './index.css';
 
 const appSummary = {
   market: 'الرياض - السعودية',
