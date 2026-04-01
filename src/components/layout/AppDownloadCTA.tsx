@@ -24,10 +24,10 @@ export function AppDownloadCTA() {
               
               <div className="flex flex-wrap gap-6 justify-end pt-4">
                 <a href="#" className="transition-transform hover:scale-105 active:scale-95">
-                  <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={60} className="h-[60px] w-auto" />
+                  <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={54} className="h-[54px] w-auto" />
                 </a>
                 <a href="#" className="transition-transform hover:scale-105 active:scale-95">
-                  <Image src={googlePlayBadge} alt="Get it on Google Play" width={200} height={60} className="h-[60px] w-auto" />
+                  <Image src={googlePlayBadge} alt="Get it on Google Play" width={180} height={54} className="h-[54px] w-auto" />
                 </a>
               </div>
             </div>

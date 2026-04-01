@@ -1,8 +1,6 @@
-
 "use client";
 
 import Link from 'next/link';
-import { User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
@@ -30,14 +28,6 @@ export function Navbar() {
               {link.name}
             </Link>
           ))}
-          {/* Mobile Profile Icon */}
-          <div className="flex items-center gap-3 lg:hidden">
-            <Link href="/profile">
-              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-[#F5F5F7] shadow-none">
-                <User className="w-5 h-5 text-[#1D1D1F]" />
-              </Button>
-            </Link>
-          </div>
         </div>
 
         {/* Brand Logo - Right Side */}

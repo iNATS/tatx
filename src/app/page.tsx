@@ -58,10 +58,10 @@ export default function Home() {
               
               <div className="flex flex-wrap gap-4 justify-center pt-4">
                 <a href="#" className="transition-transform hover:scale-105 active:scale-95">
-                  <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={60} className="h-[60px] w-auto" />
+                  <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={54} className="h-[54px] w-auto" />
                 </a>
                 <a href="#" className="transition-transform hover:scale-105 active:scale-95">
-                  <Image src={googlePlayBadge} alt="Get it on Google Play" width={200} height={60} className="h-[60px] w-auto" />
+                  <Image src={googlePlayBadge} alt="Get it on Google Play" width={180} height={54} className="h-[54px] w-auto" />
                 </a>
               </div>
             </div>
@@ -134,7 +134,7 @@ export default function Home() {
                   </Button>
                 </div>
                 <div className="relative aspect-square md:aspect-video rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
-                  <Image src="https://picsum.photos/seed/tatx-taxi-white/1200/1000" alt="Tatx Premium Ride" fill className="object-cover" />
+                  <Image src="/assets/img/iPhone-13-PRO-MAX-app.tatx.com.webp" alt="Tatx Premium Ride" fill className="object-cover" />
                 </div>
               </div>
             </div>
@@ -155,10 +155,10 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-8 justify-center pt-10">
               <a href="#" className="transition-transform hover:scale-105 active:scale-95">
-                <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={60} className="h-[60px] w-auto" />
+                <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={54} className="h-[54px] w-auto" />
               </a>
               <a href="#" className="transition-transform hover:scale-105 active:scale-95">
-                <Image src={googlePlayBadge} alt="Get it on Google Play" width={200} height={60} className="h-[60px] w-auto" />
+                <Image src={googlePlayBadge} alt="Get it on Google Play" width={180} height={54} className="h-[54px] w-auto" />
               </a>
             </div>
           </div>
