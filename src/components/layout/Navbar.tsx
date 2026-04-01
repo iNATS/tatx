@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -32,21 +33,20 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-border shadow-none">
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-6">
+    <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-xl border-b border-border/50">
+      <div className="container mx-auto px-4 h-24 flex items-center justify-between gap-6">
         {/* Brand Logo & Name */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-border shadow-sm flex items-center justify-center p-1">
+        <Link href="/" className="flex items-center gap-4 group">
+          <div className="relative w-12 h-12 overflow-hidden rounded-2xl bg-white border border-border/50 shadow-sm flex items-center justify-center p-1.5 transition-transform group-hover:scale-105">
             <Image 
-              src="https://picsum.photos/seed/tatx-logo/200/200" 
+              src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
               alt="Tatx Logo" 
-              width={40} 
-              height={40} 
+              width={48} 
+              height={48} 
               className="object-contain"
-              data-ai-hint="app logo"
             />
           </div>
-          <span className="text-2xl font-black hidden md:block tracking-tight text-foreground">
+          <span className="text-3xl font-black tracking-tight text-foreground">
             Tatx
           </span>
         </Link>
@@ -54,15 +54,15 @@ export function Navbar() {
         {/* Location Picker - Hidden on Mobile */}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <div className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-secondary/50 rounded-full cursor-pointer hover:bg-secondary transition-all border border-transparent hover:border-border">
-              <MapPin className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold truncate max-w-[150px]">التوصيل إلى: {selectedLocation.district}</span>
-              <ChevronDown className="w-3 h-3 text-muted-foreground" />
+            <div className="hidden lg:flex items-center gap-3 px-6 py-3 bg-secondary/40 rounded-full cursor-pointer hover:bg-secondary/60 transition-all border border-transparent hover:border-border/50">
+              <MapPin className="w-5 h-5 text-primary" />
+              <span className="text-sm font-black truncate max-w-[180px]">التوصيل إلى: {selectedLocation.district}</span>
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
             </div>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-none shadow-2xl p-8" dir="rtl">
+          <DialogContent className="sm:max-w-[450px] rounded-[2.5rem] border-none shadow-2xl p-10" dir="rtl">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-black text-right mb-6">اختر موقع التوصيل</DialogTitle>
+              <DialogTitle className="text-3xl font-black text-right mb-8">اختر موقع التوصيل</DialogTitle>
             </DialogHeader>
             <RadioGroup 
               defaultValue={selectedLocation.id} 
@@ -73,51 +73,51 @@ export function Navbar() {
                   setIsOpen(false);
                 }
               }}
-              className="space-y-3"
+              className="space-y-4"
             >
               {LOCATIONS.map((loc) => (
                 <div key={loc.id}>
                   <RadioGroupItem value={loc.id} id={loc.id} className="peer sr-only" />
                   <Label
                     htmlFor={loc.id}
-                    className="flex items-center justify-between p-5 bg-secondary/40 rounded-2xl cursor-pointer hover:bg-secondary/60 transition-all peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-white font-black"
+                    className="flex items-center justify-between p-6 bg-secondary/30 rounded-3xl cursor-pointer hover:bg-secondary/50 transition-all peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-white font-black"
                   >
-                    <div className="flex items-center gap-4">
-                      <MapPin className="w-5 h-5 opacity-70" />
+                    <div className="flex items-center gap-5">
+                      <MapPin className="w-6 h-6 opacity-70" />
                       <div className="flex flex-col text-right">
-                        <span>{loc.district}</span>
-                        <span className="text-[10px] opacity-60 font-bold">{loc.city}</span>
+                        <span className="text-lg">{loc.district}</span>
+                        <span className="text-xs opacity-60 font-bold">{loc.city}</span>
                       </div>
                     </div>
-                    {selectedLocation.id === loc.id && <Check className="w-5 h-5" />}
+                    {selectedLocation.id === loc.id && <Check className="w-6 h-6" />}
                   </Label>
                 </div>
               ))}
             </RadioGroup>
-            <div className="mt-8">
-              <Button className="w-full rounded-2xl font-black h-14 bg-white text-primary border-2 border-primary/20 hover:bg-primary/5 shadow-none">
+            <div className="mt-10">
+              <Button className="w-full rounded-2xl font-black h-16 text-lg bg-white text-primary border-2 border-primary/20 hover:bg-primary/5 shadow-none">
                 إضافة عنوان جديد
               </Button>
             </div>
           </DialogContent>
         </Dialog>
 
-        {/* Desktop Actions */}
-        <div className="flex items-center gap-3">
+        {/* Actions */}
+        <div className="flex items-center gap-4">
           <Link href="/profile" className="hidden md:block">
-            <Button variant="ghost" className="flex gap-2 font-black shadow-none hover:bg-secondary rounded-full px-6 h-12">
-              <User className="w-5 h-5" />
+            <Button variant="ghost" className="flex gap-2 font-black shadow-none hover:bg-secondary/50 rounded-full px-8 h-14 text-lg">
+              <User className="w-6 h-6" />
               <span>دخول</span>
             </Button>
           </Link>
 
           <Link href="/cart">
-            <Button className="relative gap-2 font-black rounded-full px-7 h-12 bg-primary hover:bg-primary/90 shadow-lg border-none transition-all active:scale-95">
-              <ShoppingBag className="w-5 h-5" />
+            <Button className="relative gap-3 font-black rounded-full px-8 h-14 text-lg bg-primary hover:bg-primary/90 shadow-xl border-none transition-all active:scale-95">
+              <ShoppingBag className="w-6 h-6" />
               <span className="hidden sm:inline">السلة</span>
               {itemCount > 0 && (
                 <Badge 
-                  className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center p-0 text-[10px] bg-foreground text-background border-2 border-white shadow-xl rounded-full"
+                  className="absolute -top-1 -right-1 h-7 w-7 flex items-center justify-center p-0 text-xs bg-black text-white border-2 border-white shadow-xl rounded-full"
                 >
                   {itemCount}
                 </Badge>
@@ -125,8 +125,8 @@ export function Navbar() {
             </Button>
           </Link>
 
-          <Button variant="ghost" size="icon" className="md:hidden shadow-none rounded-full h-12 w-12" asChild>
-            <Link href="/search"><Search className="w-6 h-6" /></Link>
+          <Button variant="ghost" size="icon" className="md:hidden shadow-none rounded-full h-14 w-14 hover:bg-secondary/50" asChild>
+            <Link href="/search"><Search className="w-7 h-7" /></Link>
           </Button>
         </div>
       </div>

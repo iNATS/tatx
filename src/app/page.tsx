@@ -19,43 +19,49 @@ import {
   ShieldCheck,
   Clock,
   MapPin,
-  ChevronLeft
+  ChevronLeft,
+  CheckCircle2,
+  Download
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FEATURED_ITEMS, PROVIDERS } from '@/lib/data';
+import { FEATURED_ITEMS } from '@/lib/data';
 import { useRouter } from 'next/navigation';
 
+/**
+ * @fileOverview الصفحة الرئيسية المعاد تصميمها بأسلوب Material Design 3.
+ * تركز الصفحة على كونها Landing Page احترافية تبرز ميزات تطبيق Tatx.
+ */
 export default function Home() {
   const router = useRouter();
 
   const services = [
-    { name: 'سوبر ماركت', icon: Store, desc: 'كل مستلزمات المنزل' },
-    { name: 'مطاعم', icon: Utensils, desc: 'أشهى الأطباق والوجبات' },
-    { name: 'تاكسي', icon: Car, desc: 'مشاوير آمنة وسريعة' },
-    { name: 'شاليهات', icon: HomeIcon, desc: 'خصوصية تامة واستجمام' },
-    { name: 'قاعات', icon: PartyPopper, desc: 'لمناسباتكم السعيدة' },
-    { name: 'صيانة', icon: Wrench, desc: 'خدمات منزلية متكاملة' },
+    { name: 'سوبر ماركت', icon: Store, desc: 'كل مستلزمات المنزل بجودة تاتكس', color: 'bg-blue-50 text-blue-600' },
+    { name: 'مطاعم', icon: Utensils, desc: 'أشهى الأطباق من أفضل المطاعم', color: 'bg-orange-50 text-orange-600' },
+    { name: 'تاكسي', icon: Car, desc: 'مشاوير آمنة، سريعة، وبسعر عادل', color: 'bg-emerald-50 text-green-600' },
+    { name: 'شاليهات', icon: HomeIcon, desc: 'خصوصية تامة واستجمام عائلي فاخر', color: 'bg-purple-50 text-purple-600' },
+    { name: 'قاعات', icon: PartyPopper, desc: 'قاعات فخمة لجميع مناسباتكم', color: 'bg-pink-50 text-pink-600' },
+    { name: 'صيانة', icon: Wrench, desc: 'خدمات منزلية متكاملة بضماننا', color: 'bg-amber-50 text-amber-600' },
   ];
 
   return (
     <>
       <Navbar />
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-[#FBFBFB]">
         
-        {/* --- SECTION 1: HERO (App Landing Style) --- */}
-        <section className="relative pt-12 md:pt-24 pb-32 overflow-hidden bg-gradient-to-br from-primary/5 via-white to-white">
+        {/* --- SECTION 1: MD3 HERO SECTION --- */}
+        <section className="relative pt-16 md:pt-28 pb-32 overflow-hidden bg-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               
-              {/* Right Column: Text Content */}
-              <div className="text-right space-y-10 order-1">
-                <div className="inline-flex items-center gap-2 bg-white px-5 py-2 rounded-full shadow-sm border border-primary/10">
+              {/* Text Content */}
+              <div className="text-right space-y-8 order-1">
+                <div className="inline-flex items-center gap-2 bg-primary/5 px-6 py-2.5 rounded-full border border-primary/10">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  <span className="text-sm font-black text-primary">الآن متاح في جميع مدن المملكة</span>
+                  <span className="text-sm font-black text-primary">تطبيق Tatx الجديد متاح الآن</span>
                 </div>
                 
-                <h1 className="text-5xl md:text-8xl font-black leading-[1.1] tracking-tighter text-foreground">
+                <h1 className="text-5xl md:text-[5.5rem] font-black leading-[1] tracking-tight text-foreground">
                   كل احتياجاتك<br />
                   <span className="text-primary italic">في تطبيق واحد</span>
                 </h1>
@@ -64,15 +70,15 @@ export default function Home() {
                   من طلب الوجبات وحجز المشاوير إلى استئجار الشاليهات وتنسيق المناسبات.. Tatx هو رفيقك الذكي لكل لحظة في يومك.
                 </p>
 
-                <div className="flex flex-wrap gap-5 justify-end">
-                  <Button className="h-[70px] px-10 rounded-[1.5rem] bg-black text-white gap-4 shadow-2xl hover:scale-[1.02] transition-all border-none">
+                <div className="flex flex-wrap gap-4 justify-end">
+                  <Button className="h-[72px] px-8 rounded-3xl bg-black text-white gap-4 shadow-xl hover:scale-[1.02] transition-all border-none">
                     <div className="flex flex-col items-end leading-none">
                       <span className="text-[10px] opacity-60 mb-1">Download on the</span>
                       <span className="text-xl font-black">App Store</span>
                     </div>
                     <Smartphone className="w-8 h-8" />
                   </Button>
-                  <Button className="h-[70px] px-10 rounded-[1.5rem] bg-black text-white gap-4 shadow-2xl hover:scale-[1.02] transition-all border-none">
+                  <Button className="h-[72px] px-8 rounded-3xl bg-black text-white gap-4 shadow-xl hover:scale-[1.02] transition-all border-none">
                     <div className="flex flex-col items-end leading-none">
                       <span className="text-[10px] opacity-60 mb-1">GET IT ON</span>
                       <span className="text-xl font-black">Google Play</span>
@@ -85,31 +91,44 @@ export default function Home() {
                   </Button>
                 </div>
 
-                <div className="flex items-center gap-8 justify-end pt-6">
-                  <div className="text-center">
-                    <h4 className="text-3xl font-black">50K+</h4>
-                    <p className="text-xs text-muted-foreground font-bold">مستخدم نشط</p>
-                  </div>
-                  <div className="w-px h-10 bg-border" />
-                  <div className="text-center">
-                    <h4 className="text-3xl font-black">4.9</h4>
-                    <p className="text-xs text-muted-foreground font-bold">تقييم المتجر</p>
-                  </div>
-                  <div className="w-px h-10 bg-border" />
-                  <div className="text-center">
-                    <h4 className="text-3xl font-black">100%</h4>
-                    <p className="text-xs text-muted-foreground font-bold">ضمان الخدمة</p>
-                  </div>
+                <div className="flex items-center gap-10 justify-end pt-8">
+                  {[
+                    { label: 'مستخدم نشط', val: '50K+' },
+                    { label: 'تقييم المتجر', val: '4.9' },
+                    { label: 'ضمان الخدمة', val: '100%' }
+                  ].map((stat, i) => (
+                    <div key={i} className="text-right">
+                      <h4 className="text-3xl font-black text-foreground">{stat.val}</h4>
+                      <p className="text-xs text-muted-foreground font-bold">{stat.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Left Column: Phone Mockup */}
+              {/* Phone Mockup with MD3 Style */}
               <div className="relative order-2 flex justify-center lg:justify-start">
-                <div className="absolute inset-0 bg-primary/20 blur-[150px] rounded-full scale-110 -z-10" />
-                <div className="relative w-full max-w-[320px] md:max-w-[380px] aspect-[9/19] bg-foreground rounded-[4rem] p-3 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] border-[12px] border-foreground overflow-hidden">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-foreground rounded-b-3xl z-30" />
-                  <div className="relative w-full h-full rounded-[3.2rem] overflow-hidden bg-white">
-                    <Image src="https://picsum.photos/seed/tatx-app-ui/800/1600" alt="Tatx Mobile UI" fill className="object-cover" />
+                <div className="absolute inset-0 bg-primary/10 blur-[120px] rounded-full scale-110 -z-10" />
+                <div className="relative w-full max-w-[340px] md:max-w-[400px] aspect-[9/18.5] bg-[#1A1C1E] rounded-[4.5rem] p-4 shadow-[0_60px_120px_-20px_rgba(0,0,0,0.3)] border-[14px] border-[#1A1C1E] overflow-hidden group">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-8 bg-[#1A1C1E] rounded-b-3xl z-30" />
+                  <div className="relative w-full h-full rounded-[3.5rem] overflow-hidden bg-white">
+                    <Image 
+                      src="https://picsum.photos/seed/tatx-mobile-ui/800/1600" 
+                      alt="Tatx App Screenshot" 
+                      fill 
+                      className="object-cover transition-transform duration-700 group-hover:scale-105" 
+                      data-ai-hint="mobile app screenshot"
+                    />
+                  </div>
+                </div>
+                
+                {/* Floating MD3 Chips */}
+                <div className="absolute -right-8 top-1/4 bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-2xl border border-white/20 flex items-center gap-4 animate-bounce duration-[3000ms]">
+                  <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-green-600">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <div className="text-right">
+                    <span className="block font-black text-sm">تم تأكيد الطلب</span>
+                    <span className="text-[10px] text-muted-foreground font-bold">المندوب في طريقه إليك</span>
                   </div>
                 </div>
               </div>
@@ -118,11 +137,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- SECTION 2: CORE SERVICES GRID --- */}
-        <section className="py-24 bg-white">
+        {/* --- SECTION 2: MD3 SERVICES GRID --- */}
+        <section className="py-32 bg-[#FBFBFB]">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center mb-20">
-              <h2 className="text-4xl md:text-6xl font-black mb-6">خدمات Tatx بين يديك</h2>
+            <div className="max-w-3xl mx-auto text-center mb-24">
+              <h2 className="text-4xl md:text-6xl font-black mb-8 text-foreground tracking-tight">خدمات Tatx بين يديك</h2>
               <p className="text-xl text-muted-foreground font-bold leading-relaxed">
                 صممنا Tatx ليكون رفيقك المثالي، موفراً لك حلولاً ذكية تخدمك في كل تفاصيل يومك بجودة وسرعة فائقة.
               </p>
@@ -130,17 +149,17 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {services.map((ser, i) => (
-                <div key={i} className="group bg-secondary/20 p-10 rounded-[3rem] transition-all duration-500 hover:bg-primary/5 hover:shadow-xl hover:translate-y-[-8px] text-right border border-transparent hover:border-primary/10">
-                  <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-primary mb-8 mr-0 ml-auto shadow-sm group-hover:rotate-12 transition-transform duration-500">
-                    <ser.icon className="w-10 h-10" />
+                <div key={i} className="group bg-white p-12 rounded-[3.5rem] transition-all duration-500 hover:bg-white hover:shadow-2xl hover:translate-y-[-12px] text-right border border-border/50">
+                  <div className={`w-24 h-24 ${ser.color} rounded-[2.5rem] flex items-center justify-center mb-10 mr-0 ml-auto shadow-sm group-hover:scale-110 transition-transform duration-500`}>
+                    <ser.icon className="w-12 h-12" />
                   </div>
-                  <h4 className="text-3xl font-black mb-4">{ser.name}</h4>
-                  <p className="text-lg text-muted-foreground font-bold leading-relaxed mb-8">
-                    تجربة {ser.desc} فريدة من نوعها مع ضمان الجودة والسرعة التي تميز Tatx عن غيرها.
+                  <h4 className="text-3xl font-black mb-4 text-foreground">{ser.name}</h4>
+                  <p className="text-lg text-muted-foreground font-bold leading-relaxed mb-10">
+                    {ser.desc}. جودة استثنائية وسرعة في التنفيذ بضمان Tatx.
                   </p>
-                  <Button variant="ghost" className="p-0 h-auto font-black text-primary gap-2 hover:bg-transparent shadow-none group-hover:translate-x-[-5px] transition-transform">
-                    <span>اكتشف المزيد</span>
-                    <ChevronLeft className="w-5 h-5" />
+                  <Button variant="ghost" className="p-0 h-auto font-black text-primary gap-3 hover:bg-transparent shadow-none group-hover:translate-x-[-8px] transition-transform text-lg">
+                    <span>اكتشف الخدمة</span>
+                    <ChevronLeft className="w-6 h-6" />
                   </Button>
                 </div>
               ))}
@@ -149,44 +168,39 @@ export default function Home() {
         </section>
 
         {/* --- SECTION 3: TAXI FEATURE BANNER --- */}
-        <section className="py-12 bg-white">
+        <section className="py-16">
           <div className="container mx-auto px-4">
-            <div className="bg-primary rounded-[4rem] p-12 md:p-24 overflow-hidden relative group">
-              <div className="absolute inset-0 bg-gradient-to-l from-black/20 to-transparent -z-0" />
-              <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                <svg width="100%" height="100%" fill="none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <path d="M0 100 L100 0 L100 100 Z" fill="white" />
-                </svg>
-              </div>
+            <div className="bg-[#121416] rounded-[4.5rem] p-12 md:p-28 overflow-hidden relative group">
+              <div className="absolute inset-0 bg-gradient-to-l from-primary/20 to-transparent -z-0" />
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
                 <div className="order-2 lg:order-1 flex justify-center">
-                  <div className="relative w-full max-w-[400px] aspect-video rounded-[2.5rem] overflow-hidden border-[10px] border-white/20 shadow-2xl group-hover:scale-105 transition-transform duration-700">
-                    <Image src="https://picsum.photos/seed/tatx-taxi-map/800/450" alt="Tatx Taxi Map" fill className="object-cover" />
+                  <div className="relative w-full max-w-[450px] aspect-video rounded-[3rem] overflow-hidden border-[12px] border-white/5 shadow-2xl group-hover:scale-105 transition-transform duration-1000">
+                    <Image src="https://picsum.photos/seed/tatx-taxi-vibe/900/500" alt="Tatx Taxi" fill className="object-cover brightness-75" data-ai-hint="modern taxi" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-primary shadow-2xl animate-pulse">
-                        <Car className="w-8 h-8" />
+                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-primary shadow-2xl animate-pulse">
+                        <Car className="w-10 h-10" />
                       </div>
                     </div>
                   </div>
                 </div>
                 
                 <div className="text-white text-right order-1 lg:order-2">
-                  <h2 className="text-4xl md:text-7xl font-black mb-8 leading-tight">
-                    رحلاتك.. صارت<br />أسهل مع تاكسي Tatx
+                  <h2 className="text-4xl md:text-7xl font-black mb-10 leading-tight tracking-tight">
+                    رحلاتك.. صارت<br />أسهل مع <span className="text-primary">تاكسي Tatx</span>
                   </h2>
-                  <p className="text-xl md:text-2xl text-white/80 font-bold mb-12 leading-relaxed">
-                    اطلب سيارتك الآن واستمتع بمشوار مريح وآمن، مع تتبع مباشر لرحلتك وكباتن محترفين تم اختيارهم بعناية.
+                  <p className="text-xl md:text-2xl text-white/70 font-bold mb-14 leading-relaxed">
+                    اطلب سيارتك الآن واستمتع بمشوار مريح وآمن، مع تتبع مباشر لرحلتك وكباتن محترفين تم اختيارهم بعناية لخدمتكم.
                   </p>
                   <div className="flex flex-wrap gap-4 justify-end">
-                    {['تتبع مباشر', 'دفع إلكتروني', 'كباتن معتمدون', 'دعم 24/7'].map((tag, idx) => (
-                      <Badge key={idx} className="bg-white/20 text-white border-none font-black px-6 py-2.5 text-sm rounded-full shadow-none backdrop-blur-md">
+                    {['تتبع حي', 'دفع رقمي', 'كباتن معتمدون'].map((tag, idx) => (
+                      <Badge key={idx} className="bg-white/10 text-white border-none font-black px-8 py-3 text-sm rounded-2xl shadow-none backdrop-blur-md">
                         {tag}
                       </Badge>
                     ))}
                   </div>
-                  <Button onClick={() => router.push('/taxi')} className="mt-12 h-18 px-14 rounded-[1.5rem] bg-white text-primary hover:bg-white/90 font-black text-2xl shadow-2xl transition-all active:scale-95 border-none">
-                    احجز مشوارك الآن
+                  <Button onClick={() => router.push('/taxi')} className="mt-16 h-[80px] px-16 rounded-3xl bg-primary text-white hover:bg-primary/90 font-black text-2xl shadow-2xl transition-all active:scale-95 border-none">
+                    احجز مشوارك الأول
                   </Button>
                 </div>
               </div>
@@ -194,90 +208,89 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- SECTION 4: EXCLUSIVE DEALS (Horizontal Scroll) --- */}
-        <section className="py-24 bg-white overflow-hidden">
+        {/* --- SECTION 4: APP SCREENSHOTS / FEATURES --- */}
+        <section className="py-32 bg-white overflow-hidden">
           <div className="container mx-auto px-4">
-            <div className="flex justify-between items-end mb-16 flex-row-reverse text-right">
+            <div className="flex justify-between items-end mb-24 flex-row-reverse text-right">
               <div>
-                <h2 className="text-4xl md:text-6xl font-black mb-4 tracking-tight">عروض تاتكس الحصرية</h2>
-                <p className="text-xl text-muted-foreground font-bold">أفضل الخدمات بأسعار لا تقاوم، فقط لمستخدمي التطبيق</p>
+                <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight text-foreground">تجربة مستخدم لا تضاهى</h2>
+                <p className="text-xl text-muted-foreground font-bold">بساطة في التصميم، قوة في الأداء. شاهد واجهات تطبيق Tatx</p>
               </div>
-              <div className="flex gap-3">
-                <Button variant="outline" size="icon" className="rounded-full h-14 w-14 border-2 shadow-sm"><ArrowLeft className="w-6 h-6 rotate-180" /></Button>
-                <Button variant="outline" size="icon" className="rounded-full h-14 w-14 border-2 bg-primary text-white border-primary shadow-lg"><ArrowLeft className="w-6 h-6" /></Button>
+              <div className="hidden md:flex gap-4">
+                <Button variant="outline" size="icon" className="rounded-full h-16 w-16 border-2 shadow-sm"><ArrowLeft className="w-8 h-8 rotate-180" /></Button>
+                <Button variant="outline" size="icon" className="rounded-full h-16 w-16 border-2 bg-primary text-white border-primary shadow-xl"><ArrowLeft className="w-8 h-8" /></Button>
               </div>
             </div>
 
-            <div className="flex gap-8 overflow-x-auto no-scrollbar pb-12 flex-row-reverse -mx-4 px-4">
-              {FEATURED_ITEMS.map((item) => (
-                <Link key={item.id} href={`/item/${item.id}`} className="min-w-[380px] md:min-w-[500px]">
-                  <Card className="relative h-[550px] rounded-[3.5rem] overflow-hidden group border-none shadow-2xl">
-                    <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-12 text-white text-right">
-                      <div className="flex items-center gap-3 mb-6 justify-end">
-                        <Badge className="bg-primary text-white font-black px-5 py-2 rounded-xl shadow-lg border-none text-lg">{item.price} ر.س</Badge>
-                        <Badge variant="secondary" className="bg-white/20 text-white border-none font-black px-5 py-2 rounded-xl text-lg backdrop-blur-md">خصم 20%</Badge>
-                      </div>
-                      <h3 className="text-4xl font-black mb-4 leading-tight">{item.name}</h3>
-                      <p className="text-white/70 font-bold text-lg line-clamp-2 leading-relaxed">{item.description}</p>
-                    </div>
-                  </Card>
-                </Link>
+            <div className="flex gap-10 overflow-x-auto no-scrollbar pb-16 flex-row-reverse -mx-4 px-4">
+              {[
+                { title: 'سوبر ماركت ذكي', img: 'https://picsum.photos/seed/screen1/600/1200', hint: 'تصفح آلاف المنتجات بلمسة واحدة' },
+                { title: 'تتبع رحلاتك', img: 'https://picsum.photos/seed/screen2/600/1200', hint: 'راقب الكابتن مباشرة على الخريطة' },
+                { title: 'حجز فوري للشاليهات', img: 'https://picsum.photos/seed/screen3/600/1200', hint: 'أفضل العروض الحصرية بين يديك' },
+                { title: 'خدمات منزلية', img: 'https://picsum.photos/seed/screen4/600/1200', hint: 'اطلب فني متخصص في دقائق' }
+              ].map((screen, idx) => (
+                <div key={idx} className="min-w-[300px] md:min-w-[380px] space-y-8">
+                  <div className="relative aspect-[9/18.5] rounded-[3.5rem] overflow-hidden border-8 border-[#F0F0F0] shadow-2xl group cursor-pointer">
+                    <Image src={screen.img} alt={screen.title} fill className="object-cover transition-transform duration-1000 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <div className="text-right px-4">
+                    <h4 className="text-2xl font-black text-foreground mb-2">{screen.title}</h4>
+                    <p className="text-sm text-muted-foreground font-bold">{screen.hint}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
         {/* --- SECTION 5: TRUST & TESTIMONIALS --- */}
-        <section className="py-24 bg-secondary/10">
+        <section className="py-32 bg-[#F1F3F4]">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-4xl md:text-6xl font-black mb-20">لماذا يختارنا الآلاف؟</h2>
+            <h2 className="text-4xl md:text-6xl font-black mb-24 text-foreground tracking-tight">لماذا يفضلنا الآلاف؟</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {[
-                { name: 'أحمد القحطاني', role: 'عميل مميز', text: 'Tatx غير روتيني اليومي، سرعة التوصيل في السوبر ماركت خيالية والتطبيق سهل جداً وسلس في الاستخدام.' },
+                { name: 'أحمد القحطاني', role: 'عميل بلاتيني', text: 'Tatx غير روتيني اليومي، سرعة التوصيل في السوبر ماركت خيالية والتطبيق سهل جداً وسلس في الاستخدام.' },
                 { name: 'سارة العتيبي', role: 'ربة منزل', text: 'أفضل ميزة هي حجز الشاليهات، الصور مطابقة للواقع تماماً والخدمة احترافية جداً، شكراً لفريق تاتكس.' },
                 { name: 'خالد محمد', role: 'كابتن تاتكس', text: 'فخور كوني جزء من فريق كباتن تاتكس، نظام العمل مرن والدعم مستمر دائماً لتحسين دخلنا وتطوير مهاراتنا.' }
               ].map((test, i) => (
-                <Card key={i} className="p-12 rounded-[3.5rem] border-none shadow-sm bg-white text-right relative overflow-hidden group hover:shadow-2xl transition-all duration-500">
-                  <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <Zap className="w-24 h-24 text-primary" />
-                  </div>
-                  <div className="flex items-center gap-5 justify-end mb-10 flex-row-reverse">
-                    <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-xl border-4 border-white">
-                      <Image src={`https://picsum.photos/seed/user-${i}/200/200`} alt={test.name} fill className="object-cover" />
+                <Card key={i} className="p-12 rounded-[4rem] border-none shadow-sm bg-white text-right relative overflow-hidden group hover:shadow-2xl transition-all duration-500">
+                  <div className="flex items-center gap-6 justify-end mb-10 flex-row-reverse">
+                    <div className="relative w-24 h-24 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
+                      <Image src={`https://picsum.photos/seed/user-${i}/300/300`} alt={test.name} fill className="object-cover" />
                     </div>
                     <div>
-                      <h4 className="font-black text-2xl">{test.name}</h4>
+                      <h4 className="font-black text-2xl text-foreground">{test.name}</h4>
                       <p className="text-sm font-bold text-primary">{test.role}</p>
                     </div>
                   </div>
-                  <p className="text-xl font-bold text-muted-foreground leading-relaxed italic">"{test.text}"</p>
+                  <p className="text-xl font-bold text-muted-foreground leading-[1.8] italic">"{test.text}"</p>
                 </Card>
               ))}
             </div>
           </div>
         </section>
 
-        {/* --- SECTION 6: FINAL CALL TO ACTION --- */}
+        {/* --- SECTION 6: MD3 FINAL CTA --- */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4">
-            <div className="bg-black rounded-[5rem] p-12 md:p-32 text-center relative overflow-hidden group">
-              <div className="absolute inset-0 opacity-40 grayscale group-hover:grayscale-0 transition-all duration-1000">
-                <Image src="https://picsum.photos/seed/tatx-community/1600/800" alt="Tatx Community" fill className="object-cover" />
+            <div className="bg-primary rounded-[5rem] p-16 md:p-32 text-center relative overflow-hidden group">
+              <div className="absolute inset-0 opacity-20 grayscale group-hover:grayscale-0 transition-all duration-1000 scale-110">
+                <Image src="https://picsum.photos/seed/tatx-community-love/1600/800" alt="Tatx Community" fill className="object-cover" />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/90" />
+              <div className="absolute inset-0 bg-primary/80" />
               
               <div className="relative z-10 max-w-4xl mx-auto space-y-12">
                 <h2 className="text-5xl md:text-8xl font-black text-white leading-tight tracking-tight">
                   انضم إلى عائلة Tatx<br />وابدأ رحلتك اليوم
                 </h2>
-                <p className="text-2xl text-white/70 font-bold max-w-2xl mx-auto leading-relaxed">
+                <p className="text-2xl text-white/90 font-bold max-w-2xl mx-auto leading-relaxed">
                   حمل التطبيق الآن واستمتع بتجربة فريدة تجمع كل احتياجاتك في مكان واحد وبأفضل الأسعار.
                 </p>
                 <div className="flex flex-wrap gap-8 justify-center pt-8">
-                  <Button className="h-20 px-16 rounded-[2rem] bg-primary text-white font-black text-2xl shadow-[0_20px_50px_rgba(226,126,54,0.4)] hover:scale-105 transition-all border-none">
+                  <Button className="h-[84px] px-16 rounded-[2.5rem] bg-white text-primary hover:bg-white/95 font-black text-2xl shadow-2xl hover:scale-105 transition-all border-none gap-4">
+                    <Download className="w-8 h-8" />
                     ابدأ الآن مجاناً
                   </Button>
                 </div>
