@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, RefreshCon
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, fonts } from '../constants/theme';
+import { colors, spacing, borderRadius, typography, fonts } from '../constants/theme';
 import { vendorStores } from '../data/vendorCatalog';
 import { useApp } from '../context/AppContext';
 import ItemDetailModal from '../components/ItemDetailModal';
