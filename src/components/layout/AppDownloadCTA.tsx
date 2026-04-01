@@ -1,12 +1,9 @@
-
 "use client";
 
-import Image from 'next/image';
+import { Apple, Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function AppDownloadCTA() {
-  const appStoreUrl = "https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg";
-  const googlePlayUrl = "https://storage.googleapis.com/pe-portal-consumer-prod-wagtail-static/images/googleplay-badge-01-getit.width-1440.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=wagtail%40pe-portal-consumer-prod.iam.gserviceaccount.com%2F20260401%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260401T070647Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=8f41108c3f91c16681aa762bdf17525548b03092f6564192a9487ce5ca0e80afdddf144527da9801b0d82e6c06bf2e7005d610a9cbf7ee32a5ab5b2d7ad3105ca97345a71152b9bb67e2b36990350ae4d365b25ae67e666208c794e49e61156bcd828aa1f43cca2dcacece3e77d7735398a4ab15958fb5aaf2c6171400d8b1d883c5e783868d77696c5cdf0014959138cbb3680684d1636ceb0f5ec170575c3afa914bda43251aced0d4c0eb4976c9640a94613319cd0a3cdfbe245ad82194fab7c6be7e95b38f50a8e0dd755a73e70f11046b0d9dcc62f42eee85581b8b477b5951b399b952d6a92dc4963913dffc60bc61995d34b70ce905130845346c6139";
-
   return (
     <section className="bg-white py-32" dir="rtl">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -24,22 +21,22 @@ export function AppDownloadCTA() {
               </p>
               
               <div className="flex flex-wrap gap-6 justify-end pt-4">
-                <div className="relative h-[65px] w-[190px] cursor-pointer hover:scale-105 transition-transform">
-                  <Image 
-                    src={appStoreUrl} 
-                    alt="Download on the App Store" 
-                    fill 
-                    className="object-contain" 
-                  />
-                </div>
-                <div className="relative h-[65px] w-[210px] cursor-pointer hover:scale-105 transition-transform">
-                  <Image 
-                    src={googlePlayUrl} 
-                    alt="Get it on Google Play" 
-                    fill 
-                    className="object-contain" 
-                  />
-                </div>
+                <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
+                  <div className="flex flex-col items-end leading-none">
+                    <span className="text-[10px] font-bold opacity-60">Download on the</span>
+                    <span className="text-xl">App Store</span>
+                  </div>
+                  <Apple className="w-8 h-8" />
+                </Button>
+                <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
+                  <div className="flex flex-col items-end leading-none">
+                    <span className="text-[10px] font-bold opacity-60">GET IT ON</span>
+                    <span className="text-xl">Google Play</span>
+                  </div>
+                  <div className="w-8 h-8 flex items-center justify-center">
+                    <Play className="w-7 h-7 fill-white" />
+                  </div>
+                </Button>
               </div>
             </div>
 
@@ -62,3 +59,5 @@ export function AppDownloadCTA() {
     </section>
   );
 }
+
+import Image from 'next/image';
