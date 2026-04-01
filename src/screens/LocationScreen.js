@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, borderRadius, fonts } from '../constants/theme';
 import { useApp } from '../context/AppContext';
+import PageHeader from '../components/PageHeader';
 import { syncUserAddresses } from '../services/appUserService';
 
 const LocationScreen = ({ navigation }) => {
@@ -83,15 +84,13 @@ const LocationScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm, flexDirection: rowDirection }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>العناوين</Text>
-        <TouchableOpacity style={styles.headerButton} onPress={openNewModal}>
-          <Ionicons name="add" size={24} color={colors.primary} />
-        </TouchableOpacity>
-      </View>
+      <PageHeader
+        navigation={navigation}
+        title="العناوين"
+        subtitle="أدر عناوينك المحفوظة"
+        actionIcon="add"
+        onActionPress={openNewModal}
+      />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={[styles.currentBanner, { flexDirection: 'row-reverse' }]}>
@@ -173,9 +172,6 @@ const LocationScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: { backgroundColor: colors.card, justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.md, paddingBottom: spacing.md },
-  headerButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardSecondary, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.text },
   content: { padding: spacing.md, paddingBottom: spacing.xxl },
   currentBanner: { backgroundColor: colors.card, borderRadius: borderRadius.xl, padding: spacing.md, alignItems: 'center', marginBottom: spacing.md, borderWidth: 1, borderColor: colors.borderLight },
   currentBannerText: { flex: 1, width: '100%', marginHorizontal: spacing.md, alignItems: 'flex-end' },
