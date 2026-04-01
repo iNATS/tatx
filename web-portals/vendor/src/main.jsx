@@ -30,34 +30,50 @@ import './index.css';
 // Supabase Configuration
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+console.log('🔧 Supabase Config:', {
+  url: supabaseUrl,
+  hasKey: !!supabaseAnonKey,
+});
+
 const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey);
 
 // API Helpers
 const getHeaders = (extra = {}) => ({
   apikey: supabaseAnonKey,
-  Authorization: `Bearer ` + supabaseAnonKey,
+  Authorization: `Bearer ${supabaseAnonKey}`,
   'Content-Type': 'application/json',
   ...extra,
 });
 
 const fetchJson = async (url, options = {}) => {
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...getHeaders(),
-      ...(options.headers || {}),
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...getHeaders(),
+        ...(options.headers || {}),
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error(`Request failed (${response.status})`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ API Error:', response.status, errorText);
+      throw new Error(`Request failed (${response.status}): ${errorText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('❌ Fetch error:', error);
+    throw error;
   }
-
-  return response.json();
 };
 
 const fetchVendorPortalData = async (phone) => {
+  console.log('📞 Fetching vendor data for:', phone);
+  
   if (!hasSupabaseConfig) {
+    console.warn('⚠️ Supabase not configured, using demo mode');
     return {
       application: { status: 'pending', phone },
       profile: null,
@@ -66,62 +82,90 @@ const fetchVendorPortalData = async (phone) => {
     };
   }
 
-  const [application] = await fetchJson(
-    `${supabaseUrl}/rest/v1/vendor_applications?select=*&phone=eq.${encodeURIComponent(phone)}&order=created_at.desc&limit=1`
-  );
-
-  let profile = null;
-  let services = [];
-  let orders = [];
-
-  if (application?.status === 'approved') {
-    [profile] = await fetchJson(
-      `${supabaseUrl}/rest/v1/vendor_profiles?select=*&phone=eq.${encodeURIComponent(phone)}&limit=1`
+  try {
+    // Fetch vendor application
+    const applications = await fetchJson(
+      `${supabaseUrl}/rest/v1/vendor_applications?select=*&phone=eq.${encodeURIComponent(phone)}&order=created_at.desc&limit=1`
     );
+    
+    const application = applications && applications[0] ? applications[0] : null;
+    console.log('📋 Application:', application);
 
-    if (profile?.id) {
-      services = await fetchJson(
-        `${supabaseUrl}/rest/v1/vendor_services?select=*&vendor_id=eq.${profile.id}&order=created_at.desc`
+    let profile = null;
+    let services = [];
+    let orders = [];
+
+    if (application?.status === 'approved') {
+      // Fetch vendor profile
+      const profiles = await fetchJson(
+        `${supabaseUrl}/rest/v1/vendor_profiles?select=*&phone=eq.${encodeURIComponent(phone)}&limit=1`
       );
+      profile = profiles && profiles[0] ? profiles[0] : null;
+      console.log('👤 Profile:', profile);
+
+      if (profile?.id) {
+        // Fetch vendor services
+        services = await fetchJson(
+          `${supabaseUrl}/rest/v1/vendor_services?select=*&vendor_id=eq.${profile.id}&order=created_at.desc`
+        );
+        console.log('📦 Services:', services.length);
+      }
+
+      if (profile?.store_name) {
+        // Fetch orders
+        orders = await fetchJson(
+          `${supabaseUrl}/rest/v1/customer_orders?select=*&vendor_name=eq.${encodeURIComponent(profile.store_name)}&order=created_at.desc`
+        );
+        console.log('🛍 Orders:', orders.length);
+      }
     }
 
-    if (profile?.store_name) {
-      orders = await fetchJson(
-        `${supabaseUrl}/rest/v1/customer_orders?select=*&vendor_name=eq.${encodeURIComponent(profile.store_name)}&order=created_at.desc`
-      );
-    }
+    return { application, profile, services, orders };
+  } catch (error) {
+    console.error('❌ Error fetching vendor data:', error);
+    throw error;
   }
-
-  return { application, profile, services, orders };
 };
 
 const upsertVendorService = async (service) => {
-  const response = await fetch(
-    `${supabaseUrl}/rest/v1/vendor_services${service.id ? `?id=eq.${service.id}` : ''}`,
-    {
-      method: service.id ? 'PATCH' : 'POST',
-      headers: getHeaders({ Prefer: 'return=representation' }),
-      body: JSON.stringify(service.id ? service : [service]),
-    }
-  );
+  console.log('💾 Saving service:', service);
+  
+  const url = service.id 
+    ? `${supabaseUrl}/rest/v1/vendor_services?id=eq.${service.id}`
+    : `${supabaseUrl}/rest/v1/vendor_services`;
+  
+  const response = await fetch(url, {
+    method: service.id ? 'PATCH' : 'POST',
+    headers: getHeaders({ Prefer: 'return=representation' }),
+    body: JSON.stringify(service.id ? service : [service]),
+  });
 
   if (!response.ok) {
-    throw new Error(`Service save failed (${response.status})`);
+    const errorText = await response.text();
+    console.error('❌ Save error:', response.status, errorText);
+    throw new Error(`Service save failed (${response.status}): ${errorText}`);
   }
 
   const result = await response.json();
+  console.log('✅ Service saved:', result[0]);
   return service.id ? result[0] || service : result[0];
 };
 
 const removeVendorService = async (id) => {
+  console.log('🗑 Deleting service:', id);
+  
   const response = await fetch(`${supabaseUrl}/rest/v1/vendor_services?id=eq.${id}`, {
     method: 'DELETE',
     headers: getHeaders(),
   });
 
   if (!response.ok) {
-    throw new Error(`Service delete failed (${response.status})`);
+    const errorText = await response.text();
+    console.error('❌ Delete error:', response.status, errorText);
+    throw new Error(`Service delete failed (${response.status}): ${errorText}`);
   }
+  
+  console.log('✅ Service deleted');
 };
 
 // Modern UI Components
@@ -397,71 +441,167 @@ const ServiceModal = ({ service, isOpen, onClose, onSave, vendorId }) => {
   );
 };
 
-// Login Screen Component
-const LoginScreen = ({ phone, setPhone, onLogin, loading, error }) => (
-  <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white via-rose-50/30 to-slate-50 p-6" dir="rtl">
-    <div className="grid gap-8 lg:grid-cols-2">
-      {/* Left Side - Info */}
-      <Card className="relative overflow-hidden bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 p-8 text-white shadow-2xl">
-        <div className="relative z-10">
-          <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary-100">Tatx SA Vendor</p>
-          <h1 className="mt-4 text-5xl font-black leading-tight">بوابة البائع</h1>
-          <p className="mt-5 text-sm leading-8 text-white/80">
-            من هنا يراجع البائع حالة الطلب القادم من تطبيق Expo، وبعد الموافقة يدير خدماته وأسعاره وتوفره وطلباته من مكان واحد.
-          </p>
-          
-          <div className="mt-8 grid gap-4">
-            {[
-              ['إدارة الخدمات', 'إضافة وتعديل الخدمات والمنتجات'],
-              ['متابعة الطلبات', 'عرض الطلبات الواردة وتحديث حالتها'],
-              ['تحليل المبيعات', 'تقارير شاملة عن أداء متجرك'],
-            ].map(([title, desc]) => (
-              <div key={title} className="rounded-3xl bg-white/10 p-4 backdrop-blur-sm">
-                <h3 className="font-bold">{title}</h3>
-                <p className="mt-2 text-xs text-white/70">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Decorative circles */}
-        <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white/10" />
-        <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-white/10" />
-      </Card>
+// Login Screen Component with OTP
+const LoginScreen = ({ phone, setPhone, onLogin, loading, error, otpMode, setOtpMode, otpCode, setOtpCode, onVerifyOtp, verifyingOtp }) => {
+  const [localError, setLocalError] = useState('');
 
-      {/* Right Side - Login Form */}
-      <Card className="flex flex-col justify-center p-8">
-        <div>
-          <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary-100 text-primary-600">
-            <Store className="h-8 w-8" />
-          </div>
-          <h2 className="mt-6 text-3xl font-black text-slate-950">دخول البائع</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-500">أدخل رقم الجوال المستخدم في تسجيل الدخول</p>
-          
-          <div className="mt-8 space-y-4">
-            <Input 
-              label="رقم الجوال" 
-              placeholder="05xxxxxxxx" 
-              value={phone} 
-              onChange={(e) => setPhone(e.target.value)}
-              icon={Phone}
-            />
+  const handleSendOTP = async () => {
+    if (!phone.trim() || !/^05[0-9]{8}$/.test(phone)) {
+      setLocalError('أدخل رقم جوال سعودي صحيح (يبدأ بـ 05)');
+      return;
+    }
+    setLocalError('');
+    await onLogin();
+  };
+
+  const handleVerifyOTP = () => {
+    if (!otpCode || otpCode.length !== 4) {
+      setLocalError('أدخل رمز التحقق المكون من 4 أرقام');
+      return;
+    }
+    setLocalError('');
+    onVerifyOtp();
+  };
+
+  if (otpMode) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white via-rose-50/30 to-slate-50 p-6" dir="rtl">
+        <Card className="max-w-md w-full">
+          <div className="p-8">
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary-100 text-primary-600 mx-auto">
+              <CheckCircle2 className="h-8 w-8" />
+            </div>
+            <h2 className="mt-6 text-2xl font-black text-center text-slate-950">رمز التحقق</h2>
+            <p className="mt-3 text-sm text-center leading-7 text-slate-500">
+              أدخل رمز التحقق المرسل إلى {phone}
+            </p>
+            <p className="mt-2 text-xs text-center text-primary-600 font-bold">
+              رمز الاختبار: 1234
+            </p>
             
-            {error && (
-              <div className="rounded-2xl bg-error-50 px-4 py-3 text-sm text-error-700">
-                {error}
+            <div className="mt-8 space-y-4">
+              <div className="flex justify-center gap-3">
+                {[0, 1, 2, 3].map((index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    maxLength={1}
+                    value={otpCode[index] || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value && !/^\d$/.test(value)) return;
+                      const newCode = otpCode.split('');
+                      newCode[index] = value;
+                      setOtpCode(newCode.join(''));
+                      if (value && index < 3) {
+                        document.getElementById(`otp-${index + 1}`)?.focus();
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Backspace' && !otpCode[index] && index > 0) {
+                        document.getElementById(`otp-${index - 1}`)?.focus();
+                      }
+                    }}
+                    id={`otp-${index}`}
+                    className="input w-14 h-16 text-center text-2xl font-bold"
+                    autoFocus={index === 0}
+                  />
+                ))}
               </div>
-            )}
-            
-            <Button className="w-full" onClick={onLogin} disabled={loading || !phone.trim()} icon={Phone}>
-              {loading ? 'جارٍ التحقق...' : 'التحقق من الحساب'}
-            </Button>
+              
+              {localError && (
+                <div className="rounded-2xl bg-error-50 px-4 py-3 text-sm text-error-700 text-center">
+                  {localError}
+                </div>
+              )}
+              
+              <Button className="w-full" onClick={handleVerifyOTP} disabled={verifyingOtp}>
+                {verifyingOtp ? 'جارٍ التحقق...' : 'تأكيد'}
+              </Button>
+              
+              <Button variant="ghost" className="w-full" onClick={() => setOtpMode(false)}>
+                تغيير رقم الجوال
+              </Button>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white via-rose-50/30 to-slate-50 p-6" dir="rtl">
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Left Side - Info */}
+        <Card className="relative overflow-hidden bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 p-8 text-white shadow-2xl">
+          <div className="relative z-10">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary-100">Tatx SA Vendor</p>
+            <h1 className="mt-4 text-5xl font-black leading-tight">بوابة البائع</h1>
+            <p className="mt-5 text-sm leading-8 text-white/80">
+              من هنا يراجع البائع حالة الطلب القادم من تطبيق Expo، وبعد الموافقة يدير خدماته وأسعاره وتوفره وطلباته من مكان واحد.
+            </p>
+            
+            <div className="mt-8 grid gap-4">
+              {[
+                ['إدارة الخدمات', 'إضافة وتعديل الخدمات والمنتجات'],
+                ['متابعة الطلبات', 'عرض الطلبات الواردة وتحديث حالتها'],
+                ['تحليل المبيعات', 'تقارير شاملة عن أداء متجرك'],
+              ].map(([title, desc]) => (
+                <div key={title} className="rounded-3xl bg-white/10 p-4 backdrop-blur-sm">
+                  <h3 className="font-bold">{title}</h3>
+                  <p className="mt-2 text-xs text-white/70">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Decorative circles */}
+          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white/10" />
+          <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-white/10" />
+        </Card>
+
+        {/* Right Side - Login Form */}
+        <Card className="flex flex-col justify-center p-8">
+          <div>
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-primary-100 text-primary-600">
+              <Store className="h-8 w-8" />
+            </div>
+            <h2 className="mt-6 text-3xl font-black text-slate-950">دخول البائع</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-500">أدخل رقم الجوال المسجل في بوابة البائع</p>
+            
+            <div className="mt-8 space-y-4">
+              <Input 
+                label="رقم الجوال" 
+                placeholder="05xxxxxxxx" 
+                value={phone} 
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  setLocalError('');
+                }}
+                icon={Phone}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendOTP()}
+              />
+              
+              {error && (
+                <div className="rounded-2xl bg-error-50 px-4 py-3 text-sm text-error-700">
+                  {error}
+                </div>
+              )}
+              
+              <Button className="w-full" onClick={handleSendOTP} disabled={loading || !phone.trim()} icon={Phone}>
+                {loading ? 'جارٍ الإرسال...' : 'إرسال رمز التحقق'}
+              </Button>
+              
+              <div className="text-center text-xs text-slate-400 mt-4">
+                جرب: 0555000002 (حساب بائع معتمد)
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Main App Component
 const VendorPortal = () => {

@@ -5,12 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  
   body {
-    @apply bg-gradient-to-br from-white via-rose-50/30 to-slate-50;
     @apply font-sans;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
@@ -34,7 +29,7 @@
   }
   
   .card {
-    @apply rounded-3xl border border-white/70 bg-white/95 shadow-soft backdrop-blur-xl;
+    @apply rounded-3xl border border-white/70 bg-white/95 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.28)] backdrop-blur-xl;
   }
   
   .input {
