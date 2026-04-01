@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -122,7 +121,7 @@ export default function Home() {
                 </div>
                 
                 {/* Floating MD3 Chips */}
-                <div className="absolute -right-8 top-1/4 bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-2xl border border-white/20 flex items-center gap-4 animate-bounce duration-[3000ms]">
+                <div className="absolute -right-8 top-1/4 bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-2xl border border-white/20 flex items-center gap-4">
                   <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-green-600">
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
