@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -82,7 +81,7 @@ export function PortalSidebar({ role, title }: PortalSidebarProps) {
         <Link href="/" className="flex items-center gap-3 group mb-10">
           <div className="relative w-10 h-10 overflow-hidden rounded-xl bg-white border border-border flex items-center justify-center p-1 shadow-sm">
             <Image 
-              src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" 
+              src="https://images.sftcdn.net/images/t_app-icon-m/p/75df1bdf-499a-4260-9ba0-8aca15b79912/238198743/tatx-ttks-logo" 
               alt="Tatx Logo" 
               width={40} 
               height={40} 

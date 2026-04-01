@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone } from 'lucide-react';
 
 export function Footer() {
-  const brandLogo = "https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png";
+  const brandLogo = "https://images.sftcdn.net/images/t_app-icon-m/p/75df1bdf-499a-4260-9ba0-8aca15b79912/238198743/tatx-ttks-logo";
 
   return (
     <footer className="bg-white border-t border-[#D2D2D7]/30 pt-20 pb-12" dir="rtl">

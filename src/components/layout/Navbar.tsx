@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export function Navbar() {
-  const brandLogo = "https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png";
+  const brandLogo = "https://images.sftcdn.net/images/t_app-icon-m/p/75df1bdf-499a-4260-9ba0-8aca15b79912/238198743/tatx-ttks-logo";
   
   const navLinks = [
     { name: 'الرئيسية', href: '#hero' },

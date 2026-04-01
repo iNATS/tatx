@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -31,7 +30,7 @@ export default function Home() {
 
   const appStoreBadge = "https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg";
   const googlePlayBadge = "https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg";
-  const brandLogo = "https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png";
+  const brandLogo = "https://images.sftcdn.net/images/t_app-icon-m/p/75df1bdf-499a-4260-9ba0-8aca15b79912/238198743/tatx-ttks-logo";
   const appScreenshot = "https://images.sftcdn.net/images/t_app-cover-l,f_auto/p/75df1bdf-499a-4260-9ba0-8aca15b79912/2498934352/tatx-ttks-screenshot";
 
   return (
