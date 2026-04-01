@@ -21,7 +21,6 @@ export function Footer() {
                   width={32} 
                   height={32} 
                   className="object-contain"
-                  data-ai-hint="tatx logo"
                 />
               </div>
             </Link>
@@ -43,7 +42,7 @@ export function Footer() {
               <li><Link href="#" className="hover:text-primary transition-colors">المطاعم</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">التاكسي</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">السوبر ماركت</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">الشاليهات والقاعات</Link></li>
+              <li><Link href="#" className="hover:text-primary transition-colors">لعب أطفال وهدايا</Link></li>
             </ul>
           </div>
 

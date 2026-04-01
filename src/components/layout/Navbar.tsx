@@ -31,10 +31,9 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-2xl border-b border-[#D2D2D7]/30 h-20 md:h-24 transition-all">
+    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-2xl border-b border-[#D2D2D7]/30 h-20 md:h-24">
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         
-        {/* Left Side (Cart & User) */}
         <div className="flex items-center gap-3">
           <Link href="/profile">
             <Button variant="ghost" size="icon" className="rounded-full h-12 w-12 hover:bg-[#F5F5F7] shadow-none">
@@ -53,7 +52,6 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* Center Side (Location Picker) */}
         <div className="hidden md:flex flex-1 justify-center">
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
@@ -101,7 +99,6 @@ export function Navbar() {
           </Dialog>
         </div>
 
-        {/* Right Side (Brand) */}
         <Link href="/" className="flex items-center gap-3 group">
           <span className="text-2xl md:text-3xl font-black tracking-tight text-primary">
             Tatx
@@ -113,7 +110,6 @@ export function Navbar() {
               width={48} 
               height={48} 
               className="object-contain"
-              data-ai-hint="tatx logo"
             />
           </div>
         </Link>
