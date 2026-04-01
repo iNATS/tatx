@@ -6,6 +6,13 @@ const host = process.env.HOST || '0.0.0.0';
 const port = Number(process.env.PORT || 3000);
 const distDir = path.join(__dirname, process.env.DIST_DIR || 'dist');
 
+// Check if dist directory exists
+if (!fs.existsSync(distDir)) {
+  console.error(`Error: dist directory not found at ${distDir}`);
+  console.error('Please run "npm run build:web" first to build the web app.');
+  process.exit(1);
+}
+
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
@@ -78,4 +85,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(port, host, () => {
   console.log(`TATX web server listening on http://${host}:${port}`);
+  console.log(`Serving files from: ${distDir}`);
 });
