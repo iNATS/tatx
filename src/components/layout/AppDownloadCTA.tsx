@@ -23,22 +23,27 @@ export function AppDownloadCTA() {
               </p>
               
               <div className="flex flex-wrap gap-6 justify-end">
-                <Button className="h-[80px] px-10 rounded-3xl bg-[#1D1D1F] text-white hover:bg-[#1D1D1F]/90 font-black text-2xl gap-5 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] transition-all hover:scale-105 active:scale-95">
+                {/* App Store Button Official Style */}
+                <Button className="h-[80px] px-10 rounded-3xl bg-black text-white hover:bg-black/90 font-black gap-5 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] transition-all hover:scale-105 active:scale-95 border-none">
                   <Apple className="w-10 h-10" />
-                  <div className="text-right flex flex-col items-start leading-none">
-                    <span className="text-xs opacity-60 font-bold">Download on the</span>
+                  <div className="text-left flex flex-col items-start leading-none">
+                    <span className="text-[10px] opacity-70 font-bold uppercase tracking-wider">Download on the</span>
                     <span className="text-2xl font-black">App Store</span>
                   </div>
                 </Button>
                 
-                <Button className="h-[80px] px-10 rounded-3xl bg-white text-[#1D1D1F] border-2 border-[#D2D2D7] hover:bg-[#F5F5F7] font-black text-2xl gap-5 transition-all hover:scale-105 active:scale-95">
+                {/* Google Play Button Official Style */}
+                <Button className="h-[80px] px-10 rounded-3xl bg-black text-white hover:bg-black/90 font-black gap-5 transition-all hover:scale-105 active:scale-95 border-none shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)]">
                   <div className="w-10 h-10 flex items-center justify-center">
                     <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
-                      <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
+                      <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1z" fill="#ffb900"/>
+                      <path d="M47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0z" fill="#21a366"/>
+                      <path d="M425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8z" fill="#ed3b3b"/>
+                      <path d="M104.6 499l280.8-161.2-60.1-60.1L104.6 499z" fill="#107c10"/>
                     </svg>
                   </div>
-                  <div className="text-right flex flex-col items-start leading-none">
-                    <span className="text-xs opacity-60 font-bold">GET IT ON</span>
+                  <div className="text-left flex flex-col items-start leading-none">
+                    <span className="text-[10px] opacity-70 font-bold uppercase tracking-wider">GET IT ON</span>
                     <span className="text-2xl font-black">Google Play</span>
                   </div>
                 </Button>

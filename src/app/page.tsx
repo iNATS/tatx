@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -60,17 +61,29 @@ export default function Home() {
               </p>
               
               <div className="flex flex-wrap gap-6 justify-center pt-4">
-                <Button className="h-16 px-12 rounded-2xl bg-[#1D1D1F] text-white hover:bg-[#1D1D1F]/90 font-black text-xl gap-3 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.2)] transition-transform hover:scale-105 active:scale-95">
-                  <Apple className="w-7 h-7" />
-                  App Store
+                {/* Real App Store Button */}
+                <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
+                  <Apple className="w-9 h-9" />
+                  <div className="flex flex-col items-start leading-none text-left">
+                    <span className="text-[10px] opacity-80 font-bold uppercase tracking-wider">Download on the</span>
+                    <span className="text-2xl font-black">App Store</span>
+                  </div>
                 </Button>
-                <Button className="h-16 px-12 rounded-2xl bg-white text-[#1D1D1F] border-2 border-[#D2D2D7] hover:bg-[#F5F5F7] font-black text-xl gap-3 transition-transform hover:scale-105 active:scale-95">
-                  <div className="w-7 h-7 flex items-center justify-center">
+
+                {/* Real Google Play Button */}
+                <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
+                  <div className="w-9 h-9 flex items-center justify-center">
                     <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
-                      <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
+                      <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1z" fill="#ffb900"/>
+                      <path d="M47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0z" fill="#21a366"/>
+                      <path d="M425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8z" fill="#ed3b3b"/>
+                      <path d="M104.6 499l280.8-161.2-60.1-60.1L104.6 499z" fill="#107c10"/>
                     </svg>
                   </div>
-                  Google Play
+                  <div className="flex flex-col items-start leading-none text-left">
+                    <span className="text-[10px] opacity-80 font-bold uppercase tracking-wider">GET IT ON</span>
+                    <span className="text-2xl font-black">Google Play</span>
+                  </div>
                 </Button>
               </div>
             </div>
@@ -214,21 +227,27 @@ export default function Home() {
               انضم إلى ملايين المستخدمين الذين جعلوا Tatx جزءاً من روتينهم اليومي.
             </p>
             <div className="flex flex-wrap gap-8 justify-center pt-10">
-              <Button className="h-[90px] px-14 rounded-3xl bg-[#1D1D1F] text-white gap-5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] transition-all hover:scale-105 active:scale-95 border-none">
+              {/* App Store Button Final */}
+              <Button className="h-[90px] px-10 rounded-3xl bg-black text-white gap-5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] transition-all hover:scale-105 active:scale-95 border-none">
                 <Apple className="w-10 h-10" />
                 <div className="flex flex-col items-start leading-none text-left">
-                  <span className="text-xs opacity-60 font-bold">Download on the</span>
+                  <span className="text-xs opacity-70 font-bold uppercase tracking-widest">Download on the</span>
                   <span className="text-3xl font-black">App Store</span>
                 </div>
               </Button>
-              <Button className="h-[90px] px-14 rounded-3xl bg-white text-[#1D1D1F] gap-5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all hover:scale-105 active:scale-95 border-2 border-[#D2D2D7]">
+
+              {/* Google Play Button Final */}
+              <Button className="h-[90px] px-10 rounded-3xl bg-black text-white gap-5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] transition-all hover:scale-105 active:scale-95 border-none">
                 <div className="w-10 h-10 flex items-center justify-center">
                   <svg viewBox="0 0 512 512" fill="currentColor" className="w-full h-full">
-                    <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
+                    <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1z" fill="#ffb900"/>
+                    <path d="M47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0z" fill="#21a366"/>
+                    <path d="M425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8z" fill="#ed3b3b"/>
+                    <path d="M104.6 499l280.8-161.2-60.1-60.1L104.6 499z" fill="#107c10"/>
                   </svg>
                 </div>
                 <div className="flex flex-col items-start leading-none text-left">
-                  <span className="text-xs opacity-60 font-bold">GET IT ON</span>
+                  <span className="text-xs opacity-70 font-bold uppercase tracking-widest">GET IT ON</span>
                   <span className="text-3xl font-black">Google Play</span>
                 </div>
               </Button>
