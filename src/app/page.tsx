@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -56,7 +57,7 @@ export default function Home() {
                 كل ما تحتاجه من توصيل، تسوق، ومشاوير في واجهة واحدة أنيقة. صُمم ليواكب طموحاتك.
               </p>
               
-              <div className="flex flex-wrap gap-6 justify-center pt-4">
+              <div className="flex flex-wrap gap-4 justify-center pt-4">
                 <div className="relative h-[60px] w-[180px] cursor-pointer hover:scale-105 transition-transform">
                   <Image src={appStoreUrl} alt="App Store" fill className="object-contain" />
                 </div>
