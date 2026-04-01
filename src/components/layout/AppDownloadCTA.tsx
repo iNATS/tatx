@@ -1,9 +1,11 @@
 "use client";
 
-import { Apple, Play } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 export function AppDownloadCTA() {
+  const appStoreBadge = "https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg";
+  const googlePlayBadge = "https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg";
+
   return (
     <section className="bg-white py-32" dir="rtl">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -21,22 +23,12 @@ export function AppDownloadCTA() {
               </p>
               
               <div className="flex flex-wrap gap-6 justify-end pt-4">
-                <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
-                  <div className="flex flex-col items-end leading-none">
-                    <span className="text-[10px] font-bold opacity-60">Download on the</span>
-                    <span className="text-xl">App Store</span>
-                  </div>
-                  <Apple className="w-8 h-8" />
-                </Button>
-                <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
-                  <div className="flex flex-col items-end leading-none">
-                    <span className="text-[10px] font-bold opacity-60">GET IT ON</span>
-                    <span className="text-xl">Google Play</span>
-                  </div>
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <Play className="w-7 h-7 fill-white" />
-                  </div>
-                </Button>
+                <a href="#" className="transition-transform hover:scale-105 active:scale-95">
+                  <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={60} className="h-[60px] w-auto" />
+                </a>
+                <a href="#" className="transition-transform hover:scale-105 active:scale-95">
+                  <Image src={googlePlayBadge} alt="Get it on Google Play" width={200} height={60} className="h-[60px] w-auto" />
+                </a>
               </div>
             </div>
 
@@ -59,5 +51,3 @@ export function AppDownloadCTA() {
     </section>
   );
 }
-
-import Image from 'next/image';

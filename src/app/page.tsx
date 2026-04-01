@@ -12,8 +12,6 @@ import {
   Gift, 
   ArrowLeft,
   Zap,
-  Apple,
-  Play
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -29,6 +27,9 @@ export default function Home() {
     { name: 'صيدليات', icon: Pill, desc: 'احتياجاتك الصحية والطبية تصلك فوراً', color: 'text-pink-600', tint: 'bg-pink-50/50' },
     { name: 'لعب أطفال وهدايا', icon: Gift, desc: 'عالم من المرح والهدايا المميزة', color: 'text-amber-600', tint: 'bg-amber-50/50' },
   ];
+
+  const appStoreBadge = "https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg";
+  const googlePlayBadge = "https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg";
 
   return (
     <>
@@ -56,22 +57,12 @@ export default function Home() {
               </p>
               
               <div className="flex flex-wrap gap-4 justify-center pt-4">
-                <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
-                  <div className="flex flex-col items-end leading-none">
-                    <span className="text-[10px] font-bold opacity-60">Download on the</span>
-                    <span className="text-xl">App Store</span>
-                  </div>
-                  <Apple className="w-8 h-8" />
-                </Button>
-                <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
-                  <div className="flex flex-col items-end leading-none">
-                    <span className="text-[10px] font-bold opacity-60">GET IT ON</span>
-                    <span className="text-xl">Google Play</span>
-                  </div>
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <Play className="w-7 h-7 fill-white" />
-                  </div>
-                </Button>
+                <a href="#" className="transition-transform hover:scale-105 active:scale-95">
+                  <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={60} className="h-[60px] w-auto" />
+                </a>
+                <a href="#" className="transition-transform hover:scale-105 active:scale-95">
+                  <Image src={googlePlayBadge} alt="Get it on Google Play" width={200} height={60} className="h-[60px] w-auto" />
+                </a>
               </div>
             </div>
 
@@ -163,22 +154,12 @@ export default function Home() {
               انضم إلى ملايين المستخدمين الذين جعلوا Tatx جزءاً من روتينهم اليومي.
             </p>
             <div className="flex flex-wrap gap-8 justify-center pt-10">
-              <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
-                <div className="flex flex-col items-end leading-none">
-                  <span className="text-[10px] font-bold opacity-60">Download on the</span>
-                  <span className="text-xl">App Store</span>
-                </div>
-                <Apple className="w-8 h-8" />
-              </Button>
-              <Button className="h-[74px] px-8 rounded-2xl bg-black text-white hover:bg-black/90 font-black gap-4 shadow-xl transition-all hover:scale-105 active:scale-95 border-none">
-                <div className="flex flex-col items-end leading-none">
-                  <span className="text-[10px] font-bold opacity-60">GET IT ON</span>
-                  <span className="text-xl">Google Play</span>
-                </div>
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <Play className="w-7 h-7 fill-white" />
-                </div>
-              </Button>
+              <a href="#" className="transition-transform hover:scale-105 active:scale-95">
+                <Image src={appStoreBadge} alt="Download on the App Store" width={180} height={60} className="h-[60px] w-auto" />
+              </a>
+              <a href="#" className="transition-transform hover:scale-105 active:scale-95">
+                <Image src={googlePlayBadge} alt="Get it on Google Play" width={200} height={60} className="h-[60px] w-auto" />
+              </a>
             </div>
           </div>
         </section>
