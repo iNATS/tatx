@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -29,7 +28,7 @@ export default function LoginPage() {
         <CardHeader className="bg-primary p-10 text-white text-right">
           <div className="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl mr-0 ml-auto p-2">
             <Image 
-              src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
+              src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" 
               alt="Tatx Brand Logo" 
               width={40} 
               height={40} 

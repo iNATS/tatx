@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'app.tatx.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

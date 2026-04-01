@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -32,7 +31,7 @@ export default function SignupPage() {
             <div>
               <div className="relative w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl p-2">
                 <Image 
-                  src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
+                  src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" 
                   alt="Tatx Brand Logo" 
                   width={40} 
                   height={40} 

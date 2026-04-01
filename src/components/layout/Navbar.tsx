@@ -1,11 +1,9 @@
-
 "use client";
 
 import Link from 'next/link';
 import { ShoppingBag, User, MapPin, ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/store/use-cart';
-import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import Image from 'next/image';
 import {
@@ -110,7 +108,7 @@ export function Navbar() {
           </span>
           <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl bg-white shadow-sm border border-[#D2D2D7]/30 flex items-center justify-center p-1.5 transition-transform group-hover:scale-105">
             <Image 
-              src="https://picsum.photos/seed/tatx-brand-logo/200/200" 
+              src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" 
               alt="Tatx Brand Logo" 
               width={48} 
               height={48} 

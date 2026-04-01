@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -13,11 +12,16 @@ import {
   Gift, 
   Apple,
   Zap,
-  ArrowLeft
+  ArrowLeft,
+  Home as HomeIcon
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+/**
+ * @fileOverview الصفحة الرئيسية المعاد تصميمها لـ Tatx كصفحة هبوط (Landing Page) فاخرة.
+ * تتبع معايير Apple RTL HIG وتستخدم خط Cairo وتصميماً مشرقاً وقوياً.
+ */
 export default function Home() {
   const router = useRouter();
 
@@ -82,7 +86,7 @@ export default function Home() {
                   />
                   <div className="absolute top-10 right-10 bg-white/90 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-2xl border border-white/50 hidden md:flex items-center gap-5">
                      <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center p-2">
-                        <Image src="https://picsum.photos/seed/tatx-brand-logo/200/200" alt="Tatx Logo" width={48} height={48} className="object-contain" />
+                        <Image src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" alt="Tatx Logo" width={48} height={48} className="object-contain" />
                      </div>
                      <div className="text-right">
                         <span className="block font-black text-xl text-[#1D1D1F]">سرعة البرق</span>
@@ -201,7 +205,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-primary/5 -z-10" />
           <div className="container mx-auto px-4 max-w-5xl text-center space-y-16">
             <div className="w-24 h-24 bg-white rounded-[2rem] shadow-xl flex items-center justify-center mx-auto mb-10 border border-[#D2D2D7]/30 p-4">
-               <Image src="https://picsum.photos/seed/tatx-brand-logo/200/200" alt="Tatx Logo" width={64} height={64} className="object-contain" data-ai-hint="tatx logo" />
+               <Image src="https://app.tatx.com/assets/?unstable_path=.%2Fassets/logo.png" alt="Tatx Logo" width={64} height={64} className="object-contain" data-ai-hint="tatx logo" />
             </div>
             <h2 className="text-6xl md:text-[120px] font-black text-[#1D1D1F] tracking-tight leading-[1.1]">
               ابدأ رحلتك <br /><span className="text-primary italic">مع Tatx اليوم.</span>
