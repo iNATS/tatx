@@ -3,22 +3,14 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { 
-  Smartphone, 
   Store, 
   Utensils, 
   Car, 
-  Home as HomeIcon, 
-  PartyPopper, 
-  Wrench, 
-  ShieldCheck,
-  Clock,
-  MapPin,
-  ChevronLeft,
-  ArrowRight,
+  Sparkles, 
+  Pill, 
+  Gift, 
   Apple,
-  Star,
   Zap,
   ArrowLeft
 } from 'lucide-react';
@@ -34,11 +26,11 @@ export default function Home() {
 
   const services = [
     { name: 'سوبر ماركت', icon: Store, desc: 'تسوق يومي سريع بنقرة واحدة', color: 'text-blue-600', tint: 'bg-blue-50/50' },
+    { name: 'سوق الجميلة', icon: Sparkles, desc: 'أرقى الماركات العالمية للعناية والجمال', color: 'text-purple-600', tint: 'bg-purple-50/50' },
+    { name: 'مشاوير Tatx', icon: Car, desc: 'مشاوير آمنة مع كباتن محترفين', color: 'text-emerald-600', tint: 'bg-emerald-50/50' },
     { name: 'مطاعم Tatx', icon: Utensils, desc: 'وجباتك المفضلة تصلك ساخنة', color: 'text-orange-600', tint: 'bg-orange-50/50' },
-    { name: 'تاكسي Tatx', icon: Car, desc: 'مشاوير آمنة مع كباتن محترفين', color: 'text-emerald-600', tint: 'bg-emerald-50/50' },
-    { name: 'شاليهات', icon: HomeIcon, desc: 'استجمام وخصوصية تامة لعائلتك', color: 'text-purple-600', tint: 'bg-purple-50/50' },
-    { name: 'قاعات', icon: PartyPopper, desc: 'قاعات فخمة لمناسباتك السعيدة', color: 'text-pink-600', tint: 'bg-pink-50/50' },
-    { name: 'صيانة منزلية', icon: Wrench, desc: 'فنيون خبراء لخدمتك فوراً', color: 'text-amber-600', tint: 'bg-amber-50/50' },
+    { name: 'صيدليات', icon: Pill, desc: 'احتياجاتك الصحية والطبية تصلك فوراً', color: 'text-pink-600', tint: 'bg-pink-50/50' },
+    { name: 'لعب أطفال وهدايا', icon: Gift, desc: 'عالم من المرح والهدايا المميزة', color: 'text-amber-600', tint: 'bg-amber-50/50' },
   ];
 
   return (
@@ -48,12 +40,11 @@ export default function Home() {
         
         {/* --- SECTION 1: POWERFUL BRIGHT HERO (APPLE RTL HIG) --- */}
         <section className="relative pt-20 pb-20 md:pt-32 md:pb-40 overflow-hidden">
-          {/* Decorative Mesh Gradient (Ultra Light) */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-full bg-[radial-gradient(circle_at_top,_rgba(226,126,54,0.05)_0%,_rgba(255,255,255,0)_50%)] -z-10" />
           
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col items-center text-center space-y-10 mb-20">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary font-black text-sm animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary font-black text-sm">
                 <Zap className="w-4 h-4 fill-primary" />
                 <span>أذكى تطبيق للخدمات في المملكة</span>
               </div>
@@ -64,7 +55,7 @@ export default function Home() {
               </h1>
               
               <p className="text-xl md:text-2xl text-[#86868B] font-bold max-w-2xl leading-relaxed">
-                كل ما تحتاجه من توصيل، حجز، وخدمات في واجهة واحدة أنيقة. صُمم ليواكب طموحاتك.
+                كل ما تحتاجه من توصيل، تسوق، ومشاوير في واجهة واحدة أنيقة. صُمم ليواكب طموحاتك.
               </p>
               
               <div className="flex flex-wrap gap-6 justify-center pt-4">
@@ -92,8 +83,7 @@ export default function Home() {
                     fill 
                     className="object-cover"
                   />
-                  {/* Floating Action Badge (Static - No Animation) */}
-                  <div className="absolute top-10 right-10 bg-white/90 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-2xl border border-white/50 hidden md:flex items-center gap-5 transition-all hover:translate-y-[-5px]">
+                  <div className="absolute top-10 right-10 bg-white/90 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-2xl border border-white/50 hidden md:flex items-center gap-5">
                      <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-white">
                         <Zap className="w-8 h-8 fill-white" />
                      </div>
@@ -103,7 +93,6 @@ export default function Home() {
                      </div>
                   </div>
                </div>
-               {/* Impact Shadows */}
                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-4/5 h-20 bg-primary/10 blur-[100px] -z-0" />
             </div>
           </div>
@@ -139,7 +128,6 @@ export default function Home() {
                     <span>ابدأ الآن</span>
                     <ArrowLeft className="w-6 h-6" />
                   </div>
-                  {/* Decorative background shape */}
                   <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               ))}
@@ -176,7 +164,6 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
                 </div>
               </div>
-              {/* Background accent light */}
               <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-0" />
             </div>
           </div>
@@ -196,7 +183,7 @@ export default function Home() {
               {[
                 { title: 'سوبر ماركت ذكي', img: 'https://picsum.photos/seed/sc-1/800/1600' },
                 { title: 'تتبع لحظي للرحلات', img: 'https://picsum.photos/seed/sc-2/800/1600' },
-                { title: 'حجز شاليهات بلمسة', img: 'https://picsum.photos/seed/sc-3/800/1600' },
+                { title: 'عالم الجمال والماركات', img: 'https://picsum.photos/seed/sc-3/800/1600' },
                 { title: 'إدارة شاملة لطلباتك', img: 'https://picsum.photos/seed/sc-4/800/1600' }
               ].map((screen, idx) => (
                 <div key={idx} className="space-y-8 group cursor-pointer">

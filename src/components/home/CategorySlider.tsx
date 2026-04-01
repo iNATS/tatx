@@ -1,6 +1,6 @@
 "use client";
 
-import { Utensils, Car, Wrench, PartyPopper, Home, Store, Pill } from 'lucide-react';
+import { Utensils, Car, Store, Pill, Sparkles, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CATEGORIES, PROVIDERS } from '@/lib/data';
 import Link from 'next/link';
@@ -9,11 +9,10 @@ import { usePathname } from 'next/navigation';
 const iconMap: Record<string, any> = {
   Utensils,
   Car,
-  Wrench,
-  PartyPopper,
-  Home,
   Store,
   Pill,
+  Sparkles,
+  Gift,
 };
 
 export function CategorySlider() {
